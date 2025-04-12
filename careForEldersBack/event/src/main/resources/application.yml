@@ -1,0 +1,13 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: event
+  data:
+    uri: mongodb://mongodb:27017/event
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
