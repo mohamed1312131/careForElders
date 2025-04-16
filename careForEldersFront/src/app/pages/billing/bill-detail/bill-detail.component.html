@@ -1,0 +1,50 @@
+<!-- src/app/pages/billing/bill-detail/bill-detail.component.html -->
+<div class="bill-detail-container">
+    <div *ngIf="isLoading" class="loading">
+      Loading bill details...
+    </div>
+  
+    <div *ngIf="!isLoading && bill" class="bill-content">
+      <h2>Bill Details</h2>
+      
+      <div class="bill-info">
+        <div class="info-row">
+          <span class="label">Bill ID:</span>
+          <span class="value">{{ bill.id }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Amount:</span>
+          <span class="value">{{ bill.amount | currency }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status:</span>
+          <span class="value status-badge" [class.paid]="bill.status === 'PAID'"
+                                     [class.pending]="bill.status === 'PENDING'">
+            {{ bill.status }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Due Date:</span>
+          <span class="value">{{ bill.dueDate | date }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Type:</span>
+          <span class="value">{{ bill.type }}</span>
+        </div>
+        <div *ngIf="bill.description" class="info-row description">
+          <span class="label">Description:</span>
+          <span class="value">{{ bill.description }}</span>
+        </div>
+      </div>
+  
+      <div class="actions" *ngIf="bill.status === 'PENDING'">
+        <button class="pay-button" (click)="navigateToPayment()">
+          Pay Bill
+        </button>
+      </div>
+    </div>
+  
+    <div *ngIf="!isLoading && !bill" class="not-found">
+      Bill not found
+    </div>
+  </div>
