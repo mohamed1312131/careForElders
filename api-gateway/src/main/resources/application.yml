@@ -1,0 +1,86 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+        - id: medical-record-service
+          uri: lb://medical-record-service
+          predicates:
+            - Path=/api/medical-records/**
+          filters:
+            - StripPrefix=1
+        - id: appointmentAvailability
+          uri: lb://appointmentAvailability
+          predicates:
+            - Path=/api/appointmentAvailability/**
+          filters:
+            - StripPrefix=1
+        - id: blogForum
+          uri: lb://blogForum
+          predicates:
+            - Path=/api/blogForum/**
+          filters:
+            - StripPrefix=1
+        - id: chat
+          uri: lb://chat
+          predicates:
+            - Path=/api/chat/**
+          filters:
+            - StripPrefix=1
+        - id: event
+          uri: lb://event
+          predicates:
+            - Path=/api/event/**
+          filters:
+            - StripPrefix=1
+        - id: notification
+          uri: lb://notification
+          predicates:
+            - Path=/api/notification/**
+          filters:
+            - StripPrefix=1
+        - id: nutrition
+          uri: lb://nutrition
+          predicates:
+            - Path=/api/nutrition/**
+          filters:
+            - StripPrefix=1
+        - id: paramedicalCare
+          uri: lb://paramedicalCare
+          predicates:
+            - Path=/api/paramedicalCare/**
+          filters:
+            - StripPrefix=1
+        - id: patientBill
+          uri: lb://patientBill
+          predicates:
+            - Path=/api/patientBill/**
+          filters:
+            - StripPrefix=1
+        - id: planAndExercise
+          uri: lb://planAndExercise
+          predicates:
+            - Path=/api/planAndExercise/**
+          filters:
+            - StripPrefix=1
+        - id: subscription
+          uri: lb://subscription
+          predicates:
+            - Path=/api/subscription/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/

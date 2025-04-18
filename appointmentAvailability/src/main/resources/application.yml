@@ -1,0 +1,22 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: appointmentAvailability
+  data:
+    uri: mongodb://localhost:27017/appt
+
+# user this while running docker-composee
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://service-registry:8761/eureka/
+
+# use this while running with locally
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true

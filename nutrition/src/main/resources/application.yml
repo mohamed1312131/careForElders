@@ -1,0 +1,13 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: nutrition
+  data:
+    uri: mongodb://mongodb:27017/nutrition
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
