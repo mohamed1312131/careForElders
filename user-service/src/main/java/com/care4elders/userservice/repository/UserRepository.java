@@ -1,7 +1,8 @@
-package com.care4elders.userservice;
+package com.care4elders.userservice.repository;
 
 import com.care4elders.userservice.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
 import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User, String> {
