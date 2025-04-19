@@ -2,19 +2,21 @@ package com.care4elders.userservice.controller;
 
 import com.care4elders.userservice.Config.JwtUtil;
 import com.care4elders.userservice.dto.AuthRequest;
+import com.care4elders.userservice.dto.PasswordResetRequest;
+import com.care4elders.userservice.dto.ResetPasswordRequest;
+import com.care4elders.userservice.Service.EmailVerificationService;
+import com.care4elders.userservice.Service.PasswordResetService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -25,6 +27,13 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private EmailVerificationService emailVerificationService;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
+
+    // 🔐 LOGIN
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
@@ -37,9 +46,9 @@ public class AuthController {
                     )
             );
 
+            String token = jwtUtil.generateToken(request.getEmail());
             System.out.println("✅ Authentication successful for " + request.getEmail());
 
-            String token = jwtUtil.generateToken(request.getEmail());
             return ResponseEntity.ok(Collections.singletonMap("token", token));
 
         } catch (AuthenticationException ex) {
@@ -48,4 +57,37 @@ public class AuthController {
         }
     }
 
+    // ✅ EMAIL VERIFICATION
+    @GetMapping("/verify")
+    public ResponseEntity<?> verifyUserEmail(@RequestParam String token) {
+        boolean success = emailVerificationService.verifyToken(token);
+        if (success) {
+            return ResponseEntity.ok("✅ Email verified! You can now login.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("❌ Invalid or expired verification token.");
+        }
+    }
+
+    // 📩 REQUEST PASSWORD RESET
+    @PostMapping("/request-reset")
+    public ResponseEntity<?> requestReset(@RequestBody PasswordResetRequest request) {
+        boolean success = passwordResetService.sendResetLink(request.getEmail());
+        if (success) {
+            return ResponseEntity.ok("📧 Reset link sent to your email.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Email not found.");
+        }
+    }
+
+    // 🔁 PERFORM PASSWORD RESET
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        boolean success = passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+        if (success) {
+            return ResponseEntity.ok("✅ Password has been reset.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("❌ Invalid or expired reset token.");
+        }
+    }
 }

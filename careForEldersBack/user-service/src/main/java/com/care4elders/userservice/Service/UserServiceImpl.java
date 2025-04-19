@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +18,11 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
 
     @Autowired private UserRepository userRepository;
     @Autowired private BCryptPasswordEncoder passwordEncoder;
+    @Autowired private final EmailService emailService;
+
+    public UserServiceImpl(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     private UserResponse mapToResponse(User user) {
         return new UserResponse(
@@ -31,6 +37,11 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
 
     @Override
     public UserResponse createUser(UserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already in use");
+        }
+
+        // Create user object but DO NOT SAVE YET
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -38,8 +49,33 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
         user.setPhoneNumber(request.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
-        return mapToResponse(userRepository.save(user));
+        user.setEnabled(false); // not enabled until verified
+
+        // Generate token and send verification email
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+
+        // Save user to DB
+        userRepository.save(user);
+
+        emailService.sendEmail(
+                user.getEmail(),
+                "Verify your account",
+                "Click this link to verify your email: http://localhost:8081/auth/verify?token=" + token
+        );
+
+
+
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getRole()
+        );
     }
+
 
     @Override
     public UserResponse updateUser(String id, UserRequest request) {
@@ -72,5 +108,11 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
     @Override
     public void deleteUser(String id) {
         userRepository.deleteById(id);
+    }
+
+
+    public User getUserEntityByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

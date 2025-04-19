@@ -2,12 +2,13 @@ package com.care4elders.userservice.controller;
 
 import com.care4elders.userservice.dto.UserRequest;
 import com.care4elders.userservice.dto.UserResponse;
+import com.care4elders.userservice.entity.User;
 import com.care4elders.userservice.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.care4elders.userservice.Service.EmailVerificationService;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +18,16 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private EmailVerificationService emailVerificationService;
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.createUser(request));
+        UserResponse createdUser = userService.createUser(request);
+        User userEntity = userService.getUserEntityByEmail(createdUser.getEmail());
+        emailVerificationService.sendVerificationEmail(userEntity); // Send email
+        return ResponseEntity.ok(createdUser);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
@@ -45,4 +51,5 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
 }
