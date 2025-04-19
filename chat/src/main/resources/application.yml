@@ -1,0 +1,13 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: chat
+  data:
+    uri: mongodb://mongodb:27017/chat
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/

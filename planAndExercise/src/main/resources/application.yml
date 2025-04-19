@@ -1,0 +1,13 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: planAndExercise
+  data:
+    uri: mongodb://mongodb:27017/planAndExercise
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
