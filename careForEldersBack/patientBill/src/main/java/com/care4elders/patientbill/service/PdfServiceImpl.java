@@ -1,20 +1,22 @@
-// src/main/java/com/care4elders/patientbill/service/PdfServiceImpl.java
 package com.care4elders.patientbill.service;
 
 import com.care4elders.patientbill.model.Bill;
 import com.care4elders.patientbill.model.ServiceItem;
-
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.FontFactory;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Cell;
+
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.HorizontalAlignment;
 
 @Service
 public class PdfServiceImpl implements PdfService {
@@ -26,72 +28,86 @@ public class PdfServiceImpl implements PdfService {
     }
 
     @Override
-    public ByteArrayInputStream generateInvoicePdf(Long billId) throws Exception {
+    public ByteArrayInputStream generateInvoicePdf(String billId) throws Exception {
         Bill bill = billService.getBillById(billId);
-        
-        Document document = new Document();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         
         try {
-            PdfWriter.getInstance(document, out);
-            document.open();
+            PdfWriter writer = new PdfWriter(out);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+            
+            // Font setup
+            PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
+            PdfFont normalFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             
             // Add title
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
-            Paragraph title = new Paragraph("Patient Bill Invoice", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            title.setSpacingAfter(20f);
+            Paragraph title = new Paragraph("Patient Bill Invoice")
+                .setFont(boldFont)
+                .setFontSize(18)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginBottom(20);
             document.add(title);
             
             // Add invoice details
-            Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
-            Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
-            
-            document.add(new Paragraph("Invoice Number: " + bill.getId(), headerFont));
-            document.add(new Paragraph("Patient Name: " + bill.getPatientName(), normalFont));
-            document.add(new Paragraph("Patient ID: " + bill.getPatientId(), normalFont));
-            document.add(new Paragraph("Bill Date: " + bill.getBillDate(), normalFont));
-            document.add(new Paragraph("Due Date: " + bill.getDueDate(), normalFont));
-            document.add(new Paragraph("Status: " + bill.getStatus(), normalFont));
-            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("Invoice Number: " + bill.getId())
+                .setFont(boldFont)
+                .setFontSize(12));
+            document.add(new Paragraph("Patient Name: " + bill.getPatientName())
+                .setFont(normalFont)
+                .setFontSize(12));
+            document.add(new Paragraph("Patient ID: " + bill.getPatientId())
+                .setFont(normalFont)
+                .setFontSize(12));
+            document.add(new Paragraph("Bill Date: " + bill.getBillDate())
+                .setFont(normalFont)
+                .setFontSize(12));
+            document.add(new Paragraph("Due Date: " + bill.getDueDate())
+                .setFont(normalFont)
+                .setFontSize(12));
+            document.add(new Paragraph("Status: " + bill.getStatus())
+                .setFont(normalFont)
+                .setFontSize(12));
+            document.add(new Paragraph("\n"));
             
             // Add services table
-            PdfPTable table = new PdfPTable(4);
-            table.setWidthPercentage(100);
-            table.setSpacingBefore(10f);
-            table.setSpacingAfter(10f);
+            float[] columnWidths = {2, 3, 1, 1};
+            Table table = new Table(columnWidths);
+            table.setHorizontalAlignment(HorizontalAlignment.CENTER);
+            table.setMarginTop(10);
+            table.setMarginBottom(10);
             
             // Table headers
-            table.addCell(new Phrase("Service", headerFont));
-            table.addCell(new Phrase("Description", headerFont));
-            table.addCell(new Phrase("Rate", headerFont));
-            table.addCell(new Phrase("Quantity", headerFont));
+            table.addHeaderCell(new Cell().add(new Paragraph("Service").setFont(boldFont)));
+            table.addHeaderCell(new Cell().add(new Paragraph("Description").setFont(boldFont)));
+            table.addHeaderCell(new Cell().add(new Paragraph("Rate").setFont(boldFont)));
+            table.addHeaderCell(new Cell().add(new Paragraph("Quantity").setFont(boldFont)));
             
             // Table rows
             for (ServiceItem service : bill.getServices()) {
-                table.addCell(new Phrase(service.getServiceName(), normalFont));
-                table.addCell(new Phrase(service.getDescription(), normalFont));
-                table.addCell(new Phrase(String.format("$%.2f", service.getRate()), normalFont));
-                table.addCell(new Phrase(String.valueOf(service.getQuantity()), normalFont));
+                table.addCell(new Cell().add(new Paragraph(service.getServiceName()).setFont(normalFont)));
+                table.addCell(new Cell().add(new Paragraph(service.getDescription()).setFont(normalFont)));
+                table.addCell(new Cell().add(new Paragraph(String.format("$%.2f", service.getRate())).setFont(normalFont)));
+                table.addCell(new Cell().add(new Paragraph(String.valueOf(service.getQuantity())).setFont(normalFont)));
             }
             
             document.add(table);
             
             // Add total amount
             Paragraph total = new Paragraph(
-                String.format("Total Amount: $%.2f", bill.getTotalAmount()), 
-                headerFont);
-            total.setAlignment(Element.ALIGN_RIGHT);
+                String.format("Total Amount: $%.2f", bill.getTotalAmount()))
+                .setFont(boldFont)
+                .setTextAlignment(TextAlignment.RIGHT);
             document.add(total);
             
             // Add notes if available
             if (bill.getNotes() != null && !bill.getNotes().isEmpty()) {
-                document.add(Chunk.NEWLINE);
-                document.add(new Paragraph("Notes: " + bill.getNotes(), normalFont));
+                document.add(new Paragraph("\n"));
+                document.add(new Paragraph("Notes: " + bill.getNotes()).setFont(normalFont));
             }
             
             document.close();
-        } catch (DocumentException e) {
+        } catch (Exception e) {
             throw new Exception("Error generating PDF", e);
         }
         

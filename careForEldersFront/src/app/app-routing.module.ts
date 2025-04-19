@@ -2,11 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
-import { BillPaymentComponent } from './pages/billing/bill-payment/bill-payment.component';
-import { BillDetailComponent } from './pages/billing/bill-detail/bill-detail.component';
-import { BillListComponent } from './pages/billing/bill-list/bill-list.component';
-import { BillCreateComponent } from './pages/billing/bill-create/bill-create.component';
-import { InvoiceComponent } from './pages/billing/invoice/invoice.component';
+
 
 const routes: Routes = [
   // Public routes
@@ -19,11 +15,7 @@ const routes: Routes = [
   {
     path: 'billing',
     children: [
-      { path: 'create', component: BillCreateComponent },
-      { path: 'bills', component: BillListComponent },
-      { path: ':id', component: BillDetailComponent },
-      { path: ':id/pay', component: BillPaymentComponent },
-     { path: 'billing/invoice/:id',component: InvoiceComponent} 
+  
     ]
   },
  

@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface BillService {
     List<Bill> getAllBills();
-    Bill getBillById(Long id);
+    Bill getBillById(String id);
     Bill createBill(Bill bill);
-    Bill updateBill(Long id, Bill bill);
-    void deleteBill(Long id);
+    Bill updateBill(String id, Bill bill);
+    void deleteBill(String id);
 }

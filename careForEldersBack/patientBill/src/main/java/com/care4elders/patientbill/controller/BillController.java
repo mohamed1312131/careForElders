@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bills")
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
 public class BillController {
     
     private final BillService billService;
@@ -35,8 +35,9 @@ public class BillController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Bill> getBillById(@PathVariable Long id) {
-        Bill bill = billService.getBillById(id);
-        return new ResponseEntity<>(bill, HttpStatus.OK);
+       // Bill bill = billService.getBillById(id);
+        return null;
+        //new ResponseEntity<>(bill, HttpStatus.OK);
     }
 
     @PostMapping
@@ -46,19 +47,19 @@ public class BillController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Bill> updateBill(@PathVariable Long id, @RequestBody Bill bill) {
+    public ResponseEntity<Bill> updateBill(@PathVariable String id, @RequestBody Bill bill) {
         Bill updatedBill = billService.updateBill(id, bill);
         return new ResponseEntity<>(updatedBill, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBill(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBill(@PathVariable String id) {
         billService.deleteBill(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<InputStreamResource> generatePdf(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> generatePdf(@PathVariable String id) {
         try {
             ByteArrayInputStream bis = pdfService.generateInvoicePdf(id);
             

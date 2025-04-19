@@ -22,7 +22,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill getBillById(Long id) {
+    public Bill getBillById(String id) {
         return billRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bill not found with id: " + id));
     }
@@ -33,7 +33,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Bill updateBill(Long id, Bill bill) {
+    public Bill updateBill(String id, Bill bill) {
         Bill existingBill = getBillById(id);
         // Update fields from bill to existingBill
         // ...
@@ -41,7 +41,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public void deleteBill(Long id) {
+    public void deleteBill(String id) {
         billRepository.deleteById(id);
     }
 }
