@@ -1,0 +1,16 @@
+com\care4elders\userservice\controller\UserController.class
+com\care4elders\userservice\security\JwtAuthFilter.class
+com\care4elders\userservice\Service\UserService.class
+com\care4elders\userservice\repository\UserRepository.class
+com\care4elders\userservice\dto\AuthRequest.class
+com\care4elders\userservice\entity\User.class
+com\care4elders\userservice\Config\SecurityConfig.class
+com\care4elders\userservice\security\CustomUserDetailsService.class
+com\care4elders\userservice\entity\Role.class
+com\care4elders\userservice\Service\UserServiceImpl.class
+com\care4elders\userservice\UserServiceApplication.class
+com\care4elders\userservice\dto\UserResponse.class
+com\care4elders\userservice\Service\DataSeeder.class
+com\care4elders\userservice\Config\JwtUtil.class
+com\care4elders\userservice\controller\AuthController.class
+com\care4elders\userservice\dto\UserRequest.class
