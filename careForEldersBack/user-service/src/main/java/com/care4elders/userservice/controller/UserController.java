@@ -1,9 +1,8 @@
 package com.care4elders.userservice.controller;
 
-import com.care4elders.userservice.dto.UserRequest;
-import com.care4elders.userservice.dto.UserResponse;
-import com.care4elders.userservice.service.UserService;
-import jakarta.validation.Valid;
+import com.care4elders.userservice.UserService;
+import com.care4elders.userservice.entity.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,30 +18,30 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.createUser(request));
+    public User createUser(@RequestBody User user) {
+        return userService.createUser(user);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable String id) {
-        return Optional.ofNullable(userService.getUserById(id))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<User> getUserById(@PathVariable String id) {
+        Optional<User> userOptional = userService.getUserById(id);
+        return userOptional
+                .map(user -> ResponseEntity.ok(user)) // If found, return 200 OK with user body
+                .orElseGet(() -> ResponseEntity.notFound().build()); // If not found, return 404 Not Found
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String id, @Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+    public User updateUser(@PathVariable String id, @RequestBody User user) {
+        return userService.updateUser(id, user);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public void deleteUser(@PathVariable String id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
     }
 }
