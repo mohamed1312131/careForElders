@@ -22,6 +22,4 @@ public class User {
     public String phoneNumber;
     private Role role;
 
-    public User(Object o, String admin, String smith, String mail, String admin1, Object o1, String s, Role role) {
-    }
 }
