@@ -1,5 +1,6 @@
 package com.care4elders.patientbill.service;
 
+import com.care4elders.patientbill.exception.BillNotFoundException;
 import com.care4elders.patientbill.model.Bill;
 import com.care4elders.patientbill.model.ServiceItem;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Cell;
-
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -28,7 +28,7 @@ public class PdfServiceImpl implements PdfService {
     }
 
     @Override
-    public ByteArrayInputStream generateInvoicePdf(String billId) throws Exception {
+    public ByteArrayInputStream generateInvoicePdf(Long billId) throws BillNotFoundException {
         Bill bill = billService.getBillById(billId);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         
@@ -108,7 +108,7 @@ public class PdfServiceImpl implements PdfService {
             
             document.close();
         } catch (Exception e) {
-            throw new Exception("Error generating PDF", e);
+            throw new BillNotFoundException("Error generating PDF for bill ID: " + billId);
         }
         
         return new ByteArrayInputStream(out.toByteArray());

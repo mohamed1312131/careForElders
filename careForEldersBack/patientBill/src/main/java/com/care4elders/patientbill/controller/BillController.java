@@ -4,6 +4,7 @@ package com.care4elders.patientbill.controller;
 import com.care4elders.patientbill.model.Bill;
 import com.care4elders.patientbill.service.BillService;
 import com.care4elders.patientbill.service.PdfService;
+import com.care4elders.patientbill.exception.BillNotFoundException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bills")
-//@CrossOrigin(origins = "http://localhost:4200")
 public class BillController {
     
     private final BillService billService;
@@ -30,36 +30,47 @@ public class BillController {
     @GetMapping
     public ResponseEntity<List<Bill>> getAllBills() {
         List<Bill> bills = billService.getAllBills();
-        return new ResponseEntity<>(bills, HttpStatus.OK);
+        return ResponseEntity.ok(bills);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Bill> getBillById(@PathVariable Long id) {
-       // Bill bill = billService.getBillById(id);
-        return null;
-        //new ResponseEntity<>(bill, HttpStatus.OK);
+        try {
+            Bill bill = billService.getBillById(id);
+            return ResponseEntity.ok(bill);
+        } catch (BillNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
     public ResponseEntity<Bill> createBill(@RequestBody Bill bill) {
         Bill createdBill = billService.createBill(bill);
-        return new ResponseEntity<>(createdBill, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBill);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Bill> updateBill(@PathVariable String id, @RequestBody Bill bill) {
-        Bill updatedBill = billService.updateBill(id, bill);
-        return new ResponseEntity<>(updatedBill, HttpStatus.OK);
+    public ResponseEntity<Bill> updateBill(@PathVariable Long id, @RequestBody Bill bill) {
+        try {
+            Bill updatedBill = billService.updateBill(id, bill);
+            return ResponseEntity.ok(updatedBill);
+        } catch (BillNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBill(@PathVariable String id) {
-        billService.deleteBill(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> deleteBill(@PathVariable Long id) {
+        try {
+            billService.deleteBill(id);
+            return ResponseEntity.noContent().build();
+        } catch (BillNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}/pdf")
-    public ResponseEntity<InputStreamResource> generatePdf(@PathVariable String id) {
+    public ResponseEntity<InputStreamResource> generatePdf(@PathVariable Long id) {
         try {
             ByteArrayInputStream bis = pdfService.generateInvoicePdf(id);
             
@@ -71,8 +82,10 @@ public class BillController {
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(new InputStreamResource(bis));
+        } catch (BillNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

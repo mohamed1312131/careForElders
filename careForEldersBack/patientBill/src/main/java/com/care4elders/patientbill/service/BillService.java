@@ -2,12 +2,17 @@
 package com.care4elders.patientbill.service;
 
 import com.care4elders.patientbill.model.Bill;
+import com.care4elders.patientbill.model.BillStatus;
 import java.util.List;
 
 public interface BillService {
     List<Bill> getAllBills();
-    Bill getBillById(String id);
+    Bill getBillById(Long id);
     Bill createBill(Bill bill);
-    Bill updateBill(String id, Bill bill);
-    void deleteBill(String id);
+    Bill updateBill(Long id, Bill bill);
+    void deleteBill(Long id);
+    
+    // Optional query methods
+    List<Bill> getBillsByPatientId(Long patientId);
+    List<Bill> getBillsByStatus(BillStatus status);
 }
