@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: user-service
+  data:
+    mongodb:
+
+      # use this while running using docker compose
+      #uri: mongodb://mongodb:27017/userdb
+      # use this while running locally
+      uri: mongodb://localhost:27017/userdb
+
+server:
+  port: 8081
+
+
+# user this while running docker-composee
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://service-registry:8761/eureka/
+
+# use this while running with locally
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+

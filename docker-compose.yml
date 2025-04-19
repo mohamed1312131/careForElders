@@ -1,0 +1,208 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+    restart: always
+
+  appointment-availability:
+    build: ./appointmentAvailability
+    container_name: appointment-availability
+    ports:
+      - "8083:8083"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  blog-forum:
+    build: ./blogForum
+    container_name: blog-forum
+    ports:
+      - "8084:8084"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  chat:
+    build: ./chat
+    container_name: chat
+    ports:
+      - "8090:8090"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+    restart: always
+
+  event:
+    build: ./event
+    container_name: event
+    ports:
+      - "8089:8089"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  medical-record:
+    build: ./medicalRecord
+    container_name: medical-record
+    ports:
+      - "8082:8082"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - microservices-network
+    restart: always
+
+  notification:
+    build: ./notification
+    container_name: notification
+    ports:
+      - "8088:8088"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  nutrition:
+    build: ./nutrition
+    container_name: nutrition
+    ports:
+      - "8087:8087"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  paramedical-care:
+    build: ./paramedicalCare
+    container_name: paramedical-care
+    ports:
+      - "8086:8086"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  patient-bill:
+    build: ./patientBill
+    container_name: patient-bill
+    ports:
+      - "8085:8085"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  plan-and-exercise:
+    build: ./planAndExercise
+    container_name: plan-and-exercise
+    ports:
+      - "8091:8091"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  service-registry:
+    build: ./service-registry
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-network
+    restart: always
+
+  subscription:
+    build: ./subscription
+    container_name: subscription
+    ports:
+      - "8092:8092"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-network
+    depends_on:
+      - service-registry
+      - config-server
+      - mongodb
+    restart: always
+
+volumes:
+  mongodb_data:
+
+networks:
+  microservices-network:
+    driver: bridge
