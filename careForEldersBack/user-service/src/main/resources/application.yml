@@ -1,30 +1,37 @@
 spring:
   application:
     name: user-service
+
   data:
     mongodb:
+      # Use this while running with Docker Compose
+      # uri: mongodb://mongodb:27017/userdb
 
-      # use this while running using docker compose
-      #uri: mongodb://mongodb:27017/userdb
-      # use this while running locally
+      # Use this while running locally
       uri: mongodb://localhost:27017/userdb
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: aziz88303@gmail.com      # 🔐 use your real email
+    password: raau fypw kwoq erca    # 🔐 use an App Password (not Gmail password)
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # Optional (best practice): externalize secret
+  jwt:
+    secret: ${JWT_SECRET:mysecretkeymysecretkeymysecretkey!}
 
 server:
   port: 8081
 
-
-# user this while running docker-composee
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://service-registry:8761/eureka/
-
-# use this while running with locally
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
-
-

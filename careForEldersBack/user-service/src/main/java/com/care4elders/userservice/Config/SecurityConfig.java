@@ -36,7 +36,7 @@ public class SecurityConfig {
         public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
             http.csrf().disable()
                     .authorizeHttpRequests()
-                    .requestMatchers(HttpMethod.POST, "/users").permitAll() // Allow user creation without auth
+                    .requestMatchers(HttpMethod.POST, "/users").permitAll()
                     .requestMatchers("/auth/**").permitAll()
                     .anyRequest().authenticated() // Secure all other endpoints
                     .and()
