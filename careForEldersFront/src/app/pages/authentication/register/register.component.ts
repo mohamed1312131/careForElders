@@ -1,26 +1,48 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
 })
-export class AppSideRegisterComponent {
-  constructor(private router: Router) {}
+export class RegisterComponent {
+  registerForm: FormGroup;
+  successMessage: string = '';
+  errorMessage: string = '';
 
-  form = new FormGroup({
-    uname: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    email: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
-  });
+  constructor(private fb: FormBuilder, private authService: AuthService) {
+    this.registerForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phoneNumber: ['', Validators.required],
+      password: ['', Validators.required],
+      confirmPassword: ['', Validators.required],
+      role: ['USER', Validators.required],
+    },
+      {
+        validators: this.passwordsMatchValidator
+      });
+  }
+  passwordsMatchValidator(formGroup: FormGroup) {
+    const password = formGroup.get('password')?.value;
+    const confirmPassword = formGroup.get('confirmPassword')?.value;
 
-  get f() {
-    return this.form.controls;
+    return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  submit() {
-    // console.log(this.form.value);
-    this.router.navigate(['/dashboard']);
+  onSubmit(): void {
+    if (this.registerForm.valid) {
+      this.authService.register(this.registerForm.value).subscribe({
+        next: () => {
+          this.successMessage = '✅ Registration successful. Please check your email to verify your account.';
+          this.registerForm.reset();
+        },
+        error: err => {
+          this.errorMessage = '❌ Registration failed: ' + (err.error.message || err.message);
+        }
+      });
+    }
   }
 }
