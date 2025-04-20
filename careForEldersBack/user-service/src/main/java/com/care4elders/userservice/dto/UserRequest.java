@@ -22,7 +22,7 @@ public class UserRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Phone number format: 123-456-7890")
+    @Size(min=8 ,max=8 , message = "Phone number Must Be 8 characters")
     private String phoneNumber;
 
     private Role role;

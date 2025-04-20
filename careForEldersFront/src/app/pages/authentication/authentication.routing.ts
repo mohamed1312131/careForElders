@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { AppSideLoginComponent } from './login/login.component';
-import { AppSideRegisterComponent } from './register/register.component';
+import { RegisterComponent } from './register/register.component'; // ✅ corrected
 
 export const AuthenticationRoutes: Routes = [
   {
@@ -13,7 +13,7 @@ export const AuthenticationRoutes: Routes = [
       },
       {
         path: 'register',
-        component: AppSideRegisterComponent,
+        component: RegisterComponent, // ✅ corrected
       },
     ],
   },
