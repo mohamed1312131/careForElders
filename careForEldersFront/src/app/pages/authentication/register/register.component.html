@@ -85,6 +85,19 @@
             <mat-error *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched">
               Passwords do not match
             </mat-error>
+            <!-- Birth Date -->
+            <mat-label class="m-b-12 d-block">Birth Date</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary">
+              <input matInput [matDatepicker]="picker" formControlName="birthDate" required />
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Profile Image -->
+            <input type="file" (change)="onFileSelected($event)">
+            <img *ngIf="photoUrl" [src]="photoUrl" alt="Uploaded Photo" style="max-width: 200px;">
+
+
 
 
             <!-- Role -->
@@ -98,11 +111,41 @@
             </mat-form-field>
 
             <!-- Submit Button -->
-            <button mat-flat-button color="primary" class="w-100 m-t-24" [disabled]="registerForm.invalid">
-              Register
+            <button mat-flat-button color="primary" class="w-100 m-t-24" [disabled]="registerForm.invalid || loading">
+              <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+              <span *ngIf="!loading">Register</span>
             </button>
-          </form>
 
+          </form>
+          <div *ngIf="showVerification" class="m-t-24">
+            <h3 class="text-center">Confirm your email address</h3>
+            <p class="text-center">We have sent a code to <strong>{{ registerForm.value.email }}</strong></p>
+
+            <form [formGroup]="tokenForm" (ngSubmit)="verifyToken()">
+              <mat-form-field appearance="outline" class="w-100" color="primary">
+                <input matInput placeholder="Enter token" formControlName="token" required />
+              </mat-form-field>
+
+              <button mat-flat-button color="primary" class="w-100 m-t-16" [disabled]="tokenForm.invalid || verifying">
+                <mat-spinner *ngIf="verifying" diameter="20"></mat-spinner>
+                <span *ngIf="!verifying && !verified">Continue</span>
+                <span *ngIf="verified">✅ Verified</span>
+              </button>
+            </form>
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="text-danger text-center m-t-12">
+              {{ errorMessage }}
+            </div>
+
+            <!-- Success Message -->
+            <div *ngIf="verified" class="text-success text-center m-t-12">
+              ✅ Email verified! Redirecting to login...
+            </div>
+
+            <div class="text-center m-t-12">
+              <a class="text-primary" (click)="onSubmit()">Resend Code</a>
+            </div>
+          </div>
           <!-- Link to Login -->
           <div class="text-center m-t-24">
             <span class="f-w-500">Already have an account?</span>

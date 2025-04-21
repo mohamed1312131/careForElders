@@ -1,4 +1,4 @@
-package com.care4elders.userservice.config;
+package com.care4elders.userservice.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Autorise toutes les routes
+                registry.addMapping("/**")
                         .allowedOrigins("http://localhost:4200") // Frontend Angular
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

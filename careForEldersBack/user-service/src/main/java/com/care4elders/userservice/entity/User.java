@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -21,7 +22,8 @@ public class User {
     private String email;
     private String password;
     private String resetToken;
-
+    private LocalDate birthDate;
+    private String profileImage;
     public String phoneNumber;
     private Role role;
     private boolean enabled = false; // Email verification status

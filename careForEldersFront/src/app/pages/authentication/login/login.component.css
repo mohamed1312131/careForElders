@@ -1,0 +1,38 @@
+
+mat-card {
+  border-radius: 16px;
+  box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+mat-form-field {
+  margin-bottom: 16px;
+}
+
+button[mat-flat-button] {
+  margin-top: 12px;
+}
+
+.or-border {
+  text-align: center;
+  margin: 24px 0;
+  font-weight: 500;
+  position: relative;
+}
+
+.or-border::before,
+.or-border::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #ccc;
+}
+
+.or-border::before {
+  left: 0;
+}
+
+.or-border::after {
+  right: 0;
+}
