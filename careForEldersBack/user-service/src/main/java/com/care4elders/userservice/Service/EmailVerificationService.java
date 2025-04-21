@@ -8,9 +8,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class EmailVerificationService {
@@ -18,14 +19,15 @@ public class EmailVerificationService {
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
 
+    private final Map<String, User> pendingUsers = new HashMap<>();
+
     public void sendVerificationEmail(User user) {
         String token = UUID.randomUUID().toString();
         user.setVerificationToken(token);
-        userRepository.save(user);
+        pendingUsers.put(token, user); // ⛔ Do not save to DB here!
 
         String subject = "Verify your email";
-        String message = "Click the link to activate your account:\n" +
-                "http://localhost:8081/auth/verify?token=" + token;
+        String message = "Click to verify: http://localhost:8081/auth/verify?token=" + token;
 
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setTo(user.getEmail());
@@ -35,12 +37,11 @@ public class EmailVerificationService {
     }
 
     public boolean verifyToken(String token) {
-        Optional<User> optionalUser = userRepository.findByVerificationToken(token);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+        User user = pendingUsers.remove(token);
+        if (user != null) {
             user.setEnabled(true);
             user.setVerificationToken(null);
-            userRepository.save(user);
+            userRepository.save(user); // ✅ Save only after verification
             return true;
         }
         return false;

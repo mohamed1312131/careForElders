@@ -53,7 +53,12 @@
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
             <version>3.4.3</version>
         </dependency>
-
+        <!-- Cloudinary image  -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.37.0</version>
+        </dependency>
         <!-- Email Support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

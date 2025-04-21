@@ -16,15 +16,19 @@ import * as TablerIcons from 'angular-tabler-icons/icons';
 import { AuthenticationRoutes } from './authentication.routing';
 
 // Components
-import { AppSideLoginComponent } from './login/login.component';
+import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
-import {MatOption} from "@angular/material/autocomplete";
-import {MatSelect} from "@angular/material/select";
+import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/material/datepicker";
+import {MatNativeDateModule} from "@angular/material/core";
 
 @NgModule({
   declarations: [
-    AppSideLoginComponent,
-    RegisterComponent // ✅ correctly declared
+
+    RegisterComponent ,
+    LoginComponent
   ],
   imports: [
     CommonModule,
@@ -37,9 +41,13 @@ import {MatSelect} from "@angular/material/select";
     MatCheckboxModule,
     MatButtonModule,
     TablerIconsModule.pick(TablerIcons),
-    MatOption,
-    MatSelect,
-    // ✅ keep icons module
+    MatSelectModule,
+    MatAutocompleteModule,
+    MatProgressSpinnerModule,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatNativeDateModule,
   ]
 })
 export class AuthenticationModule {}

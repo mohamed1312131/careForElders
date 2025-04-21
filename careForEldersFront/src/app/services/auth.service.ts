@@ -1,14 +1,51 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
-export class AuthService {
-  private apiUrl = 'http://localhost:8081'; // Update if needed
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface LoginResponse {
+  token: string;
+}
+
+interface ResetPasswordRequest {
+  email: string;
+}
+
+interface RegisterRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  phoneNumber?: string;
+  role: string;
+  birthDate: string;
+  profileImageBase64?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService  {
+  private apiUrl = 'http://localhost:8081';
 
   constructor(private http: HttpClient) {}
 
-  register(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users`, userData);
+  login(data: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, data);
   }
+
+  register(data: RegisterRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users`, data);
+  }
+
+  requestPasswordReset(data: ResetPasswordRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/auth/reset-password`, data);
+  }
+
 }
+
