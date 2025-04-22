@@ -7,16 +7,30 @@ import com.care4elders.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.web.multipart.MultipartFile;
+import com.care4elders.userservice.Config.CloudinaryConfig;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements com.care4elders.userservice.service.UserService {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final CloudinaryService cloudinaryService;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository,
+                           BCryptPasswordEncoder passwordEncoder,
+                           EmailService emailService,
+                           CloudinaryService cloudinaryService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+        this.cloudinaryService = cloudinaryService;
+    }
 
     private UserResponse mapToResponse(User user) {
         return new UserResponse(
@@ -25,12 +39,18 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhoneNumber(),
-                user.getRole()
+                user.getRole(),
+                user.getBirthDate(),
+                user.getProfileImage()
         );
     }
 
     @Override
     public UserResponse createUser(UserRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already in use");
+        }
+
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -38,39 +58,96 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
         user.setPhoneNumber(request.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(request.getRole());
-        return mapToResponse(userRepository.save(user));
+        user.setBirthDate(request.getBirthDate());
+        user.setProfileImage(request.getProfileImage());
+        user.setEnabled(false);
+
+        String token = UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+
+        User savedUser = userRepository.save(user);
+
+        emailService.sendEmail(
+                user.getEmail(),
+                "Verify your account",
+                "Click this link to verify your email: http://localhost:8081/auth/verify?token=" + token
+        );
+
+        return mapToResponse(savedUser);
     }
 
     @Override
     public UserResponse updateUser(String id, UserRequest request) {
-        User user = userRepository.findById(id).orElseThrow();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setRole(request.getRole());
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setFirstName(request.getFirstName());
+                    user.setLastName(request.getLastName());
+                    user.setPhoneNumber(request.getPhoneNumber());
+                    user.setRole(request.getRole());
+                    user.setBirthDate(request.getBirthDate());
 
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
+                    if (request.getProfileImage() != null) {
+                        user.setProfileImage(request.getProfileImage());
+                    }
 
-        return mapToResponse(userRepository.save(user));
+                    if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+                        user.setPassword(passwordEncoder.encode(request.getPassword()));
+                    }
+
+                    return mapToResponse(userRepository.save(user));
+                })
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public UserResponse updateProfileImage(String userId, String imageUrl) {
+        return userRepository.findById(userId)
+                .map(user -> {
+                    // First delete old image if exists
+                    if (user.getProfileImage() != null && !user.getProfileImage().isEmpty()) {
+                        try {
+                            // Extract public_id from URL if needed or store it separately
+                            // cloudinaryService.deleteImage(publicId);
+                        } catch (Exception e) {
+                            // Log warning but continue with new image upload
+                            System.err.println("Failed to delete old image: " + e.getMessage());
+                        }
+                    }
+
+                    user.setProfileImage(imageUrl);
+                    User savedUser = userRepository.save(user);
+                    return mapToResponse(savedUser);
+                })
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
     public UserResponse getUserById(String id) {
         return userRepository.findById(id)
                 .map(this::mapToResponse)
-                .orElse(null);
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
     public List<UserResponse> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
+        return userRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void deleteUser(String id) {
-        userRepository.deleteById(id);
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    @Override
+    public User getUserEntityByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

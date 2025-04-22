@@ -2,6 +2,7 @@ package com.care4elders.userservice.service;
 
 import com.care4elders.userservice.dto.UserRequest;
 import com.care4elders.userservice.dto.UserResponse;
+import com.care4elders.userservice.entity.User;
 
 import java.util.List;
 
@@ -11,4 +12,6 @@ public interface UserService {
     UserResponse getUserById(String id);
     List<UserResponse> getAllUsers();
     void deleteUser(String id);
+    UserResponse updateProfileImage(String userId, String imageUrl);
+    User getUserEntityByEmail(String email);
 }
