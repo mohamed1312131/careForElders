@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
 
 interface LoginRequest {
   email: string;
@@ -9,6 +11,7 @@ interface LoginRequest {
 
 interface LoginResponse {
   token: string;
+  user:string;
 }
 
 interface ResetPasswordRequest {
@@ -36,8 +39,15 @@ export class AuthService  {
   constructor(private http: HttpClient) {}
 
   login(data: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, data);
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, data).pipe(
+      tap((response: LoginResponse) => {
+        localStorage.setItem('token', response.token);
+
+         //localStorage.setItem('user', JSON.stringify(response.user));
+      })
+    );
   }
+
 
   register(data: RegisterRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/users`, data);

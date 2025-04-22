@@ -1,6 +1,7 @@
 package com.care4elders.userservice.controller;
 
 import com.care4elders.userservice.Config.JwtUtil;
+import com.care4elders.userservice.dto.ApiResponse;
 import com.care4elders.userservice.dto.AuthRequest;
 import com.care4elders.userservice.dto.PasswordResetRequest;
 import com.care4elders.userservice.dto.ResetPasswordRequest;
@@ -90,25 +91,25 @@ public class AuthController {
         }
     }
 
-    // 📩 REQUEST PASSWORD RESET
     @PostMapping("/request-reset")
-    public ResponseEntity<?> requestReset(@RequestBody PasswordResetRequest request) {
+    public ResponseEntity<ApiResponse> requestReset(@RequestBody PasswordResetRequest request) {
         boolean success = passwordResetService.sendResetLink(request.getEmail());
         if (success) {
-            return ResponseEntity.ok("📧 Reset link sent to your email.");
+            return ResponseEntity.ok(new ApiResponse("📧 Reset link sent to your email."));
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("❌ Email not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse("❌ Email not found."));
         }
     }
 
-    // 🔁 PERFORM PASSWORD RESET
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<ApiResponse> resetPassword(@RequestBody ResetPasswordRequest request) {
         boolean success = passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
         if (success) {
-            return ResponseEntity.ok("✅ Password has been reset.");
+            return ResponseEntity.ok(new ApiResponse("✅ Password has been reset."));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("❌ Invalid or expired reset token.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse("❌ Invalid or expired reset token."));
         }
     }
 

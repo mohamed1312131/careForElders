@@ -38,9 +38,18 @@ export class PasswordResetComponent {
       },
       error: (err) => {
         this.success = false;
-        this.message = err.error || 'Failed to send reset link. Please try again.';
+        this.message = this.extractErrorMessage(err, 'Failed to send reset link. Please try again.');
         this.loading = false;
       }
+
     });
   }
+  private extractErrorMessage(err: any, fallback: string): string {
+    if (!err) return fallback;
+    if (typeof err.error === 'string') return err.error;
+    if (typeof err.error?.message === 'string') return err.error.message;
+    if (typeof err.message === 'string') return err.message;
+    return fallback;
+  }
+
 }
