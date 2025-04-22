@@ -29,9 +29,8 @@ public class PasswordResetService {
         message.setTo(email);
         message.setSubject("Reset Password");
         message.setText("Use this link to reset your password:\n" +
-                "Open Postman and send a POST request to:\n" +
-                "http://localhost:8081/auth/reset-password\n\n" +
-                "with JSON body:\n{\n  \"token\": \"" + token + "\",\n  \"newPassword\": \"your_new_password\"\n}");
+                "http://localhost:4200/admin/authentication/reset-password?token=" + token);
+
         mailSender.send(message);
 
         return true;
