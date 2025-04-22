@@ -1,0 +1,73 @@
+.blank-layout-container {
+  height: 100vh;
+  display: flex;
+  background-color: #f4f7fc;
+}
+
+.bg-gradient {
+  background: linear-gradient(135deg, #e0f7fa 0%, #ffffff 100%);
+}
+
+.cardWithShadow {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+}
+
+.boxed-auth {
+  width: 100%;
+  padding: 1rem;
+}
+
+.p-32 {
+  padding: 2rem;
+}
+
+.m-t-24 {
+  margin-top: 1.5rem;
+}
+
+.m-t-30 {
+  margin-top: 1.875rem;
+}
+
+.m-b-16 {
+  margin-bottom: 1rem;
+}
+
+.m-b-24 {
+  margin-bottom: 1.5rem;
+}
+
+.m-b-12 {
+  margin-bottom: 0.75rem;
+}
+
+.or-border {
+  text-align: center;
+  position: relative;
+  margin: 1.5rem 0;
+  font-weight: 500;
+  color: #999;
+}
+
+.or-border::before,
+.or-border::after {
+  content: '';
+  position: absolute;
+  height: 1px;
+  width: 40%;
+  background: #ddd;
+  top: 50%;
+}
+
+.or-border::before {
+  left: 0;
+}
+
+.or-border::after {
+  right: 0;
+}
+
+.text-center {
+  text-align: center;
+}

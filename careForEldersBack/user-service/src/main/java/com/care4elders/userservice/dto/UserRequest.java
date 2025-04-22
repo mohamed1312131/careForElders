@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class UserRequest {
     @NotBlank(message = "First name is required")
@@ -22,8 +24,11 @@ public class UserRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    @Pattern(regexp = "^\\d{3}-\\d{3}-\\d{4}$", message = "Phone number format: 123-456-7890")
+    @Size(min=8 ,max=8 , message = "Phone number Must Be 8 characters")
     private String phoneNumber;
 
+    private LocalDate birthDate;
+
+    private String profileImage;
     private Role role;
 }

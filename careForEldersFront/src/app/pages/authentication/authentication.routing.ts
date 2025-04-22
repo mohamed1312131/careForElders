@@ -1,20 +1,30 @@
 import { Routes } from '@angular/router';
 
-import { AppSideLoginComponent } from './login/login.component';
-import { AppSideRegisterComponent } from './register/register.component';
-
+import { LoginComponent} from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import {PasswordResetComponent} from "./password-reset/password-reset.component";
+import {ResetPasswordFormComponent} from "./reset-password-form/reset-password-form.component"; // ✅ corrected
+// authentication.routing.ts
 export const AuthenticationRoutes: Routes = [
   {
-    path: '',
+    path: '',  // This is relative to 'admin/authentication'
     children: [
       {
         path: 'login',
-        component: AppSideLoginComponent,
+        component: LoginComponent,
       },
       {
         path: 'register',
-        component: AppSideRegisterComponent,
+        component: RegisterComponent,
       },
+      {
+        path: 'forgot-password',
+        component: PasswordResetComponent
+      },
+      {
+        path: 'reset-password',
+        component: ResetPasswordFormComponent
+      }
     ],
   },
 ];
