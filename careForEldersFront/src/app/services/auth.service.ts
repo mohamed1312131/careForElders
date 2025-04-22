@@ -52,6 +52,14 @@ export class AuthService  {
   register(data: RegisterRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/users`, data);
   }
+  getAllUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/users`);
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/users/${id}`);
+  }
+
 
   requestPasswordReset(email: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/auth/request-reset`, { email });
