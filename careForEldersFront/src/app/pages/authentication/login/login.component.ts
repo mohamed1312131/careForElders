@@ -59,7 +59,7 @@ export class LoginComponent {
       return;
     }
 
-    this.authApi.requestPasswordReset({ email }).subscribe({
+    this.authApi.requestPasswordReset(email).subscribe({
       next: () => {
         this.loginError = '✔️ Reset instructions sent to your email.';
       },

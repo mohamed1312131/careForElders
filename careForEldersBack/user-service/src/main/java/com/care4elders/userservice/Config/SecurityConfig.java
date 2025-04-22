@@ -18,7 +18,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -29,8 +28,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(CustomUserDetailsService userDetailsService,
-                                                       BCryptPasswordEncoder passwordEncoder) {
+    public AuthenticationManager authenticationManager(
+            CustomUserDetailsService userDetailsService,
+            BCryptPasswordEncoder passwordEncoder
+    ) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
@@ -38,21 +39,38 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
-        http
-                .cors().configurationSource(corsConfigurationSource()).and()
-                .csrf().disable()
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/**").permitAll() // Allow all requests to /api
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthFilter jwtAuthFilter
+    ) throws Exception {
+        // Configure CORS first
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
+        // Disable CSRF (since we use JWT)
+        http.csrf(csrf -> csrf.disable());
+
+        // Permit all public endpoints
+        http.authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                        "/users",
+                        "/auth/**",
+                        "/api/**",
+                        "/request-reset/**",
+                        "/reset-password/**",
+                        "/request-reset",
+                        "/reset-password"
+                ).permitAll()
+                .anyRequest().authenticated()
+        );
+
+        // Stateless session (JWT)
+        http.sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+        // Add JWT filter (but skip public endpoints)
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -61,8 +79,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("*")); // Allow all headers
+        configuration.setAllowCredentials(true); // Allow cookies/auth headers
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

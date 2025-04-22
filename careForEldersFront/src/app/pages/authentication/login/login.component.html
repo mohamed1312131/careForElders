@@ -48,7 +48,7 @@
 
             <div class="d-flex align-items-center m-b-12">
               <mat-checkbox color="primary">Remember me</mat-checkbox>
-              <a class="text-primary f-w-600 text-decoration-none m-l-auto f-s-14" (click)="requestReset()">
+              <a [routerLink]="['/admin/authentication/forgot-password']" class="text-primary f-w-600 text-decoration-none m-l-auto f-s-14" (click)="requestReset()">
                 Forgot Password?
               </a>
             </div>
