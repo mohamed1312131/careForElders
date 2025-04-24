@@ -34,6 +34,7 @@ public class PatientProgram {
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    private LocalDateTime completionDate;
 
     @Builder.Default
     private ProgramStatus status = ProgramStatus.ACTIVE;
