@@ -1,4 +1,4 @@
-package com.care4elders.planandexercise.DTO;
+package com.care4elders.planandexercise.DTO.programExerciseDTO;
 
 
 import lombok.Data;

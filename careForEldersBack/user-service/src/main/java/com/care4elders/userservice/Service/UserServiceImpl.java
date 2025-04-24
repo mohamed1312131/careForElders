@@ -41,7 +41,8 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
                 user.getPhoneNumber(),
                 user.getRole(),
                 user.getBirthDate(),
-                user.getProfileImage()
+                user.getProfileImage(),
+                user.getSpecialization()
         );
     }
 
