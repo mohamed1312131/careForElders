@@ -1,8 +1,10 @@
 package com.care4elders.planandexercise.controller;
 
 
-import com.care4elders.planandexercise.DTO.ProgramRequestDTO;
-import com.care4elders.planandexercise.DTO.ProgramResponseDTO;
+import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramAssignmentRequestDTO;
+import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramAssignmentResponseDTO;
+import com.care4elders.planandexercise.DTO.programDTO.ProgramRequestDTO;
+import com.care4elders.planandexercise.DTO.programDTO.ProgramResponseDTO;
 import com.care4elders.planandexercise.service.ProgramService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,13 @@ public class ProgramController {
             @Valid @RequestBody ProgramRequestDTO programRequest
     ) {
         ProgramResponseDTO response = programService.createProgram(programRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    @PostMapping("/assign")
+    public ResponseEntity<ProgramAssignmentResponseDTO> assignProgram(
+            @Valid @RequestBody ProgramAssignmentRequestDTO request
+    ) {
+        ProgramAssignmentResponseDTO response = programService.assignProgramToPatient(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -1,17 +1,23 @@
 package com.care4elders.planandexercise.service;
 
-import com.care4elders.planandexercise.DTO.ProgramExerciseResponseDTO;
-import com.care4elders.planandexercise.DTO.ProgramRequestDTO;
-import com.care4elders.planandexercise.DTO.ProgramResponseDTO;
-import com.care4elders.planandexercise.entity.Exercise;
-import com.care4elders.planandexercise.entity.Program;
+import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramAssignmentRequestDTO;
+import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramAssignmentResponseDTO;
+import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramDetailsDTO;
+import com.care4elders.planandexercise.DTO.programDTO.ProgramRequestDTO;
+import com.care4elders.planandexercise.DTO.programDTO.ProgramResponseDTO;
+import com.care4elders.planandexercise.DTO.programExerciseDTO.ProgramExerciseResponseDTO;
+import com.care4elders.planandexercise.DTO.userDTO.DoctorInfoDTO;
+import com.care4elders.planandexercise.DTO.userDTO.UserDTO;
+import com.care4elders.planandexercise.entity.*;
 import com.care4elders.planandexercise.exception.EntityNotFoundException;
-import com.care4elders.planandexercise.repository.DoctorRepository;
 import com.care4elders.planandexercise.repository.ExerciseRepository;
+import com.care4elders.planandexercise.repository.PatientProgramRepository;
 import com.care4elders.planandexercise.repository.ProgramRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.care4elders.planandexercise.entity.ProgramExercise;
+import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,12 +26,20 @@ import java.util.stream.Collectors;
 public class ProgramService {
     private final ProgramRepository programRepository;
     private final ExerciseRepository exerciseRepository;
-    private final DoctorRepository doctorRepository;
+    private final RestTemplate restTemplate;
+    private final PatientProgramRepository patientProgramRepository;
 
     public ProgramResponseDTO createProgram(ProgramRequestDTO programRequest) {
-        // Validate doctor exists
-        doctorRepository.findById(programRequest.getDoctorId())
-                .orElseThrow(() -> new EntityNotFoundException("Doctor not found with ID: " + programRequest.getDoctorId()));
+        // Fetch and validate doctor from user-service
+        UserDTO doctor = restTemplate.getForObject(
+                "http://USER-SERVICE/users/{doctorId}",
+                UserDTO.class,
+                programRequest.getDoctorId()
+        );
+
+        if (doctor == null || !"DOCTOR".equals(doctor.getRole())) {
+            throw new EntityNotFoundException("Doctor not found or invalid role");
+        }
 
         // Build program exercises
         List<ProgramExercise> exercises = programRequest.getExercises().stream()
@@ -53,17 +67,21 @@ public class ProgramService {
 
         Program savedProgram = programRepository.save(program);
 
-        return mapToResponseDTO(savedProgram);
+        return mapToResponseDTO(savedProgram, doctor);
     }
 
-    private ProgramResponseDTO mapToResponseDTO(Program program) {
+    private ProgramResponseDTO mapToResponseDTO(Program program, UserDTO doctor) {
         return ProgramResponseDTO.builder()
                 .programId(program.getId())
                 .name(program.getName())
                 .description(program.getDescription())
                 .durationDays(program.getDurationDays())
                 .createdAt(program.getCreatedAt())
-                .doctorId(program.getCreatedByDoctorId())
+                .doctor(new DoctorInfoDTO(
+                        doctor.getId(),
+                        doctor.getFirstName(),
+                        doctor.getSpecialization()
+                ))
                 .exercises(program.getExercises().stream()
                         .map(ex -> {
                             Exercise exercise = exerciseRepository.findById(ex.getExerciseId())
@@ -78,6 +96,50 @@ public class ProgramService {
                                     .specialInstructions(ex.getSpecialInstructions())
                                     .build();
                         }).collect(Collectors.toList()))
+                .build();
+    }
+    public ProgramAssignmentResponseDTO assignProgramToPatient(ProgramAssignmentRequestDTO request) {
+        // Validate patient exists in user-service
+        UserDTO patient = restTemplate.getForObject(
+                "http://USER-SERVICE/users/{patientId}",
+                UserDTO.class,
+                request.getPatientId()
+        );
+
+        if (patient == null || !"PATIENT".equals(patient.getRole())) {
+            throw new EntityNotFoundException("Patient not found or invalid role");
+        }
+
+        // Validate program exists
+        Program program = programRepository.findById(request.getProgramId())
+                .orElseThrow(() -> new EntityNotFoundException("Program not found with ID: " + request.getProgramId()));
+
+        // Create assignment
+        PatientProgram assignment = PatientProgram.builder()
+                .patientId(request.getPatientId())
+                .programId(request.getProgramId())
+                .assignedDate(LocalDateTime.now())
+                .status(ProgramStatus.ACTIVE)
+                .build();
+
+        PatientProgram savedAssignment = patientProgramRepository.save(assignment);
+
+        return mapToResponseDTO(savedAssignment, program);
+    }
+
+    private ProgramAssignmentResponseDTO mapToResponseDTO(PatientProgram assignment, Program program) {
+        return ProgramAssignmentResponseDTO.builder()
+                .assignmentId(assignment.getId())
+                .patientId(assignment.getPatientId())
+                .programId(assignment.getProgramId())
+                .assignedDate(assignment.getAssignedDate())
+                .status(assignment.getStatus())
+                .programDetails(ProgramDetailsDTO.builder()
+                        .programId(program.getId())
+                        .name(program.getName())
+                        .description(program.getDescription())
+                        .durationDays(program.getDurationDays())
+                        .build())
                 .build();
     }
 }

@@ -25,6 +25,7 @@ public class User {
     private LocalDate birthDate;
     private String profileImage;
     public String phoneNumber;
+    private String specialization;
     private Role role;
     private boolean enabled = false; // Email verification status
     private String verificationToken;
