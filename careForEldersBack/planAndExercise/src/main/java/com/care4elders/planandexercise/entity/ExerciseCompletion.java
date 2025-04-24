@@ -24,10 +24,14 @@ public class ExerciseCompletion {
 
     @NotBlank
     @Indexed
-    private String patientProgramId;
+    private String patientProgramId;  // Reference to PatientProgram
 
     @NotBlank
-    private String programExerciseId;
+    @Indexed
+    private String exerciseId;       // Direct reference to Exercise
+
+    @NotBlank
+    private String programExerciseId; // Reference to ProgramExercise (if needed)
 
     @NotNull
     private LocalDateTime completedDate;

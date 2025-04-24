@@ -1,5 +1,10 @@
 package com.care4elders.planandexercise.entity;
 
 public enum NotificationType {
-    REMINDER, ALERT, UPDATE, OTHER
+    PROGRAM_ASSIGNMENT,
+    EXERCISE_COMPLETION,
+    PROGRAM_COMPLETION,
+    REMINDER,
+    ALERT,
+    OTHER
 }
