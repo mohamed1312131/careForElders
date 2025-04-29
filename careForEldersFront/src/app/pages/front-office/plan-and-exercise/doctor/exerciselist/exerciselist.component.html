@@ -1,0 +1,61 @@
+<h2 mat-dialog-title class="text-xl font-semibold text-blueGray-700">Select Exercises</h2>
+
+<mat-dialog-content class="mat-typography">
+  <div class="py-2 space-y-4">
+
+    <div *ngIf="errorMessage" class="p-4 bg-red-50 text-red-700 rounded">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage">
+
+      <!-- Filters -->
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="flex-1">
+          <label class="block text-blueGray-600 text-sm mb-1">Category</label>
+          <select [(ngModel)]="selectedCategory" (change)="filterExercises()" class="w-full p-2 border rounded">
+            <option value="">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+        </div>
+
+        <div class="flex-1">
+          <label class="block text-blueGray-600 text-sm mb-1">Difficulty</label>
+          <select [(ngModel)]="selectedDifficulty" (change)="filterExercises()" class="w-full p-2 border rounded">
+            <option value="">All Difficulties</option>
+            <option *ngFor="let level of difficultyLevels" [value]="level">{{ level }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Exercise List -->
+      <div *ngFor="let exercise of filteredExercises" class="mb-2 flex items-center">
+        <mat-checkbox
+          [(ngModel)]="exercise.selected"
+          class="mr-3"
+          color="primary">
+        </mat-checkbox>
+        <span class="text-blueGray-600 text-sm">{{ exercise.name }}</span>
+      </div>
+
+      <div *ngIf="filteredExercises.length === 0" class="text-center text-blueGray-400 text-sm">
+        No exercises found.
+      </div>
+    </div>
+
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" *ngIf="!isLoading">
+  <button mat-button (click)="onCancelClick()" class="text-blueGray-600 hover:text-blueGray-800 mr-2">
+    Cancel
+  </button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="onAddClick()"
+    [disabled]="errorMessage"
+    class="bg-pink-500 text-white active:bg-pink-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150">
+    Add Selected
+  </button>
+</mat-dialog-actions>

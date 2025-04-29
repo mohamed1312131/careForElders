@@ -1,0 +1,250 @@
+// Define variables for easier theme management
+$primary-blue: #007aff; // iOS-like blue
+$light-grey: #e5e5ea;  // Separator color
+$medium-grey: #8e8e93; // Reps text color
+$dark-grey: #1c1c1e;   // Primary text color
+$icon-grey: #c7c7cc;   // Icon color
+$background-color: #ffffff;
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; // System font stack
+
+.workout-screen {
+  font-family: $font-family;
+  background-color: $background-color;
+  height: 100vh; // Full viewport height
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  flex-shrink: 0; // Prevent header from shrinking
+
+  .header-info {
+    font-size: 0.95em;
+    color: $dark-grey;
+
+    .duration {
+      font-weight: 600; // Semi-bold
+    }
+
+    .separator {
+      margin: 0 5px;
+    }
+  }
+
+  .edit-link {
+    color: $primary-blue;
+    text-decoration: none;
+    font-size: 0.95em;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.workout-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; // Takes up available vertical space
+  overflow-y: auto; // Allows scrolling if content exceeds height
+
+  .workout-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid $light-grey; // Separator line
+
+    &:last-child {
+      border-bottom: none; // Remove border from last item
+    }
+
+    .icon {
+      color: $icon-grey;
+      font-size: 1.3em; // Adjust icon size
+      cursor: grab; // Indicate draggable/interactive element
+    }
+
+    .drag-handle {
+      margin-right: 15px;
+    }
+
+    .reorder-handle {
+      margin-left: 15px;
+    }
+
+    .item-icon {
+      width: 45px; // Adjust icon container size
+      height: 45px;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .item-details {
+      flex-grow: 1; // Pushes the reorder handle to the right
+      display: flex;
+      flex-direction: column;
+      justify-content: center; // Align text vertically if needed
+
+      .item-name {
+        font-size: 1em;
+        font-weight: 500; // Medium weight
+        color: $dark-grey;
+        margin-bottom: 2px; // Space between name and reps
+      }
+
+      .item-reps {
+        font-size: 0.85em;
+        color: $medium-grey;
+      }
+    }
+  }
+}
+
+.workout-footer {
+  padding: 15px 20px 25px 20px; // Add more bottom padding
+  background-color: $background-color; // Ensure it covers scrolled content
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); // Subtle shadow on top edge
+  flex-shrink: 0; // Prevent footer from shrinking
+
+  .start-button {
+    display: block;
+    width: 100%;
+    padding: 14px 20px;
+    background-color: $primary-blue;
+    color: $background-color;
+    border: none;
+    border-radius: 10px; // Rounded corners
+    font-size: 1.1em;
+    font-weight: 600; // Semi-bold
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: darken($primary-blue, 10%); // Darken button on hover
+    }
+
+    &:active {
+       background-color: darken($primary-blue, 15%);
+       transform: scale(0.99); // Slight press effect
+    }
+  }
+}
+
+// Optional: Style for scrollbar (Webkit browsers)
+.workout-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.workout-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.workout-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+.workout-screen {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  
+  .header-info {
+    color: #666;
+    
+    .duration, .count {
+      margin: 0 5px;
+    }
+  }
+}
+
+.workout-list {
+  list-style: none;
+  padding: 0;
+}
+
+.workout-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  .item-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    
+    .exercise-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+  }
+  
+  .item-details {
+    flex-grow: 1;
+    
+    .item-name {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    
+    .item-duration {
+      color: #666;
+      font-size: 0.9em;
+    }
+  }
+}
+
+.workout-footer {
+  margin-top: 30px;
+  text-align: center;
+  
+  .start-button {
+    padding: 15px 30px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.3s;
+    
+    &:hover {
+      background: #45a049;
+    }
+    
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+}

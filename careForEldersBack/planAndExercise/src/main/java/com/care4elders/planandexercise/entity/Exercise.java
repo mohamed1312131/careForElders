@@ -1,51 +1,39 @@
 package com.care4elders.planandexercise.entity;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import org.hibernate.validator.constraints.URL;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import jakarta.validation.constraints.*;
-import lombok.Singular;
-
 @Document(collection = "exercises")
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Exercise {
     @Id
     private String id;
-
-    @NotBlank
-    @Indexed
     private String name;
-
     private String description;
-
-    @URL
-    private String videoUrl;
-
-    @Singular
-    private List<@URL String> imageUrls;
-
-    @NotNull
-    private ExerciseType type;
-
-    @Min(1)
-    private Integer durationMinutes;
-
-    @Min(0)
-    private Integer caloriesBurned;
-
-    private String equipmentRequired;
-
-    @NotBlank
-    private String difficultyLevel;
+    private String imageUrl;
+    private String videoTutorialUrl;
+    private int defaultDurationMinutes;
+    private List<String> categories; // e.g., [Cardio, Strength, Flexibility]
+    private String difficultyLevel; // Beginner, Intermediate, Advanced
+    private List<String> equipmentNeeded; // [Dumbbells, Mat, None]
+    private String targetMuscleGroup;
+    private int caloriesBurnedEstimate;
+    private int recommendedRepetitions;
+    private int recommendedSets;
+    private boolean isPublic;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String createdBy; // User ID from user-service
+    private String status; // ACTIVE, ARCHIVED
+    // Other fields if needed
 }
