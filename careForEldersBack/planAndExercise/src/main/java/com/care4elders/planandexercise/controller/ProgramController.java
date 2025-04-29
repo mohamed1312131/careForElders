@@ -1,13 +1,10 @@
 package com.care4elders.planandexercise.controller;
 
-
-import com.care4elders.planandexercise.DTO.ExerciseCompletion.ExerciseCompletionDTO;
-import com.care4elders.planandexercise.DTO.ExerciseCompletion.ExerciseCompletionRequestDTO;
-import com.care4elders.planandexercise.DTO.PatientProgramHistoryDTO.PatientProgramHistoryDTO;
-import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramAssignmentRequestDTO;
-import com.care4elders.planandexercise.DTO.addProgramToUser.ProgramAssignmentResponseDTO;
-import com.care4elders.planandexercise.DTO.programDTO.ProgramRequestDTO;
-import com.care4elders.planandexercise.DTO.programDTO.ProgramResponseDTO;
+import com.care4elders.planandexercise.DTO.*;
+import com.care4elders.planandexercise.entity.Program;
+import com.care4elders.planandexercise.entity.ProgramDay;
+import com.care4elders.planandexercise.exception.*;
+import com.care4elders.planandexercise.repository.ProgramDayRepository;
 import com.care4elders.planandexercise.service.ProgramService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,47 +14,77 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// ProgramController.java
 @RestController
 @RequestMapping("/api/programs")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProgramController {
     private final ProgramService programService;
+    private final ProgramDayRepository programDayRepository;
 
-    @PostMapping
-    public ResponseEntity<ProgramResponseDTO> createProgram(
-            @Valid @RequestBody ProgramRequestDTO programRequest
-    ) {
-        ProgramResponseDTO response = programService.createProgram(programRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-    @PostMapping("/assign")
-    public ResponseEntity<ProgramAssignmentResponseDTO> assignProgram(
-            @Valid @RequestBody ProgramAssignmentRequestDTO request
-    ) {
-        ProgramAssignmentResponseDTO response = programService.assignProgramToPatient(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-    @GetMapping("/patient/{patientId}/current")
-    public List<ProgramAssignmentResponseDTO> getCurrentPrograms(
-            @PathVariable String patientId
-    ) {
-        return programService.getCurrentPatientPrograms(patientId);
+    @PostMapping("/create")
+    public ResponseEntity<?> createProgram(
+            @Valid @RequestBody ProgramDTO programDTO,
+            @RequestHeader("X-User-ID") String doctorId) {
+        try {
+            Program createdProgram = programService.createProgram(programDTO, doctorId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProgram);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (ServiceUnavailableException ex) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
+        }
     }
 
-
-    @PostMapping("/complete")
-    public ResponseEntity<ProgramAssignmentResponseDTO> completeProgram(
-            @RequestParam String patientId,
-            @RequestParam String programId
-    ) {
-        ProgramAssignmentResponseDTO response = programService.completeProgram(patientId, programId);
-        return ResponseEntity.ok(response);
+    @PostMapping("/{programId}/days")
+    public ResponseEntity<?> addDayToProgram(
+            @PathVariable String programId,
+            @Valid @RequestBody ProgramDayDTO dayDTO,
+            @RequestHeader("X-User-ID") String doctorId) {
+        try {
+            Program updatedProgram = programService.addDayToProgram(programId, dayDTO, doctorId);
+            return ResponseEntity.ok(updatedProgram);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (UnauthorizedAccessException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+        } catch (InvalidProgramStateException | InvalidDayConfigurationException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
-    @GetMapping("/patient/{patientId}/history")
-    public ResponseEntity<List<PatientProgramHistoryDTO>> getPatientProgramHistory(
-            @PathVariable String patientId
-    ) {
-        List<PatientProgramHistoryDTO> history = programService.getPatientProgramHistory(patientId);
-        return ResponseEntity.ok(history);
+    @GetMapping("/my-programs")
+    public ResponseEntity<?> getPatientPrograms(
+            @RequestHeader("X-User-ID") String patientId) {
+        try {
+            List<PatientProgramDTO> programs = programService.getProgramsByPatientId(patientId);
+            return ResponseEntity.ok(programs);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+    @GetMapping("/{programId}/details")
+    public ResponseEntity<?> getProgramDetailsWithProgress(
+            @PathVariable String programId,
+            @RequestHeader("X-User-ID") String patientId) {
+        try {
+            return ResponseEntity.ok(
+                    programService.getProgramDetailsWithProgress(programId, patientId)
+            );
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+    @GetMapping("/getAllPrograms")
+    public ResponseEntity<List<ProgramListDTO>> getAllPrograms() {
+        return ResponseEntity.ok(programService.getAllPrograms());
+    }
+    @GetMapping("/getProgramDetails/{programId}")
+    public ResponseEntity<ProgramDetailsDTO> getProgramDetails(@PathVariable String programId) {
+        return ResponseEntity.ok(programService.getProgramDetails(programId));
+    }
+    @GetMapping("/getPatients/{programId}/patients")
+    public ResponseEntity<List<PatientAssignmentDTO>> getProgramPatients(@PathVariable String programId) {
+        return ResponseEntity.ok(programService.getProgramPatients(programId));
     }
 }
