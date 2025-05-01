@@ -4,24 +4,29 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
-@Document(collection = "chats")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = "chats")
 public class Chat {
 
     @Id
     private String id;
 
-    private String userId; // Patient ID
+    private String patientId; // who owns this chat
 
     private Instant createdAt;
-    private Instant updatedAt;
 
-    private List<Message> messages;
-
+    @Builder.Default
+    private List<Message> messages = new ArrayList<>();
 }

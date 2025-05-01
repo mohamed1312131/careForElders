@@ -1,14 +1,16 @@
 package com.care4elders.chat.DTO;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MessageDTO {
-    private String role;
+    private String sender; // "PATIENT" or "AI"
     private String content;
     private Instant timestamp;
 }
