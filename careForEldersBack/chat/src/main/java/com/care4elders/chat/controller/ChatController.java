@@ -1,11 +1,12 @@
 package com.care4elders.chat.controller;
 
-import com.care4elders.chat.DTO.AddMessageRequest;
-import com.care4elders.chat.DTO.ChatResponse;
+
+import com.care4elders.chat.DTO.ChatDTO;
 import com.care4elders.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/chats")
@@ -14,20 +15,23 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<ChatResponse> createChat(@PathVariable String userId) {
-        return ResponseEntity.ok(chatService.createChat(userId));
+    @PostMapping("/new/{patientId}")
+    public ChatDTO createNewChat(@PathVariable String patientId) {
+        return chatService.createNewChat(patientId);
     }
 
-    @PostMapping("/{chatId}/messages")
-    public ResponseEntity<ChatResponse> addMessage(
-            @PathVariable String chatId,
-            @RequestBody AddMessageRequest request) {
-        return ResponseEntity.ok(chatService.addMessage(chatId, request));
+    @PostMapping("/{chatId}/prompt")
+    public ChatDTO addPatientPrompt(@PathVariable String chatId, @RequestBody String prompt) {
+        return chatService.addPatientPrompt(chatId, prompt);
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public List<ChatDTO> getChatsForPatient(@PathVariable String patientId) {
+        return chatService.getChatsForPatient(patientId);
     }
 
     @GetMapping("/{chatId}")
-    public ResponseEntity<ChatResponse> getChat(@PathVariable String chatId) {
-        return ResponseEntity.ok(chatService.getChat(chatId));
+    public ChatDTO getChatById(@PathVariable String chatId) {
+        return chatService.getChatById(chatId);
     }
 }
