@@ -2,6 +2,10 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
+import { BillDetailsComponent } from './billing/billing/bill-details/bill-details.component';
+import { BillListComponent } from './billing/billing/bill-list/bill-list.component';
+import { BillCreateComponent } from './billing/billing/bill-create/bill-create.component';
+import { BillEditComponent } from './billing/billing/bill-edit/bill-edit.component';
 
 
 const routes: Routes = [
@@ -12,12 +16,10 @@ const routes: Routes = [
   },
   
   // Billing routes
-  {
-    path: 'billing',
-    children: [
-  
-    ]
-  },
+  { path: 'bills', component: BillListComponent },
+  { path: 'bills/create', component: BillCreateComponent },
+  { path: 'bills/:id', component: BillDetailsComponent },
+  { path: 'bills/:id/edit', component: BillEditComponent },
  
   // Admin auth routes (login/register)
   {
