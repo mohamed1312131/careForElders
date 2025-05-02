@@ -1,22 +1,24 @@
 package com.care4elders.chat.service;
 import com.care4elders.chat.DTO.PatientInfoDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class PatientGateway {
 
-    private final RestTemplate restTemplate;
+    private final RestTemplate loadBalancedRestTemplate;
 
     public PatientInfoDTO getPatientInfo(String patientId) {
-        return restTemplate.getForObject(
-                "http://USER-SERVICE/users/{id}",
-                PatientInfoDTO.class,
-                patientId
+        return loadBalancedRestTemplate.getForObject(
+                "http://USER-SERVICE/users/" + patientId,
+                PatientInfoDTO.class
         );
     }
+
 
    /* public MedicalRecordDTO getMedicalRecord(String patientId) {
         return restTemplate.getForObject(

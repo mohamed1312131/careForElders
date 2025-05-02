@@ -10,13 +10,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OllamaClient {
 
-    private final RestTemplate restTemplate;
+    private final RestTemplate plainRestTemplate;
 
     public String generateAIResponse(String prompt) {
-        Map<String, Object> response = restTemplate.postForObject(
+        Map<String, Object> response = plainRestTemplate.postForObject(
                 "http://localhost:11434/api/generate", // Ollama local port
                 Map.of(
-                        "model", "gemma:4b", // or whatever you loaded
+                        "model", "gemma3:4b", // or whatever you loaded
                         "prompt", prompt
                 ),
                 Map.class
@@ -26,12 +26,12 @@ public class OllamaClient {
     }
     public String chat(String prompt) {
         Map<String, Object> body = Map.of(
-                "model", "gemma:4b",
+                "model", "gemma3:4b",  // Use the exact name from `ollama list`
                 "prompt", prompt,
                 "stream", false
         );
 
-        Map<String, Object> response = restTemplate.postForObject(
+        Map<String, Object> response = plainRestTemplate.postForObject(
                 "http://localhost:11434/api/generate",
                 body,
                 Map.class
