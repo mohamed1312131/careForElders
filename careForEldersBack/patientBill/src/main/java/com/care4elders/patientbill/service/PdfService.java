@@ -1,8 +1,8 @@
-// src/main/java/com/care4elders/patientbill/service/PdfService.java
 package com.care4elders.patientbill.service;
 
+import com.care4elders.patientbill.exception.BillNotFoundException;
 import java.io.ByteArrayInputStream;
 
 public interface PdfService {
-    ByteArrayInputStream generateInvoicePdf(Long billId) throws Exception;
+    ByteArrayInputStream generateInvoicePdf(String billId) throws BillNotFoundException, Exception;
 }

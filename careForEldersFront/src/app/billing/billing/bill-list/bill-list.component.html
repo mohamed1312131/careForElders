@@ -1,1 +1,65 @@
-<p>bill-list works!</p>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Patient Bills</h2>
+      <button class="btn btn-primary" (click)="createNewBill()">
+        <i class="bi bi-plus-circle me-2"></i>New Bill
+      </button>
+    </div>
+  
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+  
+    <div *ngIf="loading" class="d-flex justify-content-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  
+    <div *ngIf="!loading && bills.length === 0" class="alert alert-info">
+      No bills found. Create a new bill to get started.
+    </div>
+  
+    <div class="table-responsive" *ngIf="!loading && bills.length > 0">
+      <table class="table table-striped table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Patient</th>
+            <th>Bill Date</th>
+            <th>Due Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bill of bills">
+            <td>{{ bill.id }}</td>
+            <td>{{ bill.patientName }}</td>
+            <td>{{ bill.billDate | date }}</td>
+            <td>{{ bill.dueDate | date }}</td>
+            <td>{{ bill.totalAmount | currency }}</td>
+            <td><span [class]="getBadgeClass(bill.status)">{{ bill.status }}</span></td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-sm btn-outline-primary" (click)="viewBill(bill.id!)">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="editBill(bill.id!)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteBill(bill.id!)">
+                  <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info" (click)="downloadPdf(bill.id!)">
+                  <i class="bi bi-file-pdf"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

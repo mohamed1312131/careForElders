@@ -1,8 +1,8 @@
 // src/app/billing/services/bill.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Bill } from '../models/bill';
-import { ServiceItem } from '../models/service-item';
+import { Bill } from '../../../models/bill.model';
+import { ServiceItem } from '../../../models/service-item';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
