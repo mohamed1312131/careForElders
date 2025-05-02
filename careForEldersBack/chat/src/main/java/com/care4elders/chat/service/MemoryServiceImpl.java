@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,28 +19,22 @@ public class MemoryServiceImpl implements MemoryService {
     public void initializePatientMemory(String patientId) {
         String collectionName = "patient-" + patientId;
 
-        // Fetch patient-related data
+        // Fetch patient info
         var patientInfo = patientGateway.getPatientInfo(patientId);
-        var medicalRecord = patientGateway.getMedicalRecord(patientId);
-        var plan = patientGateway.getPlan(patientId);
-        var exercise = patientGateway.getExercise(patientId);
 
-        List<MemoryItem> memories = new ArrayList<>();
-        memories.add(new MemoryItem("patient-info", "Patient Info: Name=" + patientInfo.getName() + ", Age=" + patientInfo.getAge()));
-        memories.add(new MemoryItem("medical-record", "Medical Record: Diagnosis=" + medicalRecord.getDiagnosis()));
-        memories.add(new MemoryItem("plan", "Plan: " + plan.getDescription()));
-        memories.add(new MemoryItem("exercise", "Exercise Routine: " + exercise.getRoutine()));
+        // Build memory data
+        String summary = "Patient Info: Name=" + patientInfo.getFirstName() + ", BirthDate=" + patientInfo.getBirthDate();
+        vectorDatabaseClient.getOrCreateCollection(collectionName);
+        // Generate embedding
+        List<Double> embedding = embeddingClient.getEmbedding(summary);
 
-        // Embed and store
-        for (MemoryItem memory : memories) {
-            List<Double> embedding = embeddingClient.getEmbedding(memory.content());
-            vectorDatabaseClient.addEmbedding(
-                    collectionName,
-                    memory.id(),
-                    embedding,
-                    memory.content()
-            );
-        }
+        // Store in vector DB
+        vectorDatabaseClient.addEmbedding(
+                collectionName,
+                "patient-info", // ID
+                embedding,
+                summary
+        );
     }
 
     @Override
@@ -50,5 +45,27 @@ public class MemoryServiceImpl implements MemoryService {
         return vectorDatabaseClient.querySimilarTexts(collectionName, inputEmbedding, 5);
     }
 
-    private record MemoryItem(String id, String content) {}
+    @Override
+    public void savePatientMessage(String patientId, String message) {
+        saveToMemory("patient", patientId, message);
+    }
+
+    @Override
+    public void saveAIMessage(String patientId, String message) {
+        saveToMemory("ai", patientId, message);
+    }
+
+    private void saveToMemory(String sender, String patientId, String text) {
+        String collectionName = "patient-" + patientId;
+        String id = sender + "-" + UUID.randomUUID();
+
+        List<Double> embedding = embeddingClient.getEmbedding(text);
+
+        vectorDatabaseClient.addEmbedding(
+                collectionName,
+                id,
+                embedding,
+                text
+        );
+    }
 }
