@@ -1,0 +1,254 @@
+// Variables
+$user-message-color: #1976d2; // Blue for user messages
+$ai-message-color: #e0e0e0; // Gray for AI messages
+$border-radius: 18px;
+$spacing-unit: 16px;
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+// Empty state styling
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 500px;
+  padding: $spacing-unit * 2;
+  text-align: center;
+  
+  .empty-state-content {
+    max-width: 400px;
+  }
+  
+  .empty-icon {
+    font-size: 64px;
+    height: 64px;
+    width: 64px;
+    color: #0eacf9;
+    margin-bottom: $spacing-unit;
+  }
+  
+  h2 {
+    margin-bottom: $spacing-unit;
+    font-weight: 500;
+  }
+  
+  p {
+    margin-bottom: $spacing-unit * 2;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  button {
+    padding: $spacing-unit ($spacing-unit * 1.5);
+  }
+}
+
+// Chat interface when active
+.chat-interface {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// Header
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-unit;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: white;
+  
+  h2 {
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// Messages area
+.messages-area {
+  flex: 1;
+  padding: $spacing-unit;
+  overflow-y: auto;
+  background-color: #f9fafc;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-unit;
+  
+  .welcome-message {
+    text-align: center;
+    margin: auto 0;
+    padding: $spacing-unit * 2;
+    color: rgba(0, 0, 0, 0.6);
+    
+    h3 {
+      font-weight: 500;
+      margin-bottom: $spacing-unit;
+    }
+  }
+}
+
+// Message styling
+.message-wrapper {
+  display: flex;
+  margin-bottom: $spacing-unit;
+  
+  &.user-message-wrapper {
+    justify-content: flex-start; // User messages on the left
+  }
+  
+  &.ai-message-wrapper {
+    justify-content: flex-end; // AI messages on the right
+  }
+}
+
+.message {
+  display: flex;
+  max-width: 80%;
+  
+  .message-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    
+    mat-icon {
+      font-size: 20px;
+      height: 20px;
+      width: 20px;
+      color: rgba(0, 0, 0, 0.7);
+    }
+  }
+  
+  .message-avatar:first-child {
+    margin-right: $spacing-unit;
+  }
+  
+  .message-avatar:last-child {
+    margin-left: $spacing-unit;
+  }
+  
+  .message-content {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message-text {
+    padding: $spacing-unit;
+    border-radius: $border-radius;
+    word-wrap: break-word;
+    line-height: 1.5;
+  }
+  
+  .message-time {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.5);
+    margin-top: 4px;
+    align-self: flex-end;
+  }
+}
+
+.user-message {
+  .message-content {
+    align-items: flex-start;
+  }
+  
+  .message-text {
+    background-color: $user-message-color;
+    color: white;
+    border-top-left-radius: 4px;
+  }
+}
+
+.ai-message {
+  .message-content {
+    align-items: flex-end;
+  }
+
+  .message-text {
+    background-color: $ai-message-color;
+    color: rgba(0, 0, 0, 0.87);
+    border-top-right-radius: 4px;
+  }
+}
+
+// Typing indicator
+.typing-indicator {
+  display: flex;
+  padding: $spacing-unit;
+  
+  span {
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin: 0 2px;
+    opacity: 0.4;
+    animation: typing 1s infinite ease-in-out;
+    
+    &:nth-child(1) {
+      animation-delay: 0s;
+    }
+    
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+}
+
+@keyframes typing {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+// Input area
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: $spacing-unit;
+  background-color: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  
+  .message-input {
+    flex: 1;
+    margin-right: $spacing-unit;
+    
+    ::ng-deep .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  }
+  
+  .send-button {
+    background-color: $user-message-color;
+  }
+}
+
+// Make sure scrolling works on mobile
+@media (max-width: 600px) {
+  .message {
+    max-width: 90%;
+  }
+}

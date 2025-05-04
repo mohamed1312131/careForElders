@@ -19,6 +19,11 @@ export const FrontOfficeRoutes: Routes = [
         loadChildren: () =>
           import('./plan-and-exercise/plan-and-exercise.module').then((m) => m.PlanAndExerciseModule),
       },
+      {
+        path: 'chat',
+        loadChildren: () =>
+          import('./chat/chat.module').then((m) => m.ChatModule),
+      },
     ],
   },
 ];
