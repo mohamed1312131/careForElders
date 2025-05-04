@@ -8,9 +8,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.care4elders.appointmentavailability.repository.IReservationRepository;
 
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,4 +76,27 @@ public class ServiceImp implements IService{
 
         return reservationRepository.save(reservation);
     }
-}
+
+    
+
+
+    public List<UserDTO> getAllUsers() {
+        String userServiceUrl = "http://USER-SERVICE/users"; // Remove trailing slash
+          try {        UserDTO[] users = restTemplate.getForObject(userServiceUrl, UserDTO[].class);
+              assert users != null;
+              return Arrays.asList(users);    }
+          catch (RestClientException e) {
+              throw new RuntimeException("Failed to fetch users from User Service", e);
+          }
+    }
+
+    public UserDTO getUserById(String userId) {
+        String url = "http://USER-SERVICE/users/" + userId;
+        try {
+            return restTemplate.getForObject(url, UserDTO.class);
+        } catch (RestClientException e) {
+            throw new RuntimeException("Failed to fetch user with ID: " + userId, e);
+        }
+    }
+
+    }
