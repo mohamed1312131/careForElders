@@ -61,7 +61,6 @@ public class SecurityConfig {
                         "/request-reset",
                         "/reset-password"
                 ).permitAll()
-                .requestMatchers(HttpMethod.GET, HttpMethod.POST, "/users/**").permitAll()
                 .anyRequest().authenticated()
         );
 
