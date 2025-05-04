@@ -1,0 +1,46 @@
+<!-- program.component.html -->
+<div class="workout-screen">
+  <div class="workout-header">
+    <div class="header-info">
+      <span class="duration">{{ dayExercises?.totalDuration }} mins</span>
+      <span class="separator">•</span>
+      <span class="count">{{ dayExercises?.exercises?.length }} Workouts</span>
+    </div>
+    <a *ngIf="dayExercises?.status === 'COMPLETED'" class="edit-link">
+      Edit &gt;
+    </a>
+  </div>
+
+  <ul class="workout-list">
+    <li class="workout-item" *ngFor="let exercise of dayExercises?.exercises">
+      <div class="item-icon">
+        <img [src]="exercise.imageUrl" 
+             class="exercise-image"
+             alt="Exercise illustration">
+      </div>
+      <div class="item-details">
+        <span class="item-name">{{ exercise.name }}</span>
+        <span class="item-duration">
+          {{ exercise.durationMinutes }} minutes
+        </span>
+      </div>
+      <div class="item-actions">
+        <button class="action-button">ℹ️</button>
+      </div>
+    </li>
+  </ul>
+
+  <div class="workout-footer">
+    <button class="start-button" 
+            (click)="completeDay()"
+            *ngIf="dayExercises?.status === 'IN_PROGRESS'">
+      Complete Day
+    </button>
+    
+    <button class="start-button" 
+            (click)="startWorkout()"
+            *ngIf="dayExercises?.status !== 'COMPLETED'">
+      {{ dayExercises?.status === 'IN_PROGRESS' ? 'Continue Workout' : 'Start Workout' }}
+    </button>
+  </div>
+</div>

@@ -34,7 +34,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             user.setFirstName(oAuth2User.getAttribute("given_name"));
             user.setLastName(oAuth2User.getAttribute("family_name"));
             user.setEnabled(true);
-            user.setRole(Role.USER);
+            user.setRole(Role.NORMAL_USER);
             userRepository.save(user);
         }
 
