@@ -1,0 +1,26 @@
+<!-- workout-player.component.html -->
+<div class="workout-player-container">
+    <div class="header">
+      <h2>{{ currentExercise.name }}</h2>
+      <button mat-icon-button (click)="close()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  
+    <div class="video-container" *ngIf="!isCompleted">
+      <video [src]="currentExercise.videoUrl" controls autoplay></video>
+    </div>
+  
+    <div class="timer" *ngIf="!isCompleted">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="progress"></div>
+      </div>
+      <div class="time-display">{{ formatTime(timeLeft) }}</div>
+    </div>
+  
+    <div class="completion-message" *ngIf="isCompleted">
+      <h2>🎉 Good job!</h2>
+      <p>You've completed Day {{ data.dayNumber }}</p>
+      <button mat-raised-button color="primary" (click)="close()">Close</button>
+    </div>
+  </div>
