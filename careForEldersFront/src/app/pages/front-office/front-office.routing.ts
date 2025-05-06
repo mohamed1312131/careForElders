@@ -21,6 +21,16 @@ export const FrontOfficeRoutes: Routes = [
         path: 'userinfo/:id',
         component: UserinfoComponent,
       },
+      {
+        path: 'plan',
+        loadChildren: () =>
+          import('./plan-and-exercise/plan-and-exercise.module').then((m) => m.PlanAndExerciseModule),
+      },
+      {
+        path: 'chat',
+        loadChildren: () =>
+          import('./chat/chat.module').then((m) => m.ChatModule),
+      },
     ],
 
   },
