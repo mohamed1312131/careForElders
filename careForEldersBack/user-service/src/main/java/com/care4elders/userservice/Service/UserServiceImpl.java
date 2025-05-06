@@ -1,5 +1,6 @@
 package com.care4elders.userservice.Service;
 
+import com.care4elders.userservice.dto.UpdateUserRequest;
 import com.care4elders.userservice.dto.UserRequest;
 import com.care4elders.userservice.dto.UserResponse;
 import com.care4elders.userservice.entity.User;
@@ -78,27 +79,42 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
     }
 
     @Override
-    public UserResponse updateUser(String id, UserRequest request) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    user.setFirstName(request.getFirstName());
-                    user.setLastName(request.getLastName());
-                    user.setPhoneNumber(request.getPhoneNumber());
-                    user.setRole(request.getRole());
-                    user.setBirthDate(request.getBirthDate());
+    public UserResponse updateUser(String id, UpdateUserRequest request) {
+        User user = userRepository.findById(id).orElse(null);
 
-                    if (request.getProfileImage() != null) {
-                        user.setProfileImage(request.getProfileImage());
-                    }
+        if (user == null) {
+            return null; // Or return ResponseEntity.notFound() in controller
+        }
 
-                    if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-                        user.setPassword(passwordEncoder.encode(request.getPassword()));
-                    }
+        if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
+        if (request.getLastName() != null) user.setLastName(request.getLastName());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
+        if (request.getBirthDate() != null) user.setBirthDate(request.getBirthDate());
+        if (request.getProfileImage() != null) user.setProfileImage(request.getProfileImage());
+        if (request.getRole() != null) user.setRole(request.getRole());
 
-                    return mapToResponse(userRepository.save(user));
-                })
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        User updatedUser = userRepository.save(user);
+
+        // Manual mapping to UserResponse
+        UserResponse response = new UserResponse();
+        response.setId(updatedUser.getId());
+        response.setFirstName(updatedUser.getFirstName());
+        response.setLastName(updatedUser.getLastName());
+        response.setEmail(updatedUser.getEmail());
+        response.setPhoneNumber(updatedUser.getPhoneNumber());
+        response.setBirthDate(updatedUser.getBirthDate());
+        response.setProfileImage(updatedUser.getProfileImage());
+        response.setRole(updatedUser.getRole());
+
+        return response;
     }
+
+
 
     @Override
     public UserResponse updateProfileImage(String userId, String imageUrl) {

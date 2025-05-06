@@ -1,4 +1,52 @@
 /* You can add global styles to this file, and also import other style files */
+<<<<<<< HEAD
+
+// Adjust toast container position
+.toast-top-right {
+  top: 1rem !important; /* Ensure the toast is at the top */
+  right: 1rem !important; /* Ensure it's aligned to the right */
+  z-index: 9999 !important; /* Ensure the toast is above other elements */
+}
+
+// Customize toast appearance
+.toast {
+  font-family: 'Arial', sans-serif;
+  font-size: 16px;
+  border-radius: 8px; /* Rounded corners for better look */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 10px 15px; /* Adjust padding for readability */
+}
+
+// Specific styles for success toasts
+.toast-success {
+  background-color: #28a745 !important; /* Green background */
+  color: #fff !important; /* White text for contrast */
+}
+
+// Specific styles for error toasts
+.toast-error {
+  background-color: #dc3545 !important; /* Red background */
+  color: #fff !important;
+}
+
+// Specific styles for warning toasts
+.toast-warning {
+  background-color: #ffc107 !important; /* Yellow background */
+  color: #212529 !important;
+}
+
+// Specific styles for info toasts
+.toast-info {
+  background-color: #17a2b8 !important; /* Blue background */
+  color: #fff !important;
+}
+
+// Progress bar style
+.toast-progress {
+  background: rgba(255, 255, 255, 0.8) !important; /* Progress bar color */
+}
+=======
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+>>>>>>> bd48eb00029363c76b96edaff363b54a54f2d210

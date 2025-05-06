@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {catchError, map, Observable, throwError} from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 
@@ -38,15 +38,31 @@ export class AuthService  {
 
   constructor(private http: HttpClient) {}
 
-  login(data: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, data).pipe(
-      tap((response: LoginResponse) => {
-        localStorage.setItem('token', response.token);
+  login(loginRequest: LoginRequest): Observable<any> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, loginRequest)
+      .pipe(
+      map((response: any) => {
+        const token = response.data.token;
+        const user = response.data.user;
 
-         //localStorage.setItem('user', JSON.stringify(response.user));
+        if (token && user) {
+          // Save token and user data to local storage
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          return { token, user }; // Optionally return for further usage
+        } else {
+          throw new Error('Invalid response structure');
+        }
+      }),
+      catchError((error: any) => {
+        // Log the error and rethrow it for the component to handle
+        console.error('Error during login:', error);
+        return throwError(() => error);
       })
     );
   }
+
+
 
 
   register(data: RegisterRequest): Observable<any> {
@@ -58,6 +74,9 @@ export class AuthService  {
 
   deleteUser(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/users/${id}`);
+  }
+  updateUser(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${id}`, data);
   }
 
 
