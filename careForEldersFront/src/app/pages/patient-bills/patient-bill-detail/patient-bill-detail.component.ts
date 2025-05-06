@@ -45,12 +45,12 @@ export class PatientBillDetailComponent implements OnInit {
     }
   }
 
+  
   editBill(): void {
-    if (this.patientBill) {
+    if (this.patientBill && this.patientBill.id !== undefined) {
       this.router.navigate(['/patient-bills/edit', this.patientBill.id]);
     }
   }
-
   goBack(): void {
     this.router.navigate(['/patient-bills']);
   }

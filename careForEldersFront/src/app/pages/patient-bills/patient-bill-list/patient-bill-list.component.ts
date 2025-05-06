@@ -1,4 +1,4 @@
-// src/app/features/patient-bills/patient-bill-list/patient-bill-list.component.ts
+// src/app/pages/patient-bills/patient-bill-list/patient-bill-list.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PatientBill } from 'src/app/models/patient-bill.model';
@@ -41,19 +41,25 @@ export class PatientBillListComponent implements OnInit {
       });
   }
 
-  viewBillDetails(id: number): void {
-    this.router.navigate(['/patient-bills', id]);
+  viewBillDetails(id: number | undefined): void {
+    if (id !== undefined) {
+      this.router.navigate(['/patient-bills', id]);
+    }
   }
 
-  editBill(id: number): void {
-    this.router.navigate(['/patient-bills/edit', id]);
+  editBill(id: number | undefined): void {
+    if (id !== undefined) {
+      this.router.navigate(['/patient-bills/edit', id]);
+    }
   }
 
   createNewBill(): void {
     this.router.navigate(['/patient-bills/new']);
   }
 
-  deleteBill(id: number): void {
+  deleteBill(id: number | undefined): void {
+    if (id === undefined) return;
+    
     if (confirm('Are you sure you want to delete this bill?')) {
       this.patientBillService.deletePatientBill(id)
         .subscribe({

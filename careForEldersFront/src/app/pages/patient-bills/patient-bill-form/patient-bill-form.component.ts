@@ -174,6 +174,7 @@ export class PatientBillFormComponent implements OnInit {
       // Mark all fields as touched to trigger validation messages
       this.markFormGroupTouched(this.billForm);
       return;
+      
     }
     
     this.submitting = true;

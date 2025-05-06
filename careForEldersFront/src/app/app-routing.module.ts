@@ -17,7 +17,7 @@ const routes: Routes = [
     loadChildren: () => import('./pages/patient-bills/patient-bills.module').then(m => m.PatientBillsModule)
   },
   { path: '', redirectTo: 'patient-bills', pathMatch: 'full' },
-  { path: '**', redirectTo: 'patient-bills' }
+  { path: '**', redirectTo: 'patient-bills' },
   // Admin authentication routes (login/register)
   {
     path: "admin/authentication",
