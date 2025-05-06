@@ -58,7 +58,8 @@ public class SecurityConfig {
                         "/request-reset/**",
                         "/reset-password/**",
                         "/request-reset",
-                        "/reset-password"
+                        "/reset-password",
+                        "/users/**"
                 ).permitAll()
                 .anyRequest().authenticated()
         );
