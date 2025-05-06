@@ -4,6 +4,8 @@ import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
 import {PasswordResetComponent} from "./pages/authentication/password-reset/password-reset.component";
 import {ResetPasswordFormComponent} from "./pages/authentication/reset-password-form/reset-password-form.component";
+import {UsersComponent} from "./pages/front-office/user-service/user/user.component";
+import {MedicalRecordComponent} from "./pages/front-office/medical-record/medical-record/medical-record.component";
 
 const routes: Routes = [
   // Front office routes
@@ -34,6 +36,9 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/pages.module').then((m) => m.PagesModule),
       },
+      { path: 'front-office/user', component: UsersComponent }, // Route for User Administration
+      { path: 'front-office/medical-record', component: MedicalRecordComponent }, // Route for Medical Record
+
       {
         path: 'ui-components',
         component: FullComponent,

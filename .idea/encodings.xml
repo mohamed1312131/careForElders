@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/careForEldersBack/api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/appointmentAvailability/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/blogForum/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/chat/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/config-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/event/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/medicalRecord/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/notification/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/nutrition/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/paramedicalCare/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/patientBill/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/planAndExercise/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/service-registry/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/subscription/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/careForEldersBack/user-service/src/main/java" charset="UTF-8" />
+  </component>
+</project>
