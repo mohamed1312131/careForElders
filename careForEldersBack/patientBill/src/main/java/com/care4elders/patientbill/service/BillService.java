@@ -9,7 +9,7 @@ public interface BillService {
     List<Bill> getAllBills();
     Bill getBillById(String id) throws BillNotFoundException;
     List<Bill> getBillsByPatientId(Long patientId);
-    List<Bill> getBillsByPatientId(String patientIdStr);
+    List<Bill> getBillsByPatientIdString(String patientIdStr);
     Bill createBill(Bill bill);
     Bill updateBill(String id, Bill bill) throws BillNotFoundException;
     void deleteBill(String id) throws BillNotFoundException;

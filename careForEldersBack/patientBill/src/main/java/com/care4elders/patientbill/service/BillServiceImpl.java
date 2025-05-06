@@ -2,7 +2,7 @@ package com.care4elders.patientbill.service;
 
 import com.care4elders.patientbill.model.Bill;
 import com.care4elders.patientbill.repository.BillRepository;
-import com.care4elders.patientbill.service.BillService;
+//import com.care4elders.patientbill.service.BillService;
 import com.care4elders.patientbill.exception.BillNotFoundException;
 
 import org.springframework.stereotype.Service;
@@ -34,29 +34,24 @@ public class BillServiceImpl implements BillService {
             });
     }
     
-    // Fix the method that's causing the error
-    // Option 1: If patientId should be a Long
+    @Override
     public List<Bill> getBillsByPatientId(Long patientId) {
         log.debug("Fetching bills for patient id: {}", patientId);
         return billRepository.findByPatientId(patientId);
     }
     
-    // Option 2: If you need to convert a String to Long
-    public List<Bill> getBillsByPatientId(String patientIdStr) {
-        try {
-            Long patientId = Long.parseLong(patientIdStr);
-            log.debug("Fetching bills for patient id: {}", patientId);
-            return billRepository.findByPatientId(patientId);
-        } catch (NumberFormatException e) {
-            log.error("Invalid patient ID format: {}", patientIdStr);
-            return List.of(); // Return empty list or throw an exception
-        }
-    }
-    
-    // Option 3: If you want to keep patientId as String in some cases
+    @Override
     public List<Bill> getBillsByPatientIdString(String patientIdStr) {
         log.debug("Fetching bills for patient id string: {}", patientIdStr);
-        return billRepository.findByPatientIdString(patientIdStr);
+        try {
+            // Try to convert to Long and use the standard method
+            Long patientId = Long.parseLong(patientIdStr);
+            return billRepository.findByPatientId(patientId);
+        } catch (NumberFormatException e) {
+            log.warn("Could not parse patient ID '{}' as Long, using string query", patientIdStr);
+            // If conversion fails, use the custom query method
+            return billRepository.findByPatientIdAsString(patientIdStr);
+        }
     }
     
     @Override

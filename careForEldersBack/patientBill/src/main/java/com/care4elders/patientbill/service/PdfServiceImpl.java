@@ -2,8 +2,6 @@ package com.care4elders.patientbill.service;
 
 import com.care4elders.patientbill.model.Bill;
 import com.care4elders.patientbill.model.BillItem;
-import com.care4elders.patientbill.service.BillService;
-import com.care4elders.patientbill.service.PdfService;
 import com.care4elders.patientbill.exception.BillNotFoundException;
 
 import com.itextpdf.kernel.pdf.PdfDocument;

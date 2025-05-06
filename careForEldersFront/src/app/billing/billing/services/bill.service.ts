@@ -1,41 +1,40 @@
-// src/app/billing/services/bill.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Bill } from '../../../models/bill.model';
-import { ServiceItem } from '../../../models/service-item';
-import { Observable } from 'rxjs';
+import { Injectable } from "@angular/core"
+import type { HttpClient } from "@angular/common/http"
+import type { Observable } from "rxjs"
+import { Bill } from "src/app/models/bill.model"
+//import type { Bill } from "../models/bill.model"
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: "root",
+})
 export class BillService {
-  // Direct API URL (replace with your actual backend URL)
-  private apiUrl = 'http://localhost:8080/api/bills';
+  private apiUrl = "http://localhost:8080/api/bills"
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<Bill[]> {
-    return this.http.get<Bill[]>(this.apiUrl);
+  getAllBills(): Observable<Bill[]> {
+    return this.http.get<Bill[]>(this.apiUrl)
   }
 
-  create(bill: Bill): Observable<Bill> {
-    // Calculate total if not provided
-  /*  if (!bill.totalAmount && bill.services) {
-      bill.totalAmount = bill.services.reduce(
-        (sum, item) => sum + (item.rate * item.quantity), 0
-      );
-    }*/
-    return this.http.post<Bill>(this.apiUrl, bill);
+  getBillById(id: number): Observable<Bill> {
+    return this.http.get<Bill>(`${this.apiUrl}/${id}`)
   }
 
-  generatePdf(billId: number): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/${billId}/pdf`, {
-      responseType: 'blob'
-    });
+  createBill(bill: Bill): Observable<Bill> {
+    return this.http.post<Bill>(this.apiUrl, bill)
   }
 
-  // Helper method for service items
-  calculateServiceTotal(services: ServiceItem[]): number {
-    return services.reduce(
-      (total, item) => total + (item.rate * item.quantity), 0
-    );
+  updateBill(id: number, bill: Bill): Observable<Bill> {
+    return this.http.put<Bill>(`${this.apiUrl}/${id}`, bill)
+  }
+
+  deleteBill(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`)
+  }
+
+  downloadPdf(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/pdf`, {
+      responseType: "blob",
+    })
   }
 }

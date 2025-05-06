@@ -1,0 +1,144 @@
+<div class="container mt-4">
+    <div class="card">
+      <div class="card-header">
+        <h3>{{ isEditMode ? 'Edit Bill' : 'Create New Bill' }}</h3>
+      </div>
+      <div class="card-body">
+        <div *ngIf="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+  
+        <div *ngIf="loading" class="d-flex justify-content-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+  
+        <form [formGroup]="billForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="patientId" class="form-label">Patient ID</label>
+                <input type="text" class="form-control" id="patientId" formControlName="patientId">
+                <div *ngIf="billForm.get('patientId')?.invalid && billForm.get('patientId')?.touched" class="text-danger">
+                  <small *ngIf="billForm.get('patientId')?.errors?.['required']">Patient ID is required</small>
+                  <small *ngIf="billForm.get('patientId')?.errors?.['pattern']">Patient ID must be a number</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="patientName" class="form-label">Patient Name</label>
+                <input type="text" class="form-control" id="patientName" formControlName="patientName">
+                <div *ngIf="billForm.get('patientName')?.invalid && billForm.get('patientName')?.touched" class="text-danger">
+                  <small *ngIf="billForm.get('patientName')?.errors?.['required']">Patient name is required</small>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="billDate" class="form-label">Bill Date</label>
+                <input type="date" class="form-control" id="billDate" formControlName="billDate">
+                <div *ngIf="billForm.get('billDate')?.invalid && billForm.get('billDate')?.touched" class="text-danger">
+                  <small *ngIf="billForm.get('billDate')?.errors?.['required']">Bill date is required</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="dueDate" class="form-label">Due Date</label>
+                <input type="date" class="form-control" id="dueDate" formControlName="dueDate">
+                <div *ngIf="billForm.get('dueDate')?.invalid && billForm.get('dueDate')?.touched" class="text-danger">
+                  <small *ngIf="billForm.get('dueDate')?.errors?.['required']">Due date is required</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select class="form-select" id="status" formControlName="status">
+                  <option value="PAID">Paid</option>
+                  <option value="UNPAID">Unpaid</option>
+                  <option value="OVERDUE">Overdue</option>
+                </select>
+              </div>
+            </div>
+          </div>
+  
+          <div class="mb-3">
+            <label for="description" class="form-label">Description (Optional)</label>
+            <textarea class="form-control" id="description" rows="3" formControlName="description"></textarea>
+          </div>
+  
+          <h4 class="mt-4 mb-3">Bill Items</h4>
+          
+          <div formArrayName="items">
+            <div *ngFor="let item of itemsFormArray.controls; let i = index" [formGroupName]="i" class="card mb-3">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-5">
+                    <div class="mb-3">
+                      <label [for]="'description-' + i" class="form-label">Description</label>
+                      <input type="text" class="form-control" [id]="'description-' + i" formControlName="description">
+                      <div *ngIf="item.get('description')?.invalid && item.get('description')?.touched" class="text-danger">
+                        <small *ngIf="item.get('description')?.errors?.['required']">Description is required</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="mb-3">
+                      <label [for]="'quantity-' + i" class="form-label">Quantity</label>
+                      <input type="number" class="form-control" [id]="'quantity-' + i" formControlName="quantity" min="1" (change)="onItemChange(i)">
+                      <div *ngIf="item.get('quantity')?.invalid && item.get('quantity')?.touched" class="text-danger">
+                        <small *ngIf="item.get('quantity')?.errors?.['required']">Quantity is required</small>
+                        <small *ngIf="item.get('quantity')?.errors?.['min']">Quantity must be at least 1</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="mb-3">
+                      <label [for]="'unitPrice-' + i" class="form-label">Unit Price</label>
+                      <input type="number" class="form-control" [id]="'unitPrice-' + i" formControlName="unitPrice" min="0" step="0.01" (change)="onItemChange(i)">
+                      <div *ngIf="item.get('unitPrice')?.invalid && item.get('unitPrice')?.touched" class="text-danger">
+                        <small *ngIf="item.get('unitPrice')?.errors?.['required']">Unit price is required</small>
+                        <small *ngIf="item.get('unitPrice')?.errors?.['min']">Unit price must be at least 0</small>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    <div class="mb-3">
+                      <label [for]="'amount-' + i" class="form-label">Amount</label>
+                      <input type="text" class="form-control" [id]="'amount-' + i" formControlName="amount" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger mb-3" (click)="removeItem(i)" [disabled]="itemsFormArray.length <=  class="btn btn-danger mb-3" (click)="removeItem(i)" [disabled]="itemsFormArray.length <= 1">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="mb-4">
+            <button type="button" class="btn btn-outline-primary" (click)="addItem()">
+              <i class="bi bi-plus-circle me-1"></i> Add Item
+            </button>
+          </div>
+  
+          <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="submitting">
+              <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+              {{ isEditMode ? 'Update' : 'Create' }} Bill
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

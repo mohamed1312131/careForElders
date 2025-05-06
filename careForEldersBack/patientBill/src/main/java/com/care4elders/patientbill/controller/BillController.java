@@ -53,7 +53,7 @@ public class BillController {
     @GetMapping("/patient/str/{patientIdStr}")
     public ResponseEntity<List<Bill>> getBillsByPatientIdString(@PathVariable String patientIdStr) {
         log.info("Fetching bills for patient id string: {}", patientIdStr);
-        List<Bill> bills = billService.getBillsByPatientId(patientIdStr);
+        List<Bill> bills = billService.getBillsByPatientIdString(patientIdStr);
         return ResponseEntity.ok(bills);
     }
 
