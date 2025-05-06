@@ -10,6 +10,21 @@ export const navItems: NavItem[] = [
     route: '/dashboard',
   },
   {
+    navCap: 'Administration', // Administration Section
+  },
+  {
+    displayName: 'Users Administration',
+    iconName: 'settings', // Choose an appropriate icon
+    route: '/user/users',},
+  {
+    navCap: 'Medical Record', // Administration Section
+  },
+  {
+    displayName: 'medical Record',
+    iconName: 'lock',
+    route: '/front-office/medical-record',
+  },
+  {
     navCap: 'Ui Components',
   },
   {
