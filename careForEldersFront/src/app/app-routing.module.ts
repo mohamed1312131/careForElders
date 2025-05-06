@@ -2,9 +2,6 @@ import { NgModule } from "@angular/core"
 import { RouterModule, type Routes } from "@angular/router"
 import { BlankComponent } from "./layouts/blank/blank.component"
 import { FullComponent } from "./layouts/full/full.component"
-import { BillListComponent } from "./billing/billing/bill-list/bill-list.component"
-import { BillFormComponent } from "./billing/billing/bill-form/bill-form.component"
-import { BillDetailComponent } from "./billing/billing/bill-details/bill-details.component"
 
 const routes: Routes = [
   // Public front office routes
@@ -14,18 +11,13 @@ const routes: Routes = [
   },
 
   // Billing routes - nested under the FullComponent layout
+ 
   {
-    path: "billing",
-    component: FullComponent,
-    children: [
-      { path: "", redirectTo: "bills", pathMatch: "full" },
-      { path: "bills", component: BillListComponent },
-      { path: "bills/new", component: BillFormComponent },
-      { path: "bills/:id", component: BillDetailComponent },
-      { path: "bills/:id/edit", component: BillFormComponent },
-    ],
+    path: 'patient-bills',
+    loadChildren: () => import('./pages/patient-bills/patient-bills.module').then(m => m.PatientBillsModule)
   },
-
+  { path: '', redirectTo: 'patient-bills', pathMatch: 'full' },
+  { path: '**', redirectTo: 'patient-bills' }
   // Admin authentication routes (login/register)
   {
     path: "admin/authentication",

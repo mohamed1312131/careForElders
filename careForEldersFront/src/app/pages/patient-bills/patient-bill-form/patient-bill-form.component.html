@@ -1,0 +1,163 @@
+<!-- src/app/features/patient-bills/patient-bill-form/patient-bill-form.component.html -->
+<div class="patient-bill-form-container">
+    <div class="header">
+      <h1>{{ isEditMode ? 'Edit' : 'Create' }} Patient Bill</h1>
+    </div>
+  
+    <div *ngIf="error" class="error-message">
+      {{ error }}
+    </div>
+  
+    <div *ngIf="loading" class="loading-container">
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  
+    <form *ngIf="!loading" [formGroup]="billForm" (ngSubmit)="onSubmit()" class="bill-form">
+      <div class="form-section">
+        <h2>Patient Information</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="patientId">Patient ID</label>
+            <input id="patientId" type="text" formControlName="patientId" class="form-control">
+            <div *ngIf="billForm.get('patientId')?.invalid && billForm.get('patientId')?.touched" class="error-text">
+              Patient ID is required
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="patientName">Patient Name</label>
+            <input id="patientName" type="text" formControlName="patientName" class="form-control">
+            <div *ngIf="billForm.get('patientName')?.invalid && billForm.get('patientName')?.touched" class="error-text">
+              Patient Name is required
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="form-section">
+        <h2>Bill Information</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="billNumber">Bill Number</label>
+            <input id="billNumber" type="text" formControlName="billNumber" class="form-control">
+            <div *ngIf="billForm.get('billNumber')?.invalid && billForm.get('billNumber')?.touched" class="error-text">
+              Bill Number is required
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="billDate">Bill Date</label>
+            <input id="billDate" type="date" formControlName="billDate" class="form-control">
+            <div *ngIf="billForm.get('billDate')?.invalid && billForm.get('billDate')?.touched" class="error-text">
+              Bill Date is required
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="dueDate">Due Date</label>
+            <input id="dueDate" type="date" formControlName="dueDate" class="form-control">
+            <div *ngIf="billForm.get('dueDate')?.invalid && billForm.get('dueDate')?.touched" class="error-text">
+              Due Date is required
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="form-section">
+        <h2>Bill Items</h2>
+        <div formArrayName="items">
+          <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="bill-item">
+            <div class="item-header">
+              <h3>Item #{{ i + 1 }}</h3>
+              <button type="button" class="btn-icon" (click)="removeItem(i)" [disabled]="items.length === 1">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label [for]="'description-' + i">Description</label>
+                <input [id]="'description-' + i" type="text" formControlName="description" class="form-control">
+                <div *ngIf="item.get('description')?.invalid && item.get('description')?.touched" class="error-text">
+                  Description is required
+                </div>
+              </div>
+              <div class="form-group">
+                <label [for]="'serviceType-' + i">Service Type</label>
+                <select [id]="'serviceType-' + i" formControlName="serviceType" class="form-control">
+                  <option *ngFor="let type of serviceTypes" [value]="type">{{ type }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label [for]="'serviceDate-' + i">Service Date</label>
+                <input [id]="'serviceDate-' + i" type="date" formControlName="serviceDate" class="form-control">
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label [for]="'quantity-' + i">Quantity</label>
+                <input [id]="'quantity-' + i" type="number" formControlName="quantity" class="form-control" min="1" (change)="calculateItemAmount(i)">
+                <div *ngIf="item.get('quantity')?.invalid && item.get('quantity')?.touched" class="error-text">
+                  Quantity must be at least 1
+                </div>
+              </div>
+              <div class="form-group">
+                <label [for]="'unitPrice-' + i">Unit Price</label>
+                <input [id]="'unitPrice-' + i" type="number" formControlName="unitPrice" class="form-control" min="0" step="0.01" (change)="calculateItemAmount(i)">
+                <div *ngIf="item.get('unitPrice')?.invalid && item.get('unitPrice')?.touched" class="error-text">
+                  Unit Price must be at least 0
+                </div>
+              </div>
+              <div class="form-group">
+                <label [for]="'amount-' + i">Amount</label>
+                <input [id]="'amount-' + i" type="number" formControlName="amount" class="form-control" readonly>
+              </div>
+            </div>
+          </div>
+          
+          <button type="button" class="btn-secondary" (click)="addItem()">
+            <i class="fas fa-plus"></i> Add Item
+          </button>
+        </div>
+      </div>
+  
+      <div class="form-section">
+        <h2>Payment Information</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="totalAmount">Total Amount</label>
+            <input id="totalAmount" type="number" formControlName="totalAmount" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="paidAmount">Paid Amount</label>
+            <input id="paidAmount" type="number" formControlName="paidAmount" class="form-control" min="0" step="0.01" (change)="updateBillStatus()">
+            <div *ngIf="billForm.get('paidAmount')?.invalid && billForm.get('paidAmount')?.touched" class="error-text">
+              Paid Amount must be at least 0
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="status">Status</label>
+            <input id="status" type="text" formControlName="status" class="form-control" readonly>
+          </div>
+        </div>
+      </div>
+  
+      <div class="form-section">
+        <h2>Additional Information</h2>
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea id="notes" formControlName="notes" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+  
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          <span *ngIf="submitting">
+            <i class="fas fa-spinner fa-spin"></i> Saving...
+          </span>
+          <span *ngIf="!submitting">
+            {{ isEditMode ? 'Update' : 'Create' }} Bill
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>

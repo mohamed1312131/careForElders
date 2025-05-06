@@ -25,12 +25,6 @@ import { BrandingComponent } from "./layouts/full/sidebar/branding.component"
 import { AppNavItemComponent } from "./layouts/full/sidebar/nav-item/nav-item.component"
 
 
-// Services
-import { BillService } from "./services/bill.service"
-// Billing Components
-import { BillDetailComponent } from "./billing/billing/bill-details/bill-details.component"
-import { BillFormComponent } from "./billing/billing/bill-form/bill-form.component"
-import { BillListComponent } from "./billing/billing/bill-list/bill-list.component"
 
 @NgModule({
   declarations: [
@@ -41,10 +35,7 @@ import { BillListComponent } from "./billing/billing/bill-list/bill-list.compone
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
-    // Billing Components
-    BillListComponent,
-    BillDetailComponent,
-    BillFormComponent,
+
   ],
   imports: [
     BrowserModule,
@@ -56,9 +47,7 @@ import { BillListComponent } from "./billing/billing/bill-list/bill-list.compone
     MaterialModule,
     TablerIconsModule.pick(TablerIcons),
   ],
-  providers: [
-    BillService, // Explicitly provide the BillService
-  ],
+  providers: [],
   exports: [TablerIconsModule],
   bootstrap: [AppComponent],
 })
