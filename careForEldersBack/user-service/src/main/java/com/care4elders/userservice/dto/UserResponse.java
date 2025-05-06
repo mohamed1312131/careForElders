@@ -15,4 +15,5 @@ public class UserResponse {
     private Role role;
     private LocalDate birthDate;
     private String profileImage;
+    private String specialization;
 }

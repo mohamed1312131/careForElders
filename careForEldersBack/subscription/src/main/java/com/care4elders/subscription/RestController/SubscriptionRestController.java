@@ -1,0 +1,53 @@
+package com.care4elders.subscription.RestController;
+
+import com.care4elders.subscription.DTO.SubscriptionPlanDTO;
+import com.care4elders.subscription.DTO.UserSubscriptionDTO;
+import com.care4elders.subscription.Service.SubscriptionService;
+import com.care4elders.subscription.entity.SubscriptionPlan;
+import com.care4elders.subscription.entity.UserSubscription;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/subscriptions")
+@RequiredArgsConstructor
+public class SubscriptionRestController {
+    private final SubscriptionService subscriptionService;
+
+    @PostMapping("/plans")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SubscriptionPlan createPlan(@RequestHeader("X-Admin-Id") String adminId,
+                                       @RequestBody SubscriptionPlanDTO planDTO) {
+        return subscriptionService.createPlan(adminId, planDTO);
+    }
+
+    @PutMapping("/plans/{planId}")
+    public SubscriptionPlan updatePlan(@RequestHeader("X-Admin-Id") String adminId,
+                                       @PathVariable String planId,
+                                       @RequestBody SubscriptionPlanDTO planDTO) {
+        return subscriptionService.updatePlan(adminId, planId, planDTO);
+    }
+
+    @DeleteMapping("/plans/{planId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePlan(@RequestHeader("X-Admin-Id") String adminId,
+                           @PathVariable String planId) {
+        subscriptionService.deletePlan(adminId, planId);
+    }
+
+    @PostMapping("/assign")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserSubscription assignPlan(@RequestBody UserSubscriptionDTO subscriptionDTO) {
+        return subscriptionService.assignPlanToUser(subscriptionDTO);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<UserSubscription> getUserSubscriptions(@PathVariable String userId) {
+        return subscriptionService.getUserSubscriptions(userId);
+    }
+}
+

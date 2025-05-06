@@ -2,6 +2,7 @@ package com.care4elders.userservice.Config;
 
 import com.care4elders.userservice.security.JwtAuthFilter;
 import com.care4elders.userservice.security.CustomUserDetailsService;
+import jakarta.ws.rs.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

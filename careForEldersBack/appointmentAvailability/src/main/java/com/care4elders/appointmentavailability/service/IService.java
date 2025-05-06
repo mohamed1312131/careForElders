@@ -1,5 +1,6 @@
 package com.care4elders.appointmentavailability.service;
 
+import com.care4elders.appointmentavailability.dto.UserDTO;
 import com.care4elders.appointmentavailability.entity.Reservation;
 
 import java.util.List;
@@ -11,4 +12,9 @@ public interface IService {
     Optional<Reservation> getReservationById(String id);         // Read by ID
     Reservation updateReservation(String id, Reservation r);     // Update
     void deleteReservation(String id);
+
+  //  List<UserDTO> GetAllUsers();
+    UserDTO getUserById(String userId);
+
+    List<UserDTO> getAllUsers();
 }
