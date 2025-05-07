@@ -24,6 +24,10 @@ public class SubscriptionRestController {
                                        @RequestBody SubscriptionPlanDTO planDTO) {
         return subscriptionService.createPlan(adminId, planDTO);
     }
+    @GetMapping("/plans")
+    public SubscriptionPlan getAllPlans() {
+        return subscriptionService.getAllPlans();
+    }
 
     @PutMapping("/plans/{planId}")
     public SubscriptionPlan updatePlan(@RequestHeader("X-Admin-Id") String adminId,

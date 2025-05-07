@@ -99,4 +99,20 @@ public class ServiceImp implements IService{
         }
     }
 
+    public List<UserDTO> getAllDoctors() {
+        List<UserDTO> allUsers = getAllUsers(); // uses restTemplate
+        return allUsers.stream()
+                .filter(user -> "DOCTOR".equalsIgnoreCase(user.getRole()))
+                .toList(); // Or .collect(Collectors.toList()) in Java 8
+    }
+
+    public UserDTO getDoctorById(String doctorId) {
+        UserDTO user = getUserById(doctorId);
+        if (user != null && "DOCTOR".equalsIgnoreCase(user.getRole())) {
+            return user;
+        } else {
+            throw new RuntimeException("Doctor not found with ID: " + doctorId);
+        }
+    }
+
     }

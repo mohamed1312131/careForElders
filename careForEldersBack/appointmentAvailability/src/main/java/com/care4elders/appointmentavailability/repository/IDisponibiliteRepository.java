@@ -9,8 +9,9 @@ import java.util.List;
 @Repository
 
 public interface IDisponibiliteRepository extends MongoRepository<Disponibilite, String> {
+    List<Disponibilite> findByDoctorId(String doctorId);
 
-      // List<Disponibilite> findByMedecinId(Long medecinId);
+    // List<Disponibilite> findByMedecinId(Long medecinId);
      //   List<Disponibilite> findByMedecinIdAndJour(Long medecinId, DayOfWeek jour);
 
 }
