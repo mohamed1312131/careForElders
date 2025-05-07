@@ -10,18 +10,7 @@ const routes: Routes = [
     path: "",
     loadChildren: () => import("./pages/front-office/front-office.module").then((m) => m.FrontOfficeModule),
   },
-
-  // Billing routes - nested under the FullComponent layout
-  //{ path: "api-test", component: ApiTestComponent },
-  // Add a redirect to the test page for easy access
-  { path: "test", redirectTo: "api-test", pathMatch: "full" },
-
-  {
-    path: 'patient-bills',
-    loadChildren: () => import('./pages/front-office/patient-bill/patient-bills.module').then(m => m.PatientBillsModule)
-  },
-  { path: '', redirectTo: 'patient-bills', pathMatch: 'full' },
-  { path: '**', redirectTo: 'patient-bills' },
+  
   // Admin authentication routes (login/register)
   {
     path: "admin/authentication",

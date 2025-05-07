@@ -9,6 +9,7 @@ export const FrontOfficeRoutes: Routes = [
         path: '',
         component: HomePageComponent,
       },
+
       {
         path: 'user',
         loadChildren: () =>

@@ -49,15 +49,6 @@ public class BillController {
         return ResponseEntity.ok(bills);
     }
     
-    // Alternative endpoint if patient ID is passed as a string
-    //@GetMapping("/patient/str/{patientIdStr}")
-    //public ResponseEntity<List<Bill>> getBillsByPatientIdString(@PathVariable String patientIdStr) {
-      //  log.info("Fetching bills for patient id string: {}", patientIdStr);
-      //  List<Bill> bills = billService.getBillsByPatientIdString(patientIdStr);
-     //   return ResponseEntity.ok(bills);
-    //}
-
-    // Rest of the controller remains the same...
     
     @GetMapping("/{id}")
     public ResponseEntity<Bill> getBillById(@PathVariable String id) {

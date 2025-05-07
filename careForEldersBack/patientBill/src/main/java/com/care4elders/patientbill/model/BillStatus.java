@@ -2,9 +2,7 @@
 package com.care4elders.patientbill.model;
 
 public enum BillStatus {
-    SENT,
-    CANCELLED,
-    PAID,
-    DRAFT,
-    OVERDUE
+   PAID ,
+   OVERDUE,
+   UNPAID
 }
