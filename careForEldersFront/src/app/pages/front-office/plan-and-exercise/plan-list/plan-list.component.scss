@@ -1,0 +1,70 @@
+// Optional: Import global variables or styles if you have them
+// @import 'styles/variables';
+
+.workout-list-container {
+    padding: 30px 20px; // Add padding around the whole list (adjust as needed)
+    max-width: 1400px; // Max width for the content area on very large screens
+    margin: 0 auto; // Center the container on the page
+    box-sizing: border-box; // Include padding in width calculation
+    width: 100%;
+  
+    .list-title {
+      font-size: 2em; // Clear title for the section
+      font-weight: 700;
+      color: #333; // Dark color for contrast
+      margin-bottom: 25px; // Space below the title
+      padding-left: 10px; // Slight indent to align nicely with grid padding below
+      border-left: 4px solid #6e48d2; // Accent line matching card progress bar
+    }
+  
+    .cards-wrapper {
+      display: grid;
+      // --- Responsive Grid Layout ---
+      // auto-fit: Creates as many columns as fit within the container.
+      // minmax(300px, 1fr): Each column will be at least 300px wide,
+      //                    but can grow equally (1fr) to fill available space.
+      // This naturally creates ~3 columns on medium/large screens if the container
+      // is wide enough (e.g., > 900px + gap), 2 columns on smaller tablets,
+      // and 1 column on narrow mobile screens.
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  
+      // --- Spacing ---
+      gap: 25px; // Consistent spacing between cards (rows and columns)
+  
+      // --- Alignment (Optional) ---
+      // align-items: stretch; // Default: makes cards in the same row equal height if content differs
+    }
+  }
+  
+  // --- Media Queries for Fine-tuning (Optional) ---
+  @media (max-width: 768px) {
+    .workout-list-container {
+      padding: 20px 15px; // Reduce padding on smaller screens
+  
+      .list-title {
+        font-size: 1.8em; // Slightly smaller title
+        margin-bottom: 20px;
+      }
+  
+      .cards-wrapper {
+        gap: 20px; // Slightly reduce gap
+        // Adjust minmax if needed for smaller screens, but auto-fit often handles it well.
+        // e.g., grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .workout-list-container {
+      padding: 15px 10px;
+  
+      .list-title {
+          font-size: 1.5em;
+      }
+       .cards-wrapper {
+          // On very small screens, ensure it definitely goes to one column if minmax wasn't enough
+          grid-template-columns: 1fr;
+          gap: 15px;
+       }
+    }
+  }
