@@ -54,6 +54,16 @@ public class ReservationRestController {
     public UserDTO getUserById(@PathVariable String userId) {
         return Service.getUserById(userId);
     }
+    @GetMapping("/getAllDoctors")
+    public List<UserDTO> getAllDoctors() {
+        return Service.getAllDoctors();
+    }
+
+    @GetMapping("/getDoctor/{doctorId}")
+    public UserDTO getDoctorById(@PathVariable String doctorId) {
+        return Service.getDoctorById(doctorId);
+    }
+
 }
 
 
