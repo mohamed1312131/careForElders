@@ -25,7 +25,13 @@ public class DispoService implements IDispoService {
     public List<Disponibilite> getAllDisponibilites() {
         return disponibiliteRepo.findAll();
     }
-/*
+
+
+    public List<Disponibilite> getDisponibilitesByDoctor(String doctorId) {
+        return disponibiliteRepo.findByDoctorId(doctorId);
+    }
+
+    /*
     @Override
     public List<Disponibilite> getDisponibilitesByMedecin(Long medecinId) {
         return disponibiliteRepo.findByMedecinId(medecinId);

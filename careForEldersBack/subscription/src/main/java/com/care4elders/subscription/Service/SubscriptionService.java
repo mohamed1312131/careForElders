@@ -38,6 +38,9 @@ public class SubscriptionService {
         plan.setFeatures(planDTO.getFeatures());
         return subscriptionPlanRepository.save(plan);
     }
+    public SubscriptionPlan getAllPlans() {
+        return subscriptionPlanRepository.findAll();
+    }
 
     public SubscriptionPlan updatePlan(String adminId, String planId, SubscriptionPlanDTO planDTO) {
         validateAdmin(adminId);
