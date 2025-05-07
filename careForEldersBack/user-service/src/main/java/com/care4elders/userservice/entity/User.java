@@ -32,6 +32,13 @@ public class User {
     private LocalDateTime tokenExpiryDate;
     private String resetPasswordToken;
 
+
+    // For all users (especially patients)
+    private List<String> reservationIds;
+    // For doctors only
+    private List<String> disponibiliteIds;
+
+
     // Subscription-related fields
     private String currentSubscriptionId;  // ID of active UserSubscription (in subscription service)
     private String currentPlanName;  // Cached for quick access ("Basic", "Standard", "Premium")

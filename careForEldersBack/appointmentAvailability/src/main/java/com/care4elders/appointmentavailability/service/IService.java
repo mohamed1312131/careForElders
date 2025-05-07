@@ -17,4 +17,6 @@ public interface IService {
     UserDTO getUserById(String userId);
 
     List<UserDTO> getAllUsers();
+    List<UserDTO> getAllDoctors();
+    UserDTO getDoctorById(String doctorId);
 }
