@@ -2,7 +2,7 @@ import { NgModule } from "@angular/core"
 import { RouterModule, type Routes } from "@angular/router"
 import { BlankComponent } from "./layouts/blank/blank.component"
 import { FullComponent } from "./layouts/full/full.component"
-import { ApiTestComponent } from "./test/api-test.component"
+//import { ApiTestComponent } from "./test/api-test.component"
 
 const routes: Routes = [
   // Public front office routes
@@ -12,13 +12,13 @@ const routes: Routes = [
   },
 
   // Billing routes - nested under the FullComponent layout
-  { path: "api-test", component: ApiTestComponent },
+  //{ path: "api-test", component: ApiTestComponent },
   // Add a redirect to the test page for easy access
   { path: "test", redirectTo: "api-test", pathMatch: "full" },
 
   {
     path: 'patient-bills',
-    loadChildren: () => import('./pages/patient-bills/patient-bills.module').then(m => m.PatientBillsModule)
+    loadChildren: () => import('./pages/front-office/patient-bill/patient-bills.module').then(m => m.PatientBillsModule)
   },
   { path: '', redirectTo: 'patient-bills', pathMatch: 'full' },
   { path: '**', redirectTo: 'patient-bills' },
