@@ -1,0 +1,86 @@
+<div class="chat-container">
+  <!-- Empty state when no chat is active -->
+  <div class="empty-state" *ngIf="!chat">
+    <div class="empty-state-content">
+      <mat-icon class="empty-icon">chat</mat-icon>
+      <h2>Start a new conversation</h2>
+      <p>Get personalized assistance for your health questions</p>
+      <button mat-raised-button color="primary" (click)="startNewChat()">
+        <mat-icon>add</mat-icon>
+        New Chat
+      </button>
+    </div>
+  </div>
+
+  <!-- Active chat interface -->
+  <div class="chat-interface" *ngIf="chat">
+    <!-- Header -->
+    <div class="chat-header">
+      <h2>AI Health Assistant</h2>
+      <button mat-icon-button (click)="startNewChat()" matTooltip="Start New Chat">
+        <mat-icon>add_circle</mat-icon>
+      </button>
+    </div>
+
+    <!-- Messages area -->
+    <div class="messages-area" #scrollContainer>
+      <div class="welcome-message" *ngIf="chat.messages.length === 0">
+        <h3>How can I help you today?</h3>
+        <p>Ask me any health-related questions you might have.</p>
+      </div>
+
+      <div class="message-wrapper" *ngFor="let message of chat.messages" [ngClass]="{'user-message-wrapper': isPatientMessage(message), 'ai-message-wrapper': isAIMessage(message)}">
+        <div class="message" [ngClass]="{'user-message': isPatientMessage(message), 'ai-message': isAIMessage(message)}">
+          <div class="message-avatar" *ngIf="isPatientMessage(message)">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="message-content">
+            <div class="message-text">{{ message.content }}</div>
+            <div class="message-time">{{ message.timestamp | date:'short' }}</div>
+          </div>
+          <div class="message-avatar" *ngIf="isAIMessage(message)">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Loading indicator -->
+      <div class="message-wrapper ai-message-wrapper" *ngIf="isLoading">
+        <div class="message ai-message">
+          <div class="message-content">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="message-avatar">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <mat-form-field appearance="outline" class="message-input">
+        <input 
+          matInput 
+          [(ngModel)]="newMessage" 
+          placeholder="Type your message..." 
+          (keyup.enter)="sendMessage()"
+          [disabled]="isLoading"
+        >
+      </mat-form-field>
+      <button 
+        mat-fab 
+        color="primary" 
+        class="send-button" 
+        [disabled]="!newMessage.trim() || isLoading" 
+        (click)="sendMessage()"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

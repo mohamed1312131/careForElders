@@ -1,0 +1,55 @@
+// workout-player.component.scss
+.workout-player-container {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+  
+    .video-container {
+      flex-grow: 1;
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+  
+    .timer {
+      margin-top: 20px;
+      .progress-bar {
+        height: 10px;
+        background: #eee;
+        border-radius: 5px;
+        overflow: hidden;
+        .progress-fill {
+          height: 100%;
+          background: #4CAF50;
+          transition: width 0.5s linear;
+        }
+      }
+      .time-display {
+        text-align: center;
+        font-size: 1.5em;
+        margin: 10px 0;
+      }
+    }
+  
+    .completion-message {
+      text-align: center;
+      padding: 40px;
+      h2 {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
+      button {
+        margin-top: 20px;
+      }
+    }
+  }

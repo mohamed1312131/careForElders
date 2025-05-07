@@ -1,0 +1,67 @@
+/* Add these styles to your user dialog component's SCSS file */
+
+.w-100 {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+mat-dialog-content {
+  padding: 16px 24px;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+  justify-content: flex-end;
+
+  button {
+    margin-left: 8px;
+    border-radius: 4px;
+    padding: 6px 16px;
+
+    &[color="primary"] {
+      font-weight: 500;
+    }
+  }/* Add these styles to your user dialog component's SCSS file */
+
+  .w-100 {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  mat-dialog-content {
+    padding: 16px 24px;
+  }
+
+  mat-dialog-actions {
+    padding: 16px 24px;
+    border-top: 1px solid #f0f0f0;
+    justify-content: flex-end;
+
+    button {
+      margin-left: 8px;
+      border-radius: 4px;
+      padding: 6px 16px;
+
+      &[color="primary"] {
+        font-weight: 500;
+      }
+    }
+  }
+
+  .mat-form-field-appearance-outline .mat-form-field-wrapper {
+    margin-bottom: -1.25em;
+  }
+
+  .mat-slide-toggle {
+    margin: 8px 0 16px;
+  }
+}
+
+.mat-form-field-appearance-outline .mat-form-field-wrapper {
+  margin-bottom: -1.25em;
+}
+
+.mat-slide-toggle {
+  margin: 8px 0 16px;
+}

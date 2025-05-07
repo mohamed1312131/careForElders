@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit User' : 'Add New User' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="userForm">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>First Name</mat-label>
+      <input matInput formControlName="firstName" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Last Name</mat-label>
+      <input matInput formControlName="lastName" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" required>
+      <mat-error *ngIf="userForm.get('email')?.hasError('email')">
+        Please enter a valid email
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="role">
+        <mat-option value="admin">Admin</mat-option>
+        <mat-option value="manager">Manager</mat-option>
+        <mat-option value="user">User</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-slide-toggle formControlName="active">Active</mat-slide-toggle>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary"
+          (click)="onSubmit()"
+          [disabled]="!userForm.valid"a
+  >
+    {{ isEditMode ? 'Update' : 'Save' }}
+  </button>
+</mat-dialog-actions>
