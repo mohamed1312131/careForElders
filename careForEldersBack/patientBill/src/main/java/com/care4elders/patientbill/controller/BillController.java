@@ -50,12 +50,12 @@ public class BillController {
     }
     
     // Alternative endpoint if patient ID is passed as a string
-    @GetMapping("/patient/str/{patientIdStr}")
-    public ResponseEntity<List<Bill>> getBillsByPatientIdString(@PathVariable String patientIdStr) {
-        log.info("Fetching bills for patient id string: {}", patientIdStr);
-        List<Bill> bills = billService.getBillsByPatientIdString(patientIdStr);
-        return ResponseEntity.ok(bills);
-    }
+    //@GetMapping("/patient/str/{patientIdStr}")
+    //public ResponseEntity<List<Bill>> getBillsByPatientIdString(@PathVariable String patientIdStr) {
+      //  log.info("Fetching bills for patient id string: {}", patientIdStr);
+      //  List<Bill> bills = billService.getBillsByPatientIdString(patientIdStr);
+     //   return ResponseEntity.ok(bills);
+    //}
 
     // Rest of the controller remains the same...
     
@@ -185,16 +185,7 @@ public class BillController {
         }
         
         // Validate total amount matches sum of items
-        if (bill.getItems() != null && !bill.getItems().isEmpty()) {
-            double calculatedTotal = bill.getItems().stream()
-                .mapToDouble(item -> item.getQuantity() * item.getUnitPrice())
-                .sum();
-                
-            if (Math.abs(calculatedTotal - bill.getTotalAmount()) > 0.01) {
-                errors.add(new ValidationError("totalAmount", 
-                    "Total amount does not match sum of items. Expected: " + calculatedTotal));
-            }
-        }
+       
         
         return errors;
     }

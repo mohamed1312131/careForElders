@@ -23,6 +23,7 @@ import { SidebarComponent } from "./layouts/full/sidebar/sidebar.component"
 import { HeaderComponent } from "./layouts/full/header/header.component"
 import { BrandingComponent } from "./layouts/full/sidebar/branding.component"
 import { AppNavItemComponent } from "./layouts/full/sidebar/nav-item/nav-item.component"
+import { ApiTestComponent } from "./test/api-test.component"
 
 
 
@@ -35,6 +36,8 @@ import { AppNavItemComponent } from "./layouts/full/sidebar/nav-item/nav-item.co
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
+    AppComponent,
+    ApiTestComponent,
 
   ],
   imports: [
@@ -46,6 +49,7 @@ import { AppNavItemComponent } from "./layouts/full/sidebar/nav-item/nav-item.co
     ReactiveFormsModule,
     MaterialModule,
     TablerIconsModule.pick(TablerIcons),
+    BrowserModule, AppRoutingModule, HttpClientModule, FormsModule, ReactiveFormsModule
   ],
   providers: [],
   exports: [TablerIconsModule],

@@ -4,12 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { PatientBill } from '../models/patient-bill.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientBillService {
-  private apiUrl = 'api/patient-bills'; // Replace with your actual API endpoint
+  //private apiUrl = 'api/patient-bills'; // Replace with your actual API endpoint
+  private apiUrl = `${environment.apiUrl}/bills`
 
   constructor(private http: HttpClient) {}
 
