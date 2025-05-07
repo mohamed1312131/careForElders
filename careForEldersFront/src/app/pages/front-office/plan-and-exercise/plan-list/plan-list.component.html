@@ -1,0 +1,17 @@
+<!-- plan-list.component.html -->
+<div class="workout-list-container">
+  <h1 class="list-title">Your Workout Programs</h1>
+  
+  <div *ngIf="programs.length === 0" class="no-programs">
+    <p>No programs assigned yet.</p>
+  </div>
+
+  <div class="cards-wrapper">
+    <div class="program-card" *ngFor="let program of programs">
+      <app-user-pe 
+        [program]="program"
+        >
+      </app-user-pe>
+    </div>
+  </div>
+</div>

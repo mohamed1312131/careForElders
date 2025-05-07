@@ -26,6 +26,7 @@ public class User {
     private LocalDate birthDate;
     private String profileImage;
     public String phoneNumber;
+    private String specialization;
     private Role role;
     private boolean enabled = false; // Email verification status
     private String verificationToken;
@@ -49,4 +50,6 @@ public class User {
 
     public User(Object o, String admin, String smith, String mail, String admin1, String s, Role role) {
     }
+
+
 }

@@ -19,6 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -44,40 +45,42 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
-            System.out.println("🔐 Trying to authenticate " + request.getEmail());
-
-            // 1. Load user manually before authentication
-            Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
-
-            if (optionalUser.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-            }
-
-            User user = optionalUser.get();
-
-            if (!user.isEnabled()) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Please verify your email before logging in.");
-            }
-
-            // 3. Proceed with authentication
+            // Authenticate the user
             Authentication authentication = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            String token = jwtUtil.generateToken(request.getEmail());
-            System.out.println("✅ Authentication successful for " + request.getEmail());
+            // If authentication is successful, generate JWT token
+            String jwtToken = jwtUtil.generateToken(request.getEmail());
 
-            return ResponseEntity.ok(Collections.singletonMap("token", token));
+            // Retrieve user information from the repository
+            Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+            if (userOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Collections.singletonMap("error", "User not found"));
+            }
 
-        } catch (AuthenticationException ex) {
-            System.out.println("❌ Authentication failed for " + request.getEmail() + " - " + ex.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            User user = userOptional.get();
+
+            // Return JWT token along with user information
+            return ResponseEntity.ok(Collections.singletonMap("data",
+                    Map.of(
+                            "token", jwtToken,
+                            "user", Map.of(
+                                    "id", user.getId(),
+                                    "email", user.getEmail(),
+                                    "firstName", user.getFirstName(),
+                                    "lastName", user.getLastName(),
+                                    "profileImage", user.getProfileImage(), // Assuming this is a field in the User entity
+                                    "roles", user.getRole()// Assuming the User entity has roles or similar
+                            )
+                    )
+            ));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("error", "Invalid email or password"));
         }
     }
-
 
     // ✅ EMAIL VERIFICATION
     @GetMapping("/verify")

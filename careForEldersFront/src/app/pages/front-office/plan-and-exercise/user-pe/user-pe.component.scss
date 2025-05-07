@@ -1,0 +1,133 @@
+// Import a base font if desired (e.g., from Google Fonts)
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+// Variables for easier customization
+$card-bg-start: #f4f0ff; // Light lilac/purple
+$card-bg-end: #ffffff;   // White
+$primary-text-color: #333; // Dark grey/black
+$secondary-text-color: #7a6a9b; // Greyish purple for difficulty
+$accent-color: #4a69ff; // Blue for "days left"
+$progress-color: #6e48d2; // Purple for progress bar
+$border-radius: 15px;
+$font-family: 'Poppins', sans-serif; // Example font
+
+.workout-card {
+  font-family: $font-family;
+  max-width: 550px; // Adjust as needed
+  border-radius: $border-radius;
+  background: linear-gradient(to bottom right, $card-bg-start, $card-bg-end 70%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden; // Ensures content respects border-radius
+  position: relative; // Needed for absolute positioning of the progress bar
+  padding-bottom: 8px; // Space for the progress bar mimic
+  font-family: $font-family;
+  max-width: 550px;
+  border-radius: $border-radius;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); // Standard box shadow
+  overflow: hidden;
+  position: relative;
+  padding-bottom: 8px;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+
+  .card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-info {
+    flex: 1; // Takes up available space
+    padding-right: 15px; // Space between text and image
+
+    .difficulty {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      color: $secondary-text-color;
+      font-size: 0.9em;
+
+      .icon {
+        margin-right: 4px;
+        font-size: 1.1em; // Adjust icon size if needed
+        display: inline-block; // Helps with alignment
+      }
+
+      .lightning {
+         color: #a798d3; // Lighter purple for lightning
+         font-weight: bold; // Make lightning bolder if needed
+      }
+
+      .level-text {
+        margin-right: 8px;
+        font-weight: 600;
+      }
+
+      .info {
+        cursor: pointer; // Indicate it's interactive
+        font-size: 1em;
+         color: #aaa; // Slightly muted info icon
+      }
+    }
+
+    .title {
+      font-size: 2.2em; // Large title
+      font-weight: 700;
+      color: $primary-text-color;
+      margin: 5px 0 15px 0; // Adjust vertical spacing
+      line-height: 1.2;
+    }
+
+    .days-left {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: $accent-color;
+      margin: 0;
+    }
+  }
+
+  .card-image {
+    flex-shrink: 0; // Prevents image from shrinking
+    width: 150px; // Adjust image width as needed
+    height: 150px; // Adjust image height as needed
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+     z-index: 1;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain; // Or 'cover' depending on desired image behavior
+      display: block; // Removes extra space below image
+    }
+  }
+
+  .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 8px; // Thickness of the bar
+    width: 60%; // Adjust the length of the bar
+    background: linear-gradient(to right, $progress-color, transparent); // Gradient for the bar
+    border-bottom-left-radius: $border-radius; // Match card rounding
+    // The diagonal effect in the image seems more part of the overall background gradient
+    // or potentially a pseudo-element. This creates a simple bar at the bottom.
+    // For a true diagonal line *element*, you might need transforms or ::after pseudo-element.
+    position: absolute; // Already absolute
+     z-index: 1;
+}
+&:hover {
+    // Apply transformations on hover
+    transform: translateY(-6px) scale(1.01); // Move card up slightly and scale it a tiny bit
+
+    // Enhance the shadow for a "lifted" effect
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+
+    // Optional: Add a subtle border highlight
+    // border: 1px solid rgba($progress-color, 0.5); // Example border
+  }
+}

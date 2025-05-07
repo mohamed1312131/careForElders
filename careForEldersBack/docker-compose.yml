@@ -1,208 +1,48 @@
-version: '3.8'
+
 
 services:
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
+  embedding-service:
+    build: ./embedding-service # Path to the directory containing the Dockerfile
+    container_name: embedding_service_app
     ports:
-      - "8080:8080"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-    restart: always
-
-  appointment-availability:
-    build: ./appointmentAvailability
-    container_name: appointment-availability
-    ports:
-      - "8083:8083"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  blog-forum:
-    build: ./blogForum
-    container_name: blog-forum
-    ports:
-      - "8084:8084"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  chat:
-    build: ./chat
-    container_name: chat
-    ports:
-      - "8090:8090"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  config-server:
-    build: ./config-server
-    container_name: config-server
-    ports:
-      - "8888:8888"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-    restart: always
-
-  event:
-    build: ./event
-    container_name: event
-    ports:
-      - "8089:8089"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  medical-record:
-    build: ./medicalRecord
-    container_name: medical-record
-    ports:
-      - "8082:8082"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    ports:
-      - "27017:27017"
+      - "8000:8000" # Map host port 8000 to container port 8000
+    environment:
+      # Add any environment variables your service might need
+      # - PYTHONUNBUFFERED=1 # Often useful for seeing logs immediately
+      - SENTENCE_TRANSFORMERS_HOME=/app/models # Optional: Cache models inside container volume if needed
     volumes:
-      - mongodb_data:/data/db
-    networks:
-      - microservices-network
-    restart: always
+      # Optional: Mount a volume to persist downloaded sentence-transformer models
+      # This avoids re-downloading on container recreation if the base image doesn't change much.
+      - embedding_models:/app/models
+    restart: unless-stopped # Restart policy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s # Give time for model download/load
 
-  notification:
-    build: ./notification
-    container_name: notification
+  chromadb:
+    image: chromadb/chroma:0.5.0   # Keep the specific version
+    container_name: chromadb_server
     ports:
-      - "8088:8088"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
+      - "8101:8000"
+    # REMOVE THE ENTIRE environment BLOCK BELOW
+    # environment:
+    #   - CHROMA_API_IMPL=rest
+    #   - IS_PERSISTENT=TRUE
+    volumes:
+      - chroma_data:/chroma/chroma # Persistence is handled by this volume
+    restart: unless-stopped
+    # Keep or remove healthcheck based on whether /api/v1/heartbeat works
+    # or if you find a v2 equivalent like /api/v2/heartbeat or /healthz
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat" ] # Adjust or remove if needed
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  nutrition:
-    build: ./nutrition
-    container_name: nutrition
-    ports:
-      - "8087:8087"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  paramedical-care:
-    build: ./paramedicalCare
-    container_name: paramedical-care
-    ports:
-      - "8086:8086"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  patient-bill:
-    build: ./patientBill
-    container_name: patient-bill
-    ports:
-      - "8085:8085"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  plan-and-exercise:
-    build: ./planAndExercise
-    container_name: plan-and-exercise
-    ports:
-      - "8091:8091"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  service-registry:
-    build: ./service-registry
-    container_name: service-registry
-    ports:
-      - "8761:8761"
-    networks:
-      - microservices-network
-    restart: always
-
-  subscription:
-    build: ./subscription
-    container_name: subscription
-    ports:
-      - "8092:8092"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
-
-  user-service:
-    build: ./user-service
-    container_name: user-service
-    ports:
-      - "8081:8081"
-    networks:
-      - microservices-network
-    depends_on:
-      - service-registry
-      - config-server
-      - mongodb
-    restart: always
 
 volumes:
-  mongodb_data:
-
-networks:
-  microservices-network:
-    driver: bridge
+  chroma_data: # Define the named volume for ChromaDB persistence
+  embedding_models: # Define the named volume for sentence-transformer models

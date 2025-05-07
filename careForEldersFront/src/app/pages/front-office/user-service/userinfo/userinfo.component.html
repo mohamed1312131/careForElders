@@ -1,0 +1,72 @@
+<div class="page-container">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content -->
+  <div class="container mt-4 user-update-container">
+    <h2 class="mb-4">Update Your Profile</h2>
+    <form [formGroup]="userForm" (ngSubmit)="onUpdate()" novalidate>
+      <div *ngIf="isLoading" class="alert alert-info">Loading user data...</div>
+
+      <!-- Content of the form -->
+      <div class="form-group mb-3">
+        <label for="id">User ID</label>
+        <input id="id" formControlName="id" type="text" class="form-control" readonly />
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="firstName">First Name</label>
+          <input id="firstName" formControlName="firstName" type="text" class="form-control" placeholder="John" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="lastName">Last Name</label>
+          <input id="lastName" formControlName="lastName" type="text" class="form-control" placeholder="Doe" />
+        </div>
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="email">Email</label>
+        <input id="email" formControlName="email" type="email" class="form-control" placeholder="example@email.com" />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="password">Password</label>
+        <input id="password" formControlName="password" type="password" class="form-control" placeholder="••••••••" />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="birthDate">Birth Date</label>
+        <input id="birthDate" formControlName="birthDate" type="date" class="form-control" />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="phoneNumber">Phone Number</label>
+        <input id="phoneNumber" formControlName="phoneNumber" type="text" class="form-control" placeholder="+1234567890" />
+      </div>
+
+      <div class="form-group mb-3">
+        <label for="profileImage">Profile Image</label>
+        <div *ngIf="userForm.value.profileImage">
+          <img [src]="userForm.value.profileImage" alt="Profile Image" class="img-fluid mb-2" width="500" />
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="imageFile">Choose New Profile Image</label>
+        <input type="file" id="imageFile" (change)="onImageSelected($event)" class="form-control" />
+      </div>
+
+      <div class="form-group mb-4">
+        <label for="role">Role</label>
+        <select id="role" formControlName="role" class="form-control">
+          <option value="">Select a role</option>
+          <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+        </select>
+      </div>
+
+      <button [disabled]="isLoading" type="submit" class="btn btn-success w-100">Save Changes</button>
+    </form>
+  </div>
+</div>
