@@ -5,9 +5,9 @@ spring:
   application:
     name: planAndExercise
   data:
-    uri: mongodb://mongodb:27017/planAndExercise
+    uri: mongodb://localhost:27017/planAndExercise
 
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/

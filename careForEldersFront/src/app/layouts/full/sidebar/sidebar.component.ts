@@ -8,8 +8,12 @@ import { NavService } from '../../../services/nav.service';
 })
 export class SidebarComponent implements OnInit {
   navItems = navItems;
+  openNavItem: string | null = null; // Track which item is open
 
   constructor(public navService: NavService) {}
 
   ngOnInit(): void {}
+  toggleDropdown(item: string) {
+    this.openNavItem = this.openNavItem === item ? null : item;
+  }
 }

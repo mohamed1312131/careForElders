@@ -1,5 +1,6 @@
 package com.care4elders.userservice.controller;
 
+import com.care4elders.userservice.dto.UpdateUserRequest;
 import com.care4elders.userservice.dto.UserRequest;
 import com.care4elders.userservice.dto.UserResponse;
 import com.care4elders.userservice.entity.User;
@@ -42,9 +43,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable String id, @Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+    public ResponseEntity<UserResponse> updateUser(@PathVariable String id,
+                                                   @RequestBody UpdateUserRequest request) {
+        UserResponse updatedUser = userService.updateUser(id, request);
+        return ResponseEntity.ok(updatedUser);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {

@@ -1,0 +1,55 @@
+<!-- plan-details.component.html -->
+<div class="ag-format-container">
+  <h1 class="list-title">{{ programDetails?.programName }}</h1>
+  <p class="program-description">{{ programDetails?.description }}</p>
+  
+ <!-- <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="programDetails?.completionPercentage"></div>
+    </div>
+    <span class="progress-text">{{ programDetails?.completionPercentage | number:'1.0-0' }}% Completed</span>
+  </div> -->
+
+  <div class="ag-courses_box">
+    <div class="ag-courses_item" *ngFor="let day of programDetails?.days" 
+         [class.locked]="day.locked"
+         [class.completed]="day.completed">
+      <div class="ag-courses-item_link">
+        <div class="ag-courses-item_bg"></div>
+
+        <div class="ag-courses-item_title">
+          Day {{ day.dayNumber }}
+          <span class="status-badge" [ngClass]="getStatusClass(day.status)">
+            {{ day.status | titlecase }}
+          </span>
+        </div>
+
+        <div class="ag-courses-item_content">
+          <div class="ag-courses-item_exercises">
+            <div class="exercise-item" *ngFor="let exercise of day.exercises">
+              {{ exercise.name }} ({{ exercise.durationMinutes }} mins)
+            </div>
+          </div>
+
+          <div class="ag-courses-item_duration">
+            Total Duration: {{ day.totalDuration }} minutes
+          </div>
+
+          <div class="ag-courses-item_date-box" *ngIf="day.completed">
+            Completed:
+            <span class="ag-courses-item_date">
+              {{ day.completionDate | date:'mediumDate' }}
+            </span>
+          </div>
+        </div>
+
+        <button class="start-day-btn" 
+                *ngIf="!day.locked && !day.completed"
+                (click)="startDay(day.dayNumber)"
+                >
+          {{ day.status === 'IN_PROGRESS' ? 'Continue Day' : 'Start Day' }} {{ day.dayNumber }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
