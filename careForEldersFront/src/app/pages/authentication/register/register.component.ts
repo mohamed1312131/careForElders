@@ -48,6 +48,7 @@ export class RegisterComponent {
       next: () => {
         this.showVerification = true;
         this.loading = false;
+        console.log('Registration successful!', this.registerForm.value);
       },
       error: (err) => {
         console.error(err);
