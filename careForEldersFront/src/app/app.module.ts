@@ -31,7 +31,6 @@ import { FrontOfficeModule } from "./pages/front-office/front-office.module"
 // ToastrModule for Toastr notifications
 import { ToastrModule } from 'ngx-toastr';
 import { UserinfoComponent } from './pages/front-office/user-service/userinfo/userinfo.component';
-import {UsersComponent} from "./pages/front-office/user-service/user/user.component";
 
 @NgModule({
   declarations: [
@@ -42,8 +41,7 @@ import {UsersComponent} from "./pages/front-office/user-service/user/user.compon
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
-    UserinfoComponent,
-    UsersComponent
+    UserinfoComponent
   ],
   imports: [
     BrowserModule,
