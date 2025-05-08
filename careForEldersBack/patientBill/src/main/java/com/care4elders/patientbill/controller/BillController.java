@@ -163,21 +163,11 @@ public class BillController {
     
     private List<ValidationError> validateBill(Bill bill) {
         List<ValidationError> errors = new ArrayList<>();
-        
-        // Validate due date is after bill date
-        if (bill.getDueDate() != null && bill.getBillDate() != null && 
-            bill.getDueDate().before(bill.getBillDate())) {
-            errors.add(new ValidationError("dueDate", "Due date must be after bill date"));
-        }
-        
+    
         // Validate bill has at least one item
         if (bill.getItems() == null || bill.getItems().isEmpty()) {
             errors.add(new ValidationError("items", "Bill must have at least one item"));
         }
-        
-        // Validate total amount matches sum of items
-       
-        
         return errors;
     }
 }

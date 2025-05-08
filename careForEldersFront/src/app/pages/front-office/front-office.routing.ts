@@ -3,6 +3,7 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { UsersComponent } from './user-service/user/user.component'; // Import the User component
 import { UserinfoComponent } from './user-service/userinfo/userinfo.component';
 import {MedicalRecordComponent} from "./medical-record/medical-record/medical-record.component";
+import { PatientBillFormComponent } from './patient-bill/patient-bill-form/patient-bill-form.component';
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -32,11 +33,25 @@ export const FrontOfficeRoutes: Routes = [
         loadChildren: () =>
           import('./chat/chat.module').then((m) => m.ChatModule),
       }, // to follow
+      
     ],
 
   },
   {
     path:'medicalRecord',
     component:MedicalRecordComponent,
-  }
+  },
+  {
+    path: 'bill',
+    loadChildren: () =>
+      import('./patient-bill/patient-bills.module').then((m) => m.PatientBillModule),
+    // Remove the component property here
+  },
+  {
+    path: "",
+    redirectTo: "bill",
+    pathMatch: "full",
+  },
+
+  
 ];
