@@ -14,7 +14,7 @@ import { PatientBillModule } from './patient-bill/patient-bills.module';
   imports: [
     CommonModule,
     RouterModule.forChild(FrontOfficeRoutes),
-    PatientBillModule
+    //PatientBillModule
   ]
 })
 export class FrontOfficeModule { }
