@@ -8,8 +8,7 @@ const routes: Routes = [
   // Front office routes
   {
     path: '',
-    loadChildren: () =>
-      import('./pages/front-office/front-office.module').then((m) => m.FrontOfficeModule),
+    loadChildren: () => import('./pages/front-office/front-office.module').then(m => m.FrontOfficeModule),
   },
 
   // Admin routes
