@@ -24,6 +24,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.getUserInfo(); // Fetch user info on initialization
     this.router.events.pipe(
       
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd),
@@ -54,6 +55,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
         return;
       }
       const payload = JSON.parse(atob(parts[1]));
+      console.log('Decoded JWT payload:', payload);
       const userId = payload.userId;
 
       if (!userId) {
