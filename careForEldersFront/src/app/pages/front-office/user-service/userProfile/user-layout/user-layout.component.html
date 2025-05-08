@@ -17,24 +17,28 @@
         </ul>
       </li>
       <li><a routerLink="/chat/test/activities" routerLinkActive="active">Activities</a></li>
-      <li><a routerLink="/chat/test/asset-libraries" routerLinkActive="active">Asset Libraries</a></li>
-      <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
+      <li><a routerLink="AI" routerLinkActive="active">AI</a></li> <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
       <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
-      <li><a routerLink="/chat/test/reports" routerLinkActive="active">Reports</a></li>
+      <li><a (click)="logout()">Logout</a></li>
     </ul>
-    
-
-    
   </nav>
 
   <main>
     <header>
       <div class="breadcrumbs">
         <a routerLink="/">Home</a>
+        <ng-container *ngIf="router.url.includes('/user/userProfile/AI')">
+          <span>&nbsp;&gt;&nbsp;</span> <a routerLink="/user/userProfile">User Profile</a>
+          <span>&nbsp;&gt;&nbsp;AI</span>
+        </ng-container>
+        <ng-container *ngIf="!router.url.includes('/user/userProfile/AI') && router.url.includes('/user/userProfile')">
+          <span>&nbsp;&gt;&nbsp;User Profile</span>
+        </ng-container>
+
       </div>
       <h1 class="title">{{ currentTitle }}</h1>
 
-      <nav class="nav-tabs">
+     <!-- <nav class="nav-tabs">
         <a routerLink="/deals/pipeline" routerLinkActive="active">
           Deals <span>14</span>
         </a>
@@ -44,9 +48,8 @@
         <a routerLink="/search-library" routerLinkActive="active">
           Search Library
         </a>
-      </nav>
+      </nav> -->
     </header>
 
-    <router-outlet></router-outlet>
-  </main>
+    <div class="router-content-area"><router-outlet></router-outlet></div> </main>
 </div>

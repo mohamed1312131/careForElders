@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UsersComponent } from './user.component';
+import { CreateDealComponent } from './create-deal.component';
 
-describe('UserComponent', () => {
-  let component: UsersComponent;
-  let fixture: ComponentFixture<UsersComponent>;
+describe('CreateDealComponent', () => {
+  let component: CreateDealComponent;
+  let fixture: ComponentFixture<CreateDealComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UsersComponent]
+      imports: [CreateDealComponent]
     })
     .compileComponents();
-
-    fixture = TestBed.createComponent(UsersComponent);
+    
+    fixture = TestBed.createComponent(CreateDealComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,5 +21,3 @@ describe('UserComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-

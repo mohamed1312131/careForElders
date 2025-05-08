@@ -23,6 +23,7 @@ import { TestComponent } from './test/test.component';
     RouterModule,
     FormsModule,
     ReactiveFormsModule
-  ]
+  ],
+  exports:[ChatAIComponent]
 })
 export class ChatModule { }
