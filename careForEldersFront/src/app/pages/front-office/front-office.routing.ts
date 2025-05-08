@@ -3,6 +3,7 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { UsersComponent } from './user-service/user/user.component'; // Import the User component
 import { UserinfoComponent } from './user-service/userinfo/userinfo.component';
 import {MedicalRecordComponent} from "./medical-record/medical-record/medical-record.component";
+import { AppointmentAvailabilityModule } from './appointment-availability/appointment-availability.module';
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -38,7 +39,14 @@ export const FrontOfficeRoutes: Routes = [
     data: { preload: true } 
   },
   {
+    path: 'appointement-availability',
+    loadChildren: () => import('./appointment-availability/appointment-availability.module').then(m => m.AppointmentAvailabilityModule),
+    data: { preload: true } 
+  },
+  
+  {
     path:'medicalRecord',
     component:MedicalRecordComponent,
-  }
+  },
+  
 ];
