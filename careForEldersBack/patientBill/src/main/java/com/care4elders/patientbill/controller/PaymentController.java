@@ -35,17 +35,38 @@ public class PaymentController {
         List<Payment> payments = paymentService.getPaymentsByBillId(billId);
         return ResponseEntity.ok(payments);
     }
+    
     @GetMapping
-public ResponseEntity<List<Payment>> getAllPayments() {
-    log.info("Fetching all payments");
-    List<Payment> payments = paymentService.getAllPayments();
-    return ResponseEntity.ok(payments);
-}
-//@GetMapping("/{id}")
-//public ResponseEntity<Payment> getPaymentById(@PathVariable String id) {
-    //log.info("Fetching payment with ID: {}", id);
-    //Payment payment = paymentService.getPaymentById(id);
-    //return ResponseEntity.ok(payment);
-//}
- 
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        log.info("Fetching all payments");
+        List<Payment> payments = paymentService.getAllPayments();
+        return ResponseEntity.ok(payments);
+    }
+    
+    @PostMapping
+    public ResponseEntity<?> createPayment(@Valid @RequestBody PaymentRequest paymentRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.warn("Validation errors in create payment request");
+            return ResponseEntity
+                .badRequest()
+                .body(createValidationErrorResponse(bindingResult));
+        }
+        
+        log.info("Creating new payment for bill ID: {}", paymentRequest.getBillId());
+        Payment createdPayment = paymentService.createPayment(paymentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
+    }
+    
+    private ValidationErrorResponse createValidationErrorResponse(BindingResult bindingResult) {
+        ValidationErrorResponse errorResponse = new ValidationErrorResponse();
+        
+        List<com.care4elders.patientbill.exception.ValidationError> errors = bindingResult.getFieldErrors().stream()
+            .map(error -> new com.care4elders.patientbill.exception.ValidationError(
+                error.getField(), 
+                error.getDefaultMessage()))
+            .collect(java.util.stream.Collectors.toList());
+            
+        errorResponse.setErrors(errors);
+        return errorResponse;
+    }
 }

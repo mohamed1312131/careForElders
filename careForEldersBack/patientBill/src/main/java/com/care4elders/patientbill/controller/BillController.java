@@ -1,7 +1,12 @@
 package com.care4elders.patientbill.controller;
 
 import com.care4elders.patientbill.model.Bill;
+import com.care4elders.patientbill.model.Payment;
+import com.care4elders.patientbill.model.PaymentMethod;
+import com.care4elders.patientbill.dto.PaymentRequest;
+import com.care4elders.patientbill.dto.PaymentResponse;
 import com.care4elders.patientbill.service.BillService;
+import com.care4elders.patientbill.service.PaymentService;
 import com.care4elders.patientbill.service.PdfService;
 import com.care4elders.patientbill.exception.BillNotFoundException;
 import com.care4elders.patientbill.exception.ValidationError;
@@ -20,6 +25,7 @@ import jakarta.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +39,7 @@ public class BillController {
     
     private final BillService billService;
     private final PdfService pdfService;
+    private final PaymentService paymentService;
 
     @GetMapping
     public ResponseEntity<List<Bill>> getAllBills() {
@@ -82,6 +89,19 @@ public class BillController {
         
         log.info("Creating new bill for patient: {}", bill.getPatientName());
         Bill createdBill = billService.createBill(bill);
+        
+        // Generate payment if bill is created successfully
+        if (createdBill != null && createdBill.getId() != null) {
+            try {
+                generatePaymentForBill(createdBill);
+                log.info("Payment generated for bill ID: {}", createdBill.getId());
+            } catch (Exception e) {
+                log.error("Failed to generate payment for bill ID: {}", createdBill.getId(), e);
+                // We don't want to fail the bill creation if payment generation fails
+                // Just log the error and continue
+            }
+        }
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBill);
     }
 
@@ -144,6 +164,71 @@ public class BillController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             log.error("Error generating PDF for bill with id: {}", id, e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Generate a payment for a newly created bill
+     * This method creates a payment record with status "PENDING" by default
+     */
+    private void generatePaymentForBill(Bill bill) {
+        PaymentRequest paymentRequest = new PaymentRequest();
+        paymentRequest.setBillId(bill.getId());
+        paymentRequest.setAmount(bill.getTotalAmount());
+        paymentRequest.setPaymentDate(new Date()); // Current date
+        paymentRequest.setPaymentMethod(PaymentMethod.PENDING); // Default to PENDING
+        paymentRequest.setPaymentDetails("Automatically generated payment for bill #" + bill.getBillNumber());
+        
+        paymentService.createPayment(paymentRequest);
+    }
+    
+    @PostMapping("/{id}/payment")
+    public ResponseEntity<?> createPaymentForBill(@PathVariable String id, @Valid @RequestBody PaymentRequest paymentRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.warn("Validation errors in create payment request");
+            return ResponseEntity
+                .badRequest()
+                .body(createValidationErrorResponse(bindingResult));
+        }
+        
+        try {
+            // Verify bill exists
+            Bill bill = billService.getBillById(id);
+            
+            // Set the bill ID in the payment request
+            paymentRequest.setBillId(id);
+            
+            // Create the payment
+            log.info("Creating payment for bill ID: {}", id);
+            Payment payment = paymentService.createPayment(paymentRequest);
+            
+            // If payment method is ONLINE, return a response with payment ID for the frontend to redirect
+            if (paymentRequest.getPaymentMethod() == PaymentMethod.ONLINE) {
+                PaymentResponse response = new PaymentResponse(
+                    payment.getId(),
+                    id,
+                    "PENDING",
+                    "Redirect to payment page",
+                    null
+                );
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+            }
+            
+            // If payment method is CASH, update bill status to PAID
+            if (paymentRequest.getPaymentMethod() == PaymentMethod.CASH) {
+                bill.setStatus("PAID");
+                bill.setPaidAmount(bill.getTotalAmount());
+                bill.setBalanceAmount(java.math.BigDecimal.ZERO);
+                billService.updateBill(id, bill);
+            }
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(payment);
+        } catch (BillNotFoundException e) {
+            log.error("Bill not found with id: {}", id);
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("Error creating payment for bill ID: {}", id, e);
             return ResponseEntity.internalServerError().build();
         }
     }
