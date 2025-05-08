@@ -60,7 +60,19 @@ public class PaymentSimulationController {
                 paymentService.updatePayment(payment);
                 
                 // Update bill status to PAID
-                Bill bill = billService.getBillById(creditCardRequest.getBillId());
+                Bill bill;
+                try {
+                    bill = billService.getBillById(creditCardRequest.getBillId());
+                } catch (Exception e) {
+                    log.info("Bill not found by ID, trying to find by billNumber: {}", creditCardRequest.getBillId());
+                    // Try to find by billNumber
+                    List<Bill> bills = billService.getAllBills();
+                    bill = bills.stream()
+                        .filter(b -> creditCardRequest.getBillId().equals(b.getBillNumber()))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Bill not found with id or billNumber: " + creditCardRequest.getBillId()));
+                }
+
                 bill.setStatus("PAID");
                 bill.setPaidAmount(bill.getTotalAmount());
                 bill.setBalanceAmount(java.math.BigDecimal.ZERO);
