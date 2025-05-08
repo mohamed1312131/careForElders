@@ -22,6 +22,7 @@ export class PatientBillFormComponent implements OnInit {
     { value: "OVERDUE", viewValue: "Overdue" },
     { value: "CANCELLED", viewValue: "Cancelled" },
   ]
+  //useMockData = environment.useMockData
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +38,7 @@ export class PatientBillFormComponent implements OnInit {
   ngOnInit(): void {
     console.log("PatientBillFormComponent initialized")
     console.log("Current URL:", this.router.url)
+   // console.log("Using mock data:", this.useMockData)
 
     this.billId = this.route.snapshot.paramMap.get("id")
     this.isEditMode = this.router.url.includes("/edit/")
@@ -202,7 +204,7 @@ export class PatientBillFormComponent implements OnInit {
           panelClass: ["error-snackbar"],
         })
         this.isLoading = false
-        this.router.navigate(["/front-office/patient-bill"])
+        this.router.navigate(["/bill"])
       },
     })
   }
@@ -224,86 +226,93 @@ export class PatientBillFormComponent implements OnInit {
     const billData = {
       patientId: formValue.patientId,
       patientName: formValue.patientName,
+      patientEmail: "", // Add empty value for required field
+      patientPhone: "", // Add empty value for required field
       billDate: this.formatDate(formValue.billDate),
-      dueDate: formValue.dueDate ? this.formatDate(formValue.dueDate) : undefined,
+      dueDate: formValue.dueDate ? this.formatDate(formValue.dueDate) : this.formatDate(formValue.billDate),
       totalAmount: Number.parseFloat(formValue.totalAmount),
+      paidAmount: 0, // Default to 0 for new bills
+      balanceAmount: Number.parseFloat(formValue.totalAmount), // Same as total for new bills
       paymentStatus: formValue.paymentStatus,
-      notes: formValue.notes,
+      status: formValue.paymentStatus, // Map to the status field expected by backend
+      notes: formValue.notes || "",
       items: formValue.items.map((item: any) => ({
         description: item.description,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         amount: Number.parseFloat(item.amount),
+        serviceDate: this.formatDate(formValue.billDate), // Use bill date as service date
       })),
     }
 
     console.log("Submitting bill data:", billData)
 
-    // If in edit mode, update the bill
-    if (this.isEditMode && this.billId) {
-      this.patientBillService.updateBill(this.billId, billData).subscribe({
-        next: (response) => {
-          console.log("Bill updated successfully:", response)
-          this.snackBar.open("Bill updated successfully", "Close", {
-            duration: 3000,
-          })
-          this.router.navigate(["/front-office/patient-bill"])
-        },
-        error: (error) => {
-          console.error("Error updating bill:", error)
-          let errorMessage = "Failed to update bill"
-
-          if (error.error && error.error.errors) {
-            errorMessage = error.error.errors.map((err: any) => `${err.field}: ${err.message}`).join(", ")
-          } else if (error.error && error.error.message) {
-            errorMessage = error.error.message
-          } else if (error.message) {
-            errorMessage = error.message
-          }
-
-          this.snackBar.open(errorMessage, "Close", {
-            duration: 5000,
-            panelClass: ["error-snackbar"],
-          })
-          this.isLoading = false
-        },
-        complete: () => {
-          this.isLoading = false
-        },
-      })
-    } else {
-      // Create new bill
-      this.patientBillService.createBill(billData).subscribe({
-        next: (response) => {
-          console.log("Bill created successfully:", response)
-          this.snackBar.open("Bill created successfully", "Close", {
-            duration: 3000,
-          })
-          this.router.navigate(["/front-office/patient-bill"])
-        },
-        error: (error) => {
-          console.error("Error creating bill:", error)
-          let errorMessage = "Failed to create bill"
-
-          if (error.error && error.error.errors) {
-            errorMessage = error.error.errors.map((err: any) => `${err.field}: ${err.message}`).join(", ")
-          } else if (error.error && error.error.message) {
-            errorMessage = error.error.message
-          } else if (error.message) {
-            errorMessage = error.message
-          }
-
-          this.snackBar.open(errorMessage, "Close", {
-            duration: 5000,
-            panelClass: ["error-snackbar"],
-          })
-          this.isLoading = false
-        },
-        complete: () => {
-          this.isLoading = false
-        },
-      })
+    try {
+      // If in edit mode, update the bill
+      if (this.isEditMode && this.billId) {
+        this.patientBillService.updateBill(this.billId, billData).subscribe({
+          next: (response) => {
+            console.log("Bill updated successfully:", response)
+            this.snackBar.open("Bill updated successfully", "Close", {
+              duration: 3000,
+            })
+            this.router.navigate(["/bill"])
+          },
+          error: (error) => {
+            this.handleSubmitError(error, "update")
+          },
+          complete: () => {
+            this.isLoading = false
+          },
+        })
+      } else {
+        // Create new bill
+        this.patientBillService.createBill(billData).subscribe({
+          next: (response) => {
+            console.log("Bill created successfully:", response)
+            this.snackBar.open("Bill created successfully", "Close", {
+              duration: 3000,
+            })
+            this.router.navigate(["/bill"])
+          },
+          error: (error) => {
+            this.handleSubmitError(error, "create")
+          },
+          complete: () => {
+            this.isLoading = false
+          },
+        })
+      }
+    } catch (error) {
+      this.handleSubmitError(error, this.isEditMode ? "update" : "create")
     }
+  }
+
+  handleSubmitError(error: any, operation: string): void {
+    console.error(`Error ${operation}ing bill:`, error)
+    let errorMessage = `Failed to ${operation} bill`
+
+    if (error.error && error.error.errors) {
+      errorMessage = error.error.errors.map((err: any) => `${err.field}: ${err.message}`).join(", ")
+    } else if (error.error && error.error.message) {
+      errorMessage = error.error.message
+    } else if (error.message) {
+      errorMessage = error.message
+    }
+
+    this.snackBar.open(errorMessage, "Close", {
+      duration: 5000,
+      panelClass: ["error-snackbar"],
+    })
+    this.isLoading = false
+
+    // If using mock data, navigate back to list even on error
+    //if (this.useMockData) {
+      //this.snackBar.open(`Mock ${operation} successful (backend not available)`, "Close", {
+        //duration: 3000,
+     // })
+      //this.router.navigate(["/bill"])
+    //}
   }
 
   goBack(): void {
