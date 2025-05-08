@@ -1,4 +1,4 @@
-package com.care4elders.userservice.service;
+package com.care4elders.userservice.Service;
 
 import com.care4elders.userservice.dto.UpdateUserRequest;
 import com.care4elders.userservice.dto.UserRequest;

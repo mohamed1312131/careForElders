@@ -4,7 +4,7 @@ import com.care4elders.userservice.dto.UpdateUserRequest;
 import com.care4elders.userservice.dto.UserRequest;
 import com.care4elders.userservice.dto.UserResponse;
 import com.care4elders.userservice.entity.User;
-import com.care4elders.userservice.service.UserService;
+import com.care4elders.userservice.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
