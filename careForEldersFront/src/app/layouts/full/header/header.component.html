@@ -23,25 +23,18 @@
   <!-- --------------------------------------------------------------- -->
   <!-- profile Dropdown -->
   <!-- --------------------------------------------------------------- -->
-  <a
-    mat-flat-button
-    color="primary"
-    href="https://adminmart.com/product/modernize-angular-admin-dashboard/"
-    target="_blank"
-    class="d-flex justify-content-center"
-  >
-    Download Free
-  </a>
+
   <button
     mat-icon-button
     [matMenuTriggerFor]="profilemenu"
     aria-label="Notifications"
   >
     <img
-      src="/assets/images/profile/user-1.jpg"
-      class="rounded-circle object-cover"
-      width="35"
+      [src]="profileImage"
+    class="rounded-circle object-cover"
+    width="35"
     />
+
   </button>
   <mat-menu #profilemenu="matMenu" class="topbar-dd cardWithShadow">
     <button mat-menu-item>
@@ -49,9 +42,11 @@
         ><i-tabler name="user" class="icon-18 d-flex"></i-tabler></mat-icon
       >My Profile
     </button>
-    <button mat-menu-item>
+    <button mat-menu-item (click)="MyProfile()">
+
       <mat-icon class="d-flex align-items-center"
         ><i-tabler name="mail" class="icon-18 d-flex"></i-tabler></mat-icon
+
       >My Account
     </button>
     <button mat-menu-item>
@@ -69,6 +64,7 @@
         mat-stroked-button
         color="primary"
         class="w-100"
+        (click)="logout()"
         >Logout</a
       >
     </div>

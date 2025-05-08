@@ -43,4 +43,6 @@ public class User {
 
     public User(Object o, String admin, String smith, String mail, String admin1, String s, Role role) {
     }
+
+
 }
