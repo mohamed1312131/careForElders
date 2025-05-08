@@ -1,0 +1,210 @@
+/* Global reset and box-sizing for easier layout management */
+html {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  background: #89909f;
+  padding: 3rem 0 0 3rem; /* Your outer frame padding */
+  font-size: 12px; /* Consider using rem or a larger base for accessibility */
+  height: 100%; /* Make body take full viewport height */
+  margin: 0;
+  /* overflow: hidden; */ /* Generally avoid overflow:hidden on body unless for specific overlay effects,
+                             as it can interfere with expected scrolling behavior.
+                             The goal is to make specific inner containers scrollable. */
+}
+
+.site-wrap {
+  display: grid;
+  grid-template-columns: 280px 1fr; /* Sidebar | Main Content */
+  height: 100%; /* Fill the height of the padded body */
+}
+
+.site-nav {
+  background: #2196F3;
+  color: white;
+  border-top-left-radius: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure nav takes full height of its grid cell */
+  overflow-y: auto; /* Allow nav to scroll if its content is too long */
+
+  a {
+    color: inherit;
+    text-decoration: none; /* Good practice for nav links */
+    transition: background 0.3s, color 0.3s;
+  }
+
+  ul {
+    list-style: none; /* Remove default list styling */
+    padding-left: 0; /* Remove default padding */
+    margin-top: 0;
+    margin-bottom: auto; /* Pushes .note (if any) to the bottom */
+
+    li {
+      a {
+        display: block;
+        padding: 0.75rem 0.5rem 0.75rem 2rem;
+        position: relative;
+
+        &:hover,
+        &:focus {
+          background-color: #f3f4f6; /* Tailwind's gray-100 */
+          color: #1e3a8a; /* dark text when hovered */
+        }
+
+        /* Corrected active state for routerLinkActive on <a> tag */
+        &.active {
+          background: linear-gradient(to right, #101b2d, #1d2d4d, transparent); /* Made gradient a bit softer */
+          color: white; /* Ensure text is visible on dark gradient */
+        }
+        &.active::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          background: #60a5fa; /* Tailwind's blue-400 - this is your active indicator bar */
+          width: 5px;
+          border-top-right-radius: 4px;
+          border-bottom-right-radius: 4px;
+        }
+      }
+    }
+
+    ul { /* Submenu styling */
+      padding-left: 1rem;
+      margin-bottom: 0.5rem;
+      a {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+        padding-left: 2.5rem; /* Increased indent for submenu items */
+      }
+    }
+  }
+}
+
+.name {
+  font-size: 1.3rem;
+  position: relative;
+  margin: 2rem 0 2rem 0; /* Top/Bottom margin */
+  padding: 0 2.5rem 0.5rem 2rem; /* Right padding for SVG, Left padding for text */
+  /* width: calc(100% - 3rem); -> Not needed if padding handles spacing */
+  svg {
+    position: absolute;
+    fill: white;
+    width: 16px;
+    height: 16px;
+    right: 1rem; /* Adjusted for better spacing if name text is long */
+    top: 50%;
+    transform: translateY(-50%); /* Vertically center SVG */
+  }
+  /* The ::after pseudo-element seems for a notification dot, adjust as needed */
+  &::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background: #4777ce;
+    border-radius: 50%; /* For a perfect circle */
+    position: absolute;
+    top: 7px; /* Adjust positioning */
+    right: 0.5rem; /* Adjust positioning */
+  }
+}
+
+main {
+  border-top-left-radius: 2rem;
+  background: #ebecee;
+  margin-left: -2rem; /* This creates your overlap effect, ensure it's intended and test with nav */
+  position: relative; /* Important for stacking context if needed */
+  display: flex; /* Key for controlling children's layout */
+  flex-direction: column; /* Stack header and router-content-area vertically */
+  height: 100%; /* Fill the height of its grid cell */
+  overflow: hidden; /* Prevent main itself from scrolling; scrolling happens in .router-content-area */
+}
+
+main > header {
+  padding: 3rem 3rem 0 3rem;
+  flex-shrink: 0; /* Header should not shrink if content below grows */
+  background: #ebecee; /* Ensure header has a background to prevent content scrolling underneath from showing through */
+  position: relative; /* Optional, for z-index if complex layering occurs */
+  z-index: 1; /* Keep header above the scrollable content area */
+}
+
+.router-content-area {
+  flex-grow: 1; /* Allows this div to take all available vertical space after the header */
+  overflow-y: auto; /* Enables vertical scrolling ONLY when content exceeds its height */
+  padding: 1.5rem 3rem 3rem 3rem; /* Consistent padding for routed content. Adjust top padding as needed. */
+                                /* Example: 1.5rem top, 3rem L/R, 3rem bottom */
+}
+
+.nav-tabs {
+  a {
+    margin-right: 2rem;
+    display: inline-block;
+    padding: 1rem 0; /* Simplified padding */
+    font-size: 1.15rem;
+    color: #8c939e;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+
+    &:hover {
+      color: #101620;
+    }
+
+    &.active {
+      color: #101620;
+      font-weight: 600;
+      span {
+        background: #d9dfea;
+        color: #5887d1;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: #457ace;
+        border-top-right-radius: 10px; /* These radii on a thin bar might not be very visible */
+        border-top-left-radius: 10px;
+      }
+    }
+    span {
+      border-radius: 10px;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.4rem;
+      font-weight: 600;
+      vertical-align: middle;
+      position: relative;
+      top: -2px;
+      background: #dfe0e2;
+      color: #868d99;
+      transition: background 0.3s, color 0.3s;
+    }
+  }
+}
+
+/* Your other styles (.note, .content-columns, .item) remain the same */
+/* ... */
+
+/* Comment regarding your added .active class:
+   The following global .active rule you added:
+   .active {
+     &::before { background: white; ... }
+   }
+   If routerLinkActive="active" applies the 'active' class directly to your <a> tags in the .site-nav,
+   this global style might conflict with or override the blue indicator bar defined in:
+   .site-nav ul li a.active::before { background: #60a5fa; ... }
+   Ensure your selectors are specific enough or that this global .active rule is intended.
+   I've adjusted the .site-nav a.active::before rule above to directly target <a> tags with .active.
+*/
