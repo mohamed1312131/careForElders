@@ -20,6 +20,7 @@ const routes: Routes = [
     path: "view/:id",
     component: PatientBillFormComponent, // You can create a dedicated view component later
   },
+  
  
 ]
 
