@@ -35,7 +35,7 @@ export class LoginComponent {
     this.authApi.login({ email, password }).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
-        this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['/user/userProfile']);
       },
       error: (err: any) => {
         console.error('❌ Login failed', err);
