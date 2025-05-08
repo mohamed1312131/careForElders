@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { HomePageComponent } from './home-page/home-page.component';
 import { UserinfoComponent } from './user-service/userinfo/userinfo.component';
 import {MedicalRecordComponent} from "./medical-record/medical-record/medical-record.component";
-import { AppointmentAvailabilityModule } from './appointment-availability/appointment-availability.module';
+import { PatientBillFormComponent } from './patient-bill/patient-bill-form/patient-bill-form.component';
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -35,5 +35,17 @@ export const FrontOfficeRoutes: Routes = [
     path:'medicalRecord',
     component:MedicalRecordComponent,
   },
+  {
+    path: 'bill',
+    loadChildren: () =>
+      import('./patient-bill/patient-bills.module').then((m) => m.PatientBillModule),
+    // Remove the component property here
+  },
+  {
+    path: "",
+    redirectTo: "bill",
+    pathMatch: "full",
+  },
+
   
 ];

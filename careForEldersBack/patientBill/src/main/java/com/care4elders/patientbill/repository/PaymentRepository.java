@@ -9,5 +9,6 @@ import com.care4elders.patientbill.model.Payment;
 
 @Repository
 public interface PaymentRepository extends MongoRepository<Payment, String> {
+    
     List<Payment> findByBillId(String billId);
 }

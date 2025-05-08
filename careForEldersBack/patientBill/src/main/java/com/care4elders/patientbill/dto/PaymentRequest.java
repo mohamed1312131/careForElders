@@ -1,14 +1,19 @@
 package com.care4elders.patientbill.dto;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import com.care4elders.patientbill.model.PaymentMethod;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentRequest {
     
     @NotNull(message = "Bill ID is required")
@@ -18,13 +23,12 @@ public class PaymentRequest {
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;
     
+    private Date paymentDate;
+    
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
     
-    // For online payments
-    private String cardNumber;
-    private String cardholderName;
-    private String expiryMonth;
-    private String expiryYear;
-    private String cvv;
+    private String transactionId;
+    
+    private String paymentDetails;
 }

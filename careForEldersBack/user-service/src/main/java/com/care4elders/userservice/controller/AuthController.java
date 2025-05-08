@@ -71,7 +71,7 @@ public class AuthController {
                                     "email", user.getEmail(),
                                     "firstName", user.getFirstName(),
                                     "lastName", user.getLastName(),
-                                    "profileImage", user.getProfileImage(), // Assuming this is a field in the User entity
+                                    //"profileImage", user.getProfileImage(), // Assuming this is a field in the User entity
                                     "roles", user.getRole()// Assuming the User entity has roles or similar
                             )
                     )
