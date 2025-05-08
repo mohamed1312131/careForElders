@@ -2,6 +2,7 @@ package com.care4elders.patientbill.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,4 +32,12 @@ public class CreditCardRequest {
     
     @NotBlank(message = "Bill ID is required")
     private String billId;
+
+    /**
+     * Gets the bill identifier, which could be either the MongoDB ID or the billNumber
+     * @return The bill identifier
+     */
+    public String getBillIdentifier() {
+        return this.billId;
+    }
 }
