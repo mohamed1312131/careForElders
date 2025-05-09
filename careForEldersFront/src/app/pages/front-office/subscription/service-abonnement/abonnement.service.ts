@@ -19,6 +19,6 @@ export class AbonnementService {
     return this.http.post(`${this.apiUrl}/user-subscriptions`, { userId, planId });
   }
   getCurrentSubscription(userId: string): Observable<any> {
-  return this.http.get(`${this.apiUrl}/users/${userId}`);
+  return this.http.get(`${this.apiUrl}/user/${userId}`);
 }
 }

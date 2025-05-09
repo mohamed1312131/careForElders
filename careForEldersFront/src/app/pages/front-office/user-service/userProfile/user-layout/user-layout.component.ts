@@ -41,41 +41,24 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   }
 
   getUserInfo(): void {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.warn('User token not found in local storage.');
-      return;
+    // Get user ID directly from localStorage
+    const userId = localStorage.getItem('user_id');
+    
+    if (!userId) {
+        console.warn('User ID not found in local storage.');
+        return;
     }
 
-    try {
-      
-      const parts = token.split('.');
-      if (parts.length !== 3) {
-        console.error('Invalid token format.');
-        return;
-      }
-      const payload = JSON.parse(atob(parts[1]));
-      console.log('Decoded JWT payload:', payload);
-      const userId = payload.userId;
-
-      if (!userId) {
-        console.error('User ID not found in token payload.');
-        return;
-      }
-
-      this.userService.getUserById(userId).subscribe({
+    this.userService.getUserById(userId).subscribe({
         next: (data) => {
-          this.user = data;
-          console.log('✅ User Info:', this.user);
+            this.user = data;
+            console.log('✅ User Info:', this.user);
         },
         error: (err) => {
-          console.error('❌ Failed to retrieve user info', err);
+            console.error('❌ Failed to retrieve user info', err);
         }
-      });
-    } catch (error) {
-      console.error('❌ Error processing token or fetching user info:', error);
-    }
-  }
+    });
+}
 
   toggleDealsMenu(): void {
     this.isDealsMenuOpen = !this.isDealsMenuOpen;

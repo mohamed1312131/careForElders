@@ -15,4 +15,5 @@ public interface UserService {
     void deleteUser(String id);
     UserResponse updateProfileImage(String userId, String imageUrl);
     User getUserEntityByEmail(String email);
+    List<UserResponse> getAllDoctors();
 }
