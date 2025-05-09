@@ -38,7 +38,7 @@ public class SubscriptionService {
         plan.setFeatures(planDTO.getFeatures());
         return subscriptionPlanRepository.save(plan);
     }
-    public SubscriptionPlan getAllPlans() {
+    public List<SubscriptionPlan> getAllPlans() {
         return subscriptionPlanRepository.findAll();
     }
 

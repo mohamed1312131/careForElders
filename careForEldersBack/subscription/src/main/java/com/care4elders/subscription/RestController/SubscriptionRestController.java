@@ -15,6 +15,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
+
+
+
+
 public class SubscriptionRestController {
     private final SubscriptionService subscriptionService;
 
@@ -25,7 +30,7 @@ public class SubscriptionRestController {
         return subscriptionService.createPlan(adminId, planDTO);
     }
     @GetMapping("/plans")
-    public SubscriptionPlan getAllPlans() {
+    public  List<SubscriptionPlan> getAllPlans() {
         return subscriptionService.getAllPlans();
     }
 

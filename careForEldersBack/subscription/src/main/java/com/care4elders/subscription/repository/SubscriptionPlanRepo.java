@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface SubscriptionPlanRepo extends MongoRepository<SubscriptionPlan, String> {
     SubscriptionPlan findByName(String name);
-  //  List<SubscriptionPlan> findAll();
+    List<SubscriptionPlan> findAll();
 
 }
