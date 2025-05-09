@@ -1,0 +1,9 @@
+<p>abonnement-type works!</p>
+<div class="abonnement-container">
+  <h2>Abonnement Types</h2>
+  <div *ngFor="let abonnement of abonnementTypes" class="abonnement-card">
+    <h3>{{ abonnement.name }}</h3>
+    <p>Price: {{ abonnement.price }}</p>
+    <p>Duration: {{ abonnement.duration }}</p>
+  </div>
+</div>

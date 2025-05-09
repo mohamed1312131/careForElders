@@ -1,0 +1,23 @@
+/* Import calendar styles */
+@import 'node_modules/angular-calendar/css/angular-calendar.css';
+
+.calendar-container {
+  margin-top: 20px;
+}
+
+.view-switch-buttons {
+  margin: 15px 0;
+  
+  button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+}
