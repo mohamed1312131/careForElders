@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class SubscriptionRestController {
     private final SubscriptionService subscriptionService;
 
@@ -23,6 +24,10 @@ public class SubscriptionRestController {
     public SubscriptionPlan createPlan(@RequestHeader("X-Admin-Id") String adminId,
                                        @RequestBody SubscriptionPlanDTO planDTO) {
         return subscriptionService.createPlan(adminId, planDTO);
+    }
+    @GetMapping("/plans")
+    public List<SubscriptionPlan> getAllPlans() {
+        return subscriptionService.getAllPlans();
     }
 
     @PutMapping("/plans/{planId}")
@@ -46,8 +51,7 @@ public class SubscriptionRestController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<UserSubscription> getUserSubscriptions(@PathVariable String userId) {
+    public List<UserSubscription> getUserSubscriptions(@PathVariable("userId") String userId) {
         return subscriptionService.getUserSubscriptions(userId);
     }
 }
-

@@ -22,7 +22,7 @@ public class Reservation {
 
 
     private String soignantId;     // ID of the caregiver (user with role "soignant")
-    private String normalUserId;   // ID of the normal user (patient)
+   // private String normalUserId;   // ID of the normal user (patient)
 
 
 

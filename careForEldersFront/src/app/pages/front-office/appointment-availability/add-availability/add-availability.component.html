@@ -1,0 +1,25 @@
+<div class="availability-form-container">
+    <h2>Add Availability</h2>
+  
+    <form (ngSubmit)="submitAvailability()" class="availability-form">
+      <div class="form-group">
+        <label for="jour">Day of Week:</label>
+        <select [(ngModel)]="availability.jour" name="jour" id="jour" required>
+          <option *ngFor="let day of days" [value]="day">{{ day }}</option>
+        </select>
+      </div>
+  
+      <div class="form-group">
+        <label for="heureDebut">Start Time:</label>
+        <input type="time" [(ngModel)]="availability.heureDebut" name="heureDebut" id="heureDebut" required />
+      </div>
+  
+      <div class="form-group">
+        <label for="heureFin">End Time:</label>
+        <input type="time" [(ngModel)]="availability.heureFin" name="heureFin" id="heureFin" required />
+      </div>
+  
+      <button type="submit" class="submit-btn">Add Availability</button>
+    </form>
+  </div>
+  
