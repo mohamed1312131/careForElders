@@ -1,44 +1,44 @@
 package com.care4elders.patientbill.model;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-//import org.springframework.data.mongodb.core.mapping.DBRef;
-
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "payments")
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Document(collection = "payments")
 public class Payment {
     
     @Id
     private String id;
     
-    @NotNull(message = "Bill ID is required")
     private String billId;
+    private double amount; // This is a primitive double, not a BigDecimal
+    private String paymentMethod; // CASH, ONLINE
+    private String status; // PENDING, COMPLETED, FAILED
+    private LocalDateTime timestamp;
+    private LocalDateTime completedAt;
     
-    @NotNull(message = "Amount is required")
-    @Positive(message = "Amount must be positive")
-    private BigDecimal amount;
+    public Payment(String billId, double amount, String paymentMethod) {
+        this.id = UUID.randomUUID().toString();
+        this.billId = billId;
+        this.amount = amount;
+        this.paymentMethod = paymentMethod;
+        this.status = "PENDING";
+        this.timestamp = LocalDateTime.now();
+    }
     
-    @NotNull(message = "Payment date is required")
-    private Date paymentDate;
+    // Getter for amount returns primitive double
+    public double getAmount() {
+        return amount;
+    }
     
-    @NotNull(message = "Payment method is required")
-    private PaymentMethod paymentMethod;
-    
-    private String transactionId;
-    
-    private String paymentDetails;
-    
-    private boolean successful;
+    // Setter for completedAt
+    public void setCompletedAt(LocalDateTime completedAt) {
+        this.completedAt = completedAt;
+    }
 }

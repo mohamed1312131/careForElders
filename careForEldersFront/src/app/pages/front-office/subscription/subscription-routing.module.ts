@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AbonnementTypeComponent } from './abonnement-type/abonnement-type.component';
 
 const routes: Routes = [
-  {path:'Abonnement', component:AbonnementTypeComponent},
+ {path:'Abonnement', component:AbonnementTypeComponent},
 ];
 
 @NgModule({
