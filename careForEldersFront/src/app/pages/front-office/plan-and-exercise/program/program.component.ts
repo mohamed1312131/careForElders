@@ -14,7 +14,8 @@ import { WorkoutPlayerComponent } from '../workout-player/workout-player.compone
 export class ProgramComponent implements OnInit {
   dayExercises!: any;
   assignmentId!: string;
-  dayNumber!: number;
+  dayNumber!: string;
+  userId!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,14 +26,14 @@ export class ProgramComponent implements OnInit {
   ngOnInit(): void {
    // this.assignmentId = this.route.snapshot.paramMap.get('assignmentId')!;
     //this.dayNumber = +this.route.snapshot.paramMap.get('dayNumber')!;
-    this.dayNumber = 1; // For testing purposes, replace with actual route param
-    this.assignmentId = '680cfda7bd6be81407cdbabe'; // For testing purposes, replace with actual route param
+    this.dayNumber = this.route.snapshot.paramMap.get('dayNumber')!; 
+    this.assignmentId = this.route.snapshot.paramMap.get('assignmentId')!; 
     this.loadExercises();
   }
 
   loadExercises(): void {
-    const userId = '680a2319bd2b9864caf53529'; // Get from auth service
-    this.programService.getDayExercises(this.assignmentId, this.dayNumber, userId)
+    this.userId = localStorage.getItem('user_id') || ''; // Provide a fallback value
+    this.programService.getDayExercises(this.assignmentId, +this.dayNumber, this.userId)
       .subscribe({
         next: (data) => this.dayExercises = data,
         error: (err) => console.error(err)
@@ -42,8 +43,8 @@ export class ProgramComponent implements OnInit {
 
 
   completeDay(): void {
-    const userId = '680a2319bd2b9864caf53529'; // Get from auth service
-    this.programService.completeDay(this.assignmentId, this.dayNumber, userId)
+    const userId = localStorage.getItem('user_id') || ''; // Provide a fallback value
+    this.programService.completeDay(this.assignmentId, +this.dayNumber, userId)
       .subscribe({
         next: () => {
           // Refresh data or navigate
@@ -53,10 +54,10 @@ export class ProgramComponent implements OnInit {
       });
   }
   startWorkout(): void {
-    const userId = '680a2319bd2b9864caf53529'; // Get from auth service
+    const userId = localStorage.getItem('user_id') || ''; // Provide a fallback value
     console.log('Starting workout for day:', this.dayNumber);
     console.log('Assignment ID:', this.assignmentId);
-    this.programService.startDay(this.assignmentId, this.dayNumber, userId).subscribe({
+    this.programService.startDay(this.assignmentId, +this.dayNumber, userId).subscribe({
       next: () => {
         this.dialog.open(WorkoutPlayerComponent, {
           width: '80vw',

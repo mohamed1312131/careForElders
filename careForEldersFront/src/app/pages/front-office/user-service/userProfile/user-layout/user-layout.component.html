@@ -17,7 +17,16 @@
         </ul>
       </li>
       <li><a routerLink="/chat/test/activities" routerLinkActive="active">Activities</a></li>
-      <li><a routerLink="AI" routerLinkActive="active">AI</a></li> <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
+      <li>
+      <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
+      <ul *ngIf="isPlanMenuOpen">
+        <li><a routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
+        <li><a routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
+         <li><a routerLink="/user/userProfile/plan/userprogram" routerLinkActive="active">My plan</a></li>
+      </ul>
+    </li>
+      <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
+       <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
       <li><a (click)="logout()">Logout</a></li>
@@ -27,16 +36,13 @@
   <main>
     <header>
       <div class="breadcrumbs">
-        <a routerLink="/">Home</a>
-        <ng-container *ngIf="router.url.includes('/user/userProfile/AI')">
-          <span>&nbsp;&gt;&nbsp;</span> <a routerLink="/user/userProfile">User Profile</a>
-          <span>&nbsp;&gt;&nbsp;AI</span>
-        </ng-container>
-        <ng-container *ngIf="!router.url.includes('/user/userProfile/AI') && router.url.includes('/user/userProfile')">
-          <span>&nbsp;&gt;&nbsp;User Profile</span>
-        </ng-container>
-
-      </div>
+  <a routerLink="/">Home</a>
+  <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+    <span>&nbsp;&gt;&nbsp;</span>
+    <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+    <span *ngIf="last">{{ crumb.label }}</span>
+  </ng-container>
+</div>
       <h1 class="title">{{ currentTitle }}</h1>
 
      <!-- <nav class="nav-tabs">

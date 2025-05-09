@@ -11,6 +11,11 @@ import { SearchDoctorComponent } from '../appointment-availability/search-doctor
 import { DoctorDetailsComponent } from '../appointment-availability/doctor-details/doctor-details.component';
 import { AddAvailabilityComponent } from '../appointment-availability/add-availability/add-availability.component';
 import { AbonnementTypeComponent } from '../subscription/abonnement-type/abonnement-type.component';
+import { DoctorAddProgramComponent } from '../plan-and-exercise/doctor/doctor-add-program/doctor-add-program.component';
+import { DoctorPlanListComponent } from '../plan-and-exercise/doctor/doctor-plan-list/doctor-plan-list.component';
+import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.component';
+import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
+import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 
 
 
@@ -39,6 +44,31 @@ const routes: Routes = [
       },
       {path:'Abonnement',
         component: AbonnementTypeComponent
+      },
+      {
+        path: 'plan',
+        children: [
+          { 
+            path: 'add-program', 
+            component:DoctorAddProgramComponent
+          },
+          { 
+            path: 'list', 
+            component:DoctorPlanListComponent
+          },
+          {
+            path: 'userprogram', 
+            component:PlanListComponent
+          },
+          {
+            path: 'plandetails/:programId', 
+            component:PlanDetailsComponent
+          },
+          {
+            path: 'program/:assignmentId/day/:dayNumber', 
+            component:ProgramComponent
+          },
+        ]
       }
     ]
   },
