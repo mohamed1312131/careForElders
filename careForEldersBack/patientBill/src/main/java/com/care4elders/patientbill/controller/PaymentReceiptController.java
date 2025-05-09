@@ -1,47 +1,45 @@
 package com.care4elders.patientbill.controller;
 
-import com.care4elders.patientbill.service.PdfService;
-import com.care4elders.patientbill.exception.BillNotFoundException;
+import com.care4elders.patientbill.service.PdfServiceImpl;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 @RestController
-//@RequestMapping("/api/pdf")
-@RequiredArgsConstructor
-public class PdfController {
+@RequestMapping("/api/payments")
+@AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
+public class PaymentReceiptController {
 
-    private final PdfService pdfService;
+    private final PdfServiceImpl pdfService;
     
-    @GetMapping("/api/{id}/pdf")
-    public ResponseEntity<InputStreamResource> generateInvoice(@PathVariable String billId) {
+    @GetMapping("/{paymentId}/receipt")
+    public ResponseEntity<InputStreamResource> generatePaymentReceipt(@PathVariable String paymentId) {
         try {
-            ByteArrayInputStream pdfStream = pdfService.generateInvoicePdf(billId);
+            ByteArrayInputStream pdfStream = pdfService.generatePaymentReceiptPdf(paymentId);
             
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "inline; filename=invoice-" + billId + ".pdf");
+            headers.add("Content-Disposition", "inline; filename=payment-receipt-" + paymentId + ".pdf");
             
             return ResponseEntity
                     .ok()
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(new InputStreamResource(pdfStream));
-        } catch (BillNotFoundException e) {
-            log.error("Bill not found: {}", billId);
-            return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            log.error("Error generating PDF for bill: {}", billId, e);
+            log.error("Error generating payment receipt PDF: {}", e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
