@@ -120,7 +120,7 @@
   }
   
   .no-data-cell {
-    padding: var(--spacing-unit) * 3;
+    padding: calc(var(--spacing-unit) * 3);
   }
   
   .no-data-content {
@@ -128,7 +128,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-unit) * 2;
+    padding: calc(var(--spacing-unit) * 2);
     color: #666;
     
     .no-data-icon {
@@ -183,9 +183,4 @@
     }
   }
   
-  @media (max-width: 480px) {
-    .mat-column-billDate {
-      display: none;
-    }
-  }
   
