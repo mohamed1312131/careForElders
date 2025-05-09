@@ -11,11 +11,12 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="patientBill" />
+        <module name="planAndExercise" />
+        <module name="chat" />
         <module name="blogForum" />
         <module name="user-service" />
         <module name="appointmentAvailability" />
         <module name="subscription" />
-        <module name="planAndExercise" />
       </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -29,6 +30,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="appointmentAvailability" options="-parameters" />
       <module name="blogForum" options="-parameters" />
+      <module name="chat" options="-parameters" />
       <module name="patientBill" options="" />
       <module name="planAndExercise" options="-parameters" />
       <module name="service-registry" options="-parameters" />
