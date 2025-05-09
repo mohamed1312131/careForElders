@@ -55,5 +55,9 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/doctors")
+    public ResponseEntity<List<UserResponse>> getAllDoctors() {
+        return ResponseEntity.ok(userService.getAllDoctors());
+    }
 
 }

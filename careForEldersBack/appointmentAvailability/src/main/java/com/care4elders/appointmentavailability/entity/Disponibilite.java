@@ -2,18 +2,20 @@ package com.care4elders.appointmentavailability.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-
+@Document("disponibilites")
 @Data
 public class Disponibilite {
     @Id
 
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private String id;
 
-    //  @Enumerated(EnumType.STRING)
+    private String doctorId;
+
     private DayOfWeek jour;
 
     private LocalTime heureDebut;

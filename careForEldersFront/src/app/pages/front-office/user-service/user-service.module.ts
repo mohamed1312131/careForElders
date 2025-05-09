@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { UserServiceRoutingModule } from './user-service-routing.module';
 import { UserLayoutComponent } from './userProfile/user-layout/user-layout.component';
 import { ChatModule } from '../chat/chat.module';
-//import { PatientBillsModule } from '../patient-bill/patient-bills.module';
+import { AppointmentAvailabilityModule } from '../appointment-availability/appointment-availability.module';
+import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 
 @NgModule({
@@ -12,7 +14,8 @@ import { ChatModule } from '../chat/chat.module';
     CommonModule,
     UserServiceRoutingModule,
     ChatModule,
-   // PatientBillsModule
+    AppointmentAvailabilityModule,
+    SubscriptionModule
   ]
 })
 export class UserModule { }

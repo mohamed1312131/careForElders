@@ -26,6 +26,12 @@ export const FrontOfficeRoutes: Routes = [
     data: { preload: true } 
   },
   {
+    path: 'appointement-availability',
+    loadChildren: () => import('./appointment-availability/appointment-availability.module').then(m => m.AppointmentAvailabilityModule),
+    data: { preload: true } 
+  },
+  
+  {
     path:'medicalRecord',
     component:MedicalRecordComponent,
   },

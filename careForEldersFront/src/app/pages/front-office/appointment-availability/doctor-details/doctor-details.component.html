@@ -1,0 +1,63 @@
+<!-- Greeting based on role -->
+<p *ngIf="isDoctor">Hey doctor!</p>
+<p *ngIf="!isDoctor">Hey user!</p>
+
+<div class="container">
+  <div *ngIf="doctor">
+    <h2>{{ doctor.firstName }} {{ doctor.lastName }}</h2>
+    <p>Email: {{ doctor.email }}</p>
+    <p>Specialty: {{ doctor.specialty }}</p>
+  </div>
+
+  <button *ngIf="isDoctor && doctor" (click)="onAddAvailability(doctor.id)">Add Availability</button>
+
+  <h3>Doctor Availability Calendar</h3>
+
+  <div class="view-switch-buttons">
+    <button (click)="view = CalendarView.Day">Day</button>
+    <button (click)="view = CalendarView.Week">Week</button>
+    <button (click)="view = CalendarView.Month">Month</button>
+  </div>
+
+  <div class="calendar-container">
+    <div class="calendar-container">
+      <mwl-calendar-day-view
+        *ngIf="view === CalendarView.Day"
+        [viewDate]="viewDate"
+        [events]="events"
+        [dayStartHour]="dayViewStart.hour"
+        [dayStartMinute]="dayViewStart.minute"
+        [dayEndHour]="dayEndStart.hour"
+        [dayEndMinute]="dayEndStart.minute"
+        [hourSegmentHeight]="hourSegmentHeight"
+        (dayClicked)="handleDayClick($event)"
+        (eventClicked)="handleEventClick($event)"
+        style="height: 500px;">
+      </mwl-calendar-day-view>
+    
+      <mwl-calendar-week-view
+        *ngIf="view === CalendarView.Week"
+        [viewDate]="viewDate"
+        [events]="events"
+        [dayStartHour]="dayViewStart.hour"
+        [dayStartMinute]="dayViewStart.minute"
+        [dayEndHour]="dayEndStart.hour"
+        [dayEndMinute]="dayEndStart.minute"
+        [hourSegmentHeight]="hourSegmentHeight"
+        (dayClicked)="handleDayClick($event)"
+        (eventClicked)="handleEventClick($event)"
+        style="height: 500px;">
+      </mwl-calendar-week-view>
+    
+      <mwl-calendar-month-view
+        *ngIf="view === CalendarView.Month"
+        [viewDate]="viewDate"
+        [events]="events"
+        [activeDayIsOpen]="true"
+        [weekStartsOn]="0"
+        (dayClicked)="handleDayClick($event)"
+        style="height: 500px;">
+      </mwl-calendar-month-view>
+    </div>
+  </div>
+</div>
