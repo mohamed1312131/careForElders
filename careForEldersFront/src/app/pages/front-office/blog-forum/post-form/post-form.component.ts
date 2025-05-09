@@ -1,11 +1,11 @@
 import { Component, OnInit } from "@angular/core"
-import {  FormBuilder, FormGroup, Validators, type FormArray } from "@angular/forms"
-import  { ActivatedRoute, Router } from "@angular/router"
+import { FormBuilder, FormGroup, Validators, type FormArray } from "@angular/forms"
+import { ActivatedRoute, Router } from "@angular/router"
 import { MatSnackBar } from "@angular/material/snack-bar"
 import { COMMA, ENTER } from "@angular/cdk/keycodes"
-import  { MatChipInputEvent } from "@angular/material/chips"
+// Remove or comment out this import since we're not using MatChipInputEvent anymore
+// import { MatChipInputEvent } from "@angular/material/chips"
 import { PostService } from "../post.service"
-//import type { PostService } from "../../../../services/post.service"
 
 @Component({
   selector: "app-post-form",
@@ -83,14 +83,27 @@ export class PostFormComponent implements OnInit {
     })
   }
 
-  addTag(event: MatChipInputEvent): void {
+  // Keep this method for backward compatibility if needed
+  addTag(event: any): void {
     const value = (event.value || "").trim()
 
     if (value) {
       this.tagsArray.push(this.fb.control(value))
     }
 
-    event.chipInput!.clear()
+    if (event.chipInput) {
+      event.chipInput.clear()
+    }
+  }
+
+  // Add this new method for the custom implementation
+  addTagFromInput(inputElement: HTMLInputElement): void {
+    const value = inputElement.value.trim()
+    
+    if (value) {
+      this.tagsArray.push(this.fb.control(value))
+      inputElement.value = ''
+    }
   }
 
   removeTag(index: number): void {

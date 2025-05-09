@@ -1,142 +1,156 @@
-.post-list-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
+.post-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
   
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    
-    h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-    }
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
   }
-  
-  .filters-container {
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
-    
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      
-      @media (min-width: 768px) {
-        flex-direction: row;
-        justify-content: space-between;
-      }
-    }
-    
-    .search-filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      
-      .search-input {
-        min-width: 250px;
-      }
-    }
-    
-    .sort-filters {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
+}
+
+.form-content {
+  mat-card {
+    padding: 24px;
   }
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+// Custom chip styles
+.custom-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+  min-height: 40px;
+  align-items: center;
+  width: 100%;
+  position: relative;
   
-  .loading-spinner {
-    display: flex;
-    justify-content: center;
-    padding: 40px 0;
-  }
-  
-  .posts-grid {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 20px;
+  // Fix for input inside mat-form-field
+  input[matInput] {
+    height: 18px;
+    width: auto;
+    min-width: 150px;
+    flex-grow: 1;
+    margin: 4px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 14px;
     
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(3, 1fr);
+    &:focus {
+      outline: none;
     }
   }
+}
+
+.custom-chip {
+  background-color: #3f51b5; // Primary color
+  color: white;
+  padding: 4px 8px 4px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  height: 24px;
   
-  .post-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    transition: transform 0.2s, box-shadow 0.2s;
-    
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    }
-    
-    mat-card-content {
-      flex-grow: 1;
-    }
-    
-    .post-meta {
-      display: flex;
-      justify-content: space-between;
-      color: rgba(0, 0, 0, 0.6);
-      font-size: 12px;
-      margin-top: 4px;
-    }
-    
-    .post-content {
-      margin: 16px 0;
-      line-height: 1.5;
-      color: rgba(0, 0, 0, 0.8);
-    }
-    
-    .post-tags {
-      margin-bottom: 12px;
-    }
-    
-    .post-stats {
-      display: flex;
-      align-items: center;
-      color: rgba(0, 0, 0, 0.6);
-      font-size: 14px;
-      
-      mat-icon {
-        font-size: 16px;
-        height: 16px;
-        width: 16px;
-        margin-right: 4px;
-      }
-    }
+  // Add a subtle hover effect
+  &:hover {
+    background-color: #303f9f; // Slightly darker
+  }
+}
+
+.custom-chip-remove {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 4px;
+  
+  mat-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    line-height: 18px;
   }
   
-  .no-posts {
-    grid-column: 1 / -1;
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &:focus {
+    outline: none;
+  }
+}
+
+// Fix for mat-form-field with custom content
+::ng-deep {
+  .mat-mdc-form-field-infix {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 40px 0;
-    color: rgba(0, 0, 0, 0.5);
-    
-    mat-icon {
-      font-size: 48px;
-      height: 48px;
-      width: 48px;
-      margin-bottom: 16px;
+  }
+  
+  // Ensure the custom chip list doesn't overflow the form field
+  .mat-mdc-form-field-flex {
+    align-items: flex-start;
+  }
+  
+  // Fix for input inside mat-form-field
+  .mat-mdc-form-field-input-control {
+    &.mat-mdc-form-field-input-control {
+      height: auto;
     }
   }
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 0 0 0;
   
-  mat-paginator {
-    margin-top: 20px;
+  button {
+    margin-left: 8px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .post-form-container {
+    padding: 10px;
   }
   
+  .form-header h1 {
+    font-size: 20px;
+  }
+  
+  .custom-chip {
+    font-size: 12px;
+    height: 22px;
+  }
+}
