@@ -12,6 +12,7 @@
         </processorPath>
         <module name="patientBill" />
         <module name="user-service" />
+        <module name="appointmentAvailability" />
       </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -23,6 +24,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="appointmentAvailability" options="-parameters" />
       <module name="patientBill" options="" />
       <module name="service-registry" options="-parameters" />
       <module name="user-service" options="-parameters" />
