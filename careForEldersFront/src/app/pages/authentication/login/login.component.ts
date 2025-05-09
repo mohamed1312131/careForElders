@@ -35,6 +35,7 @@ export class LoginComponent {
     this.authApi.login({ email, password }).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
+        localStorage.setItem('user_id', res.data.user.id);
         this.router.navigate(['/user/userProfile']);
       },
       error: (err: any) => {
