@@ -1,28 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-<<<<<<< HEAD
-import { UsersComponent } from './user/user.component';
-=======
 import { UserLayoutComponent } from './userProfile/user-layout/user-layout.component';
 import { UserinfoComponent } from './userinfo/userinfo.component';
 import { ChatAIComponent } from '../chat/chat-ai/chat-ai.component';
->>>>>>> origin/master
-
+import { PatientBillListComponent } from '../patient-bill/patient-bill-list/patient-bill-list.component';
 
 const routes: Routes = [
   {
-<<<<<<< HEAD
-    path: '',
-    component: UsersComponent,
-  }
-=======
     path: 'userProfile',
     component: UserLayoutComponent,
     children: [ 
       {
         path: 'AI', 
         component: ChatAIComponent
+      },{
+        path: 'bill', 
+        component: PatientBillListComponent
       },
+      
     ]
   },
   {
@@ -30,7 +25,6 @@ const routes: Routes = [
     component: UserinfoComponent,
   },
 
->>>>>>> origin/master
 ];
 
 @NgModule({

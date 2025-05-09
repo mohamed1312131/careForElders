@@ -32,7 +32,7 @@ export const FrontOfficeRoutes: Routes = [
   {
     path: 'bill',
     loadChildren: () =>
-      import('./patient-bill/patient-bills.module').then((m) => m.PatientBillModule),
+      import('./patient-bill/patient-bills.module').then((m) => m.PatientBillsModule),
     // Remove the component property here
   },
   {

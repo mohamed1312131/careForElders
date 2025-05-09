@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FrontOfficeRoutes } from './front-office.routing';
 import { RouterModule } from '@angular/router';
 import { HomePageComponent } from './home-page/home-page.component';
-import { PatientBillModule } from './patient-bill/patient-bills.module';
+import { PatientBillsModule } from './patient-bill/patient-bills.module';
 
 
 @NgModule({
@@ -14,7 +14,7 @@ import { PatientBillModule } from './patient-bill/patient-bills.module';
   imports: [
     CommonModule,
     RouterModule.forChild(FrontOfficeRoutes),
-    //PatientBillModule
+    PatientBillsModule
   ]
 })
 export class FrontOfficeModule { }
