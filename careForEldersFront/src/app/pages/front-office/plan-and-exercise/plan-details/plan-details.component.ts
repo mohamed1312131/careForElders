@@ -38,7 +38,7 @@ export class PlanDetailsComponent implements OnInit {
     if (!this.programDetails?.assignmentId) return;
     
     this.router.navigate([
-      'plan/program',
+      '/user/userProfile/plan/program',
       this.programDetails.assignmentId,
       'day',
       dayNumber
