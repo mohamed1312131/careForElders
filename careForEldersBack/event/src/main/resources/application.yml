@@ -3,11 +3,18 @@ server:
 
 spring:
   application:
-    name: event
+    name: event-service
   data:
-    uri: mongodb://mongodb:27017/event
 
+    mongodb:
+      # Use this while running with Docker Compose
+      # uri: mongodb://mongodb:27017/eventdb
+      uri: mongodb://localhost:27017/eventdb
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
+
+
+user-service:
+  base-url: http://user-service/api/users

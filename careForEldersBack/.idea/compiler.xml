@@ -3,30 +3,68 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api-gateway" />
+        <module name="config-server" />
+        <module name="service-registry" />
+      </profile>
       <profile name="Annotation profile for care4elders" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="patientBill" />
-        <module name="user-service" />
+        <module name="notification" />
+        <module name="nutrition" />
+        <module name="paramedicalCare" />
+        <module name="chat" />
+        <module name="planAndExercise" />
+        <module name="medicalRecord" />
+        <module name="blogForum" />
         <module name="appointmentAvailability" />
+        <module name="subscription" />
       </profile>
-      <profile name="Maven default annotation processors profile" enabled="true">
+      <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="service-registry" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
+        </processorPath>
+        <module name="user-service" />
+      </profile>
+      <profile name="Annotation profile for event" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
+        </processorPath>
+        <module name="event" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="appointmentAvailability" options="-parameters" />
-      <module name="patientBill" options="" />
+      <module name="blogForum" options="-parameters" />
+      <module name="chat" options="-parameters" />
+      <module name="config-server" options="-parameters" />
+      <module name="event" options="-parameters" />
+      <module name="medicalRecord" options="-parameters" />
+      <module name="notification" options="-parameters" />
+      <module name="nutrition" options="-parameters" />
+      <module name="paramedicalCare" options="-parameters" />
+      <module name="patientBill" options="-parameters" />
+      <module name="planAndExercise" options="-parameters" />
       <module name="service-registry" options="-parameters" />
+      <module name="subscription" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

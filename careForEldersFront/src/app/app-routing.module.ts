@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
+import { EventsListComponent } from './pages/event/events-list/events-list.component';
+import { EventRegistrationComponent } from './pages/event/event-registration/event-registration.component';
 
 
 const routes: Routes = [
@@ -9,6 +11,11 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./pages/front-office/front-office.module').then(m => m.FrontOfficeModule),
+  },
+  {
+    path: 'events',
+    component: EventRegistrationComponent,
+    data: { title: 'Events' }
   },
 
   // Admin routes
@@ -38,6 +45,12 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/pages.module').then((m) => m.PagesModule),
       },
+       {
+        path: 'events',  // This will be /admin/events
+        component: EventsListComponent,
+        data: { title: 'Events Management' }
+      },
+      
       {
         path: 'ui-components',
         loadChildren: () =>

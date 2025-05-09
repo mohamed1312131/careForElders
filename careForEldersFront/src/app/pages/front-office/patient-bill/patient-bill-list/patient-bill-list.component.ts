@@ -4,7 +4,7 @@ import { MatSort } from "@angular/material/sort"
 import { MatTableDataSource } from "@angular/material/table"
 import  { MatSnackBar } from "@angular/material/snack-bar"
 import { Router } from "@angular/router"
-import { PatientBillService } from "../patient-bill.service"
+import  { PatientBillService } from "../patient-bill.service"
 
 @Component({
   selector: "app-patient-bill-list",
@@ -12,17 +12,7 @@ import { PatientBillService } from "../patient-bill.service"
   styleUrls: ["./patient-bill-list.component.scss"],
 })
 export class PatientBillListComponent implements OnInit {
-  // Add 'payment' to the displayed columns
-  displayedColumns: string[] = [
-    "billNumber",
-    "patientName",
-    "billDate",
-    "dueDate",
-    "totalAmount",
-    "status",
-    "actions",
-    "paymentActions",
-  ]
+  displayedColumns: string[] = ["id", "patientName", "billDate", "totalAmount", "paymentStatus", "actions"]
   dataSource = new MatTableDataSource<any>([])
   isLoading = true
   noDataMessage = "No bills available. Create a new bill to get started."
@@ -75,54 +65,23 @@ export class PatientBillListComponent implements OnInit {
   }
 
   getStatusColor(status: string): string {
-    if (!status) return "var(--status-neutral)"
-
     switch (status.toUpperCase()) {
       case "PAID":
         return "var(--status-success)"
-      case "PARTIALLY_PAID":
-      case "PAYMENT_PLAN":
-        return "var(--status-info)"
       case "PENDING":
-      case "PENDING_INSURANCE":
-      case "SENT":
         return "var(--status-warning)"
       case "OVERDUE":
-      case "DISPUTED":
-        return "var(--status-danger)"
-      case "UNPAID":
         return "var(--status-danger)"
       case "CANCELLED":
-      case "ADJUSTED":
         return "var(--status-neutral)"
       default:
         return "var(--status-neutral)"
     }
   }
 
-  formatDate(dateString: string | Date | null): string {
-    if (!dateString) return "N/A"
-    return new Date(dateString).toLocaleDateString()
-  }
-
-  formatCurrency(amount: number | string | null): string {
-    if (amount === null || amount === undefined) return "N/A"
-
-    // Convert string to number if needed
-    const numericAmount = typeof amount === "string" ? Number.parseFloat(amount) : amount
-
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(numericAmount)
-  }
-
-  getDisplayValue(value: any, defaultValue = "N/A"): string {
-    return value !== null && value !== undefined ? value : defaultValue
-  }
-
   createNewBill(): void {
     console.log("Navigating to create bill form")
+    // Fix: Use the correct route path based on your application's URL structure
     this.router.navigate(["/bill/create"])
   }
 
@@ -132,20 +91,6 @@ export class PatientBillListComponent implements OnInit {
 
   viewBillDetails(id: string): void {
     this.router.navigate(["/bill/view", id])
-  }
-
-  // Add new method to navigate to payment view
-  navigateToPayment(id: string): void {
-    console.log("Navigating to payment view for bill:", id)
-    this.router.navigate(["/bill/payment", id])
-  }
-
-  // Add method to check if a bill is eligible for payment before the deletePatientBill method
-  isPaymentEligible(bill: any): boolean {
-    if (!bill || !bill.status) return false
-
-    const payableStatuses = ["UNPAID", "OVERDUE", "PARTIALLY_PAID", "PENDING", "SENT"]
-    return payableStatuses.includes(bill.status.toUpperCase())
   }
 
   deletePatientBill(id: string): void {
@@ -194,13 +139,5 @@ export class PatientBillListComponent implements OnInit {
         })
       },
     })
-  }
-
-  // Check if bill is eligible for payment based on status
-  canProcessPayment(status: string | null | undefined): boolean {
-    if (!status) return false
-
-    const payableStatuses = ["UNPAID", "OVERDUE", "PARTIALLY_PAID", "PENDING", "SENT"]
-    return payableStatuses.includes(status.toUpperCase())
   }
 }

@@ -6,7 +6,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { UserLayoutComponent } from './userProfile/user-layout/user-layout.component';
 import { UserinfoComponent } from './userinfo/userinfo.component';
 import { ChatAIComponent } from '../chat/chat-ai/chat-ai.component';
-import { PatientBillListComponent } from '../patient-bill/patient-bill-list/patient-bill-list.component';
 import { TestingComponent } from '../appointment-availability/testing/testing.component';
 import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
 import { DoctorDetailsComponent } from '../appointment-availability/doctor-details/doctor-details.component';
@@ -29,11 +28,7 @@ const routes: Routes = [
       {
         path: 'AI', 
         component: ChatAIComponent
-      },{
-        path: 'bill', 
-        component: PatientBillListComponent
       },
-      
       {path:'search',
         component: SearchDoctorComponent
       },

@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
@@ -18,13 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-//@RequestMapping("/api/pdf")
+@RequestMapping("/api/pdf")
 @RequiredArgsConstructor
 public class PdfController {
 
     private final PdfService pdfService;
     
-    @GetMapping("/api/{id}/pdf")
+    @GetMapping("/invoice/{billId}")
     public ResponseEntity<InputStreamResource> generateInvoice(@PathVariable String billId) {
         try {
             ByteArrayInputStream pdfStream = pdfService.generateInvoicePdf(billId);

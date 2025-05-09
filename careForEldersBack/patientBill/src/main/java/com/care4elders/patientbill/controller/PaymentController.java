@@ -1,114 +1,72 @@
 package com.care4elders.patientbill.controller;
 
-import com.care4elders.patientbill.model.Payment;
-import com.care4elders.patientbill.model.Bill;
-import com.care4elders.patientbill.service.PaymentService;
-import com.care4elders.patientbill.service.BillService;
-import com.care4elders.patientbill.service.PaymentSimulatorService;
-import com.care4elders.patientbill.exception.BillNotFoundException;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.care4elders.patientbill.dto.PaymentRequest;
+import com.care4elders.patientbill.exception.ValidationErrorResponse;
+import com.care4elders.patientbill.model.Payment;
+import com.care4elders.patientbill.service.PaymentService;
 
-@Slf4j
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api/payments")
-@AllArgsConstructor
-@CrossOrigin(origins = "http://localhost:4200")
+@RequiredArgsConstructor
+@Slf4j
 public class PaymentController {
     
     private final PaymentService paymentService;
-    private final BillService billService;
-    private final PaymentSimulatorService paymentSimulatorService;
     
-    @PostMapping("/process/{paymentId}")
-    public ResponseEntity<?> processPayment(
-            @PathVariable String paymentId,
-            @RequestParam String paymentMethod) {
-        
-        log.info("Processing payment ID: {} with method: {}", paymentId, paymentMethod);
-        
-        // Process the payment
-        Payment payment = paymentService.processPayment(paymentId, paymentMethod);
-        Map<String, Object> response = new HashMap<>();
-        
-        // Get the bill information
-        Bill bill = null;
-        try {
-            bill = billService.getBillById(payment.getBillId());
-            response.put("bill", bill);
-            response.put("billStatus", bill.getStatus());
-        } catch (BillNotFoundException e) {
-            log.warn("Could not find bill for payment: {}", e.getMessage());
-        }
-        
-        if ("CASH".equals(paymentMethod)) {
-            response.put("message", "Payment completed successfully. Cash payment received.");
-            response.put("payment", payment);
-            return ResponseEntity.ok(response);
-        } else if ("ONLINE".equals(paymentMethod)) {
-            // For online payments, use the simulator
-            boolean success = paymentSimulatorService.simulateOnlinePayment(paymentId);
-            
-            if (success) {
-                // Get the updated payment after simulation
-                Payment updatedPayment = paymentService.findById(paymentId)
-                        .orElse(payment);
-                
-                // Try to get the updated bill
-                try {
-                    bill = billService.getBillById(payment.getBillId());
-                    response.put("bill", bill);
-                    response.put("billStatus", bill.getStatus());
-                } catch (BillNotFoundException e) {
-                    log.warn("Could not find bill for payment: {}", e.getMessage());
-                }
-                
-                response.put("message", "Online payment processed successfully.");
-                response.put("payment", updatedPayment);
-                
-                return ResponseEntity.ok(response);
-            } else {
-                response.put("message", "Online payment failed. Please try again.");
-                response.put("payment", payment);
-                return ResponseEntity.badRequest().body(response);
-            }
-        } else {
-            response.put("message", "Invalid payment method. Please choose CASH or ONLINE.");
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-    
-    @GetMapping("/{paymentId}")
-    public ResponseEntity<Payment> getPayment(@PathVariable String paymentId) {
-        Payment payment = paymentService.findById(paymentId)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
-        return ResponseEntity.ok(payment);
+    @GetMapping("/bill/{billId}")
+    public ResponseEntity<List<Payment>> getPaymentsByBillId(@PathVariable String billId) {
+        log.info("Fetching payments for bill ID: {}", billId);
+        List<Payment> payments = paymentService.getPaymentsByBillId(billId);
+        return ResponseEntity.ok(payments);
     }
     
     @GetMapping
-    public ResponseEntity<?> getAllPayments(
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String method) {
-        
-        if (status != null && method != null) {
-            return ResponseEntity.ok(paymentService.findByStatusAndMethod(status, method));
-        } else if (status != null) {
-            return ResponseEntity.ok(paymentService.findByStatus(status));
-        } else if (method != null) {
-            return ResponseEntity.ok(paymentService.findByMethod(method));
-        } else {
-            return ResponseEntity.ok(paymentService.findAll());
-        }
+    public ResponseEntity<List<Payment>> getAllPayments() {
+        log.info("Fetching all payments");
+        List<Payment> payments = paymentService.getAllPayments();
+        return ResponseEntity.ok(payments);
     }
     
-    @GetMapping("/bill/{billId}")
-    public ResponseEntity<?> getPaymentsForBill(@PathVariable String billId) {
-        return ResponseEntity.ok(paymentService.findByBillId(billId));
+    @PostMapping
+    public ResponseEntity<?> createPayment(@Valid @RequestBody PaymentRequest paymentRequest, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.warn("Validation errors in create payment request");
+            return ResponseEntity
+                .badRequest()
+                .body(createValidationErrorResponse(bindingResult));
+        }
+        
+        log.info("Creating new payment for bill ID: {}", paymentRequest.getBillId());
+        Payment createdPayment = paymentService.createPayment(paymentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);
+    }
+    
+    private ValidationErrorResponse createValidationErrorResponse(BindingResult bindingResult) {
+        ValidationErrorResponse errorResponse = new ValidationErrorResponse();
+        
+        List<com.care4elders.patientbill.exception.ValidationError> errors = bindingResult.getFieldErrors().stream()
+            .map(error -> new com.care4elders.patientbill.exception.ValidationError(
+                error.getField(), 
+                error.getDefaultMessage()))
+            .collect(java.util.stream.Collectors.toList());
+            
+        errorResponse.setErrors(errors);
+        return errorResponse;
     }
 }
