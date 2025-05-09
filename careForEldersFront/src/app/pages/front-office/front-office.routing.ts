@@ -41,15 +41,11 @@ export const FrontOfficeRoutes: Routes = [
       import('./patient-bill/patient-bills.module').then((m) => m.PatientBillsModule),
     // Remove the component property here
   },
-  {
-    path: "",
-    redirectTo: "bill",
-    pathMatch: "full",
-  },
+  
   {
     path: "blog-forum",
     loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
   },
-  { path: "", redirectTo: "blog-forum", pathMatch: "full" },
+  //{ path: "", redirectTo: "blog-forum", pathMatch: "full" },
   
 ];
