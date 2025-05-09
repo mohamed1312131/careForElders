@@ -26,9 +26,9 @@ public class DispoService implements IDispoService {
         return disponibiliteRepo.findAll();
     }
 
-
+    @Override
     public List<Disponibilite> getDisponibilitesByDoctor(String doctorId) {
-        return disponibiliteRepo.findByDoctorId(doctorId);
+        return disponibiliteRepo.getDisponibiliteByDoctorId(doctorId);
     }
 
     /*

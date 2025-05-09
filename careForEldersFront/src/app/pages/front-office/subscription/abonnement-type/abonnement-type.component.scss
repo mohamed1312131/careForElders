@@ -1,26 +1,29 @@
-.abonnement-container {
-  padding: 20px;
-  h2 {
-    margin-bottom: 15px;
-    color: #2c3e50;
-  }
+/* src/app/components/abonnement/abonnement.component.css */
+.card {
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.abonnement-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
 
-  h3 {
-    margin: 0;
-    color: #2980b9;
-  }
+.card-price {
+  font-size: 2rem;
+  margin: 0;
+}
 
-  p {
-    margin: 5px 0;
-    color: #555;
-  }
+.period {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.list-unstyled li {
+  padding: 0.25rem 0;
+}
+
+.bi-check-circle-fill {
+  font-size: 1.1rem;
 }

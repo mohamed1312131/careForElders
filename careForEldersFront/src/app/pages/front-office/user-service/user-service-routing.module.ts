@@ -11,6 +11,7 @@ import { SearchDoctorComponent } from '../appointment-availability/search-doctor
 import { DoctorDetailsComponent } from '../appointment-availability/doctor-details/doctor-details.component';
 import { AddAvailabilityComponent } from '../appointment-availability/add-availability/add-availability.component';
 import { AbonnementTypeComponent } from '../subscription/abonnement-type/abonnement-type.component';
+import { MyReservationsComponent } from '../appointment-availability/my-reservations/my-reservations.component';
 
 
 
@@ -36,6 +37,9 @@ const routes: Routes = [
       },
       {path:'doctor/:id/AddAvailability',
         component: AddAvailabilityComponent
+      },
+      {path:'Reservation',
+        component: MyReservationsComponent
       },
       {path:'Abonnement',
         component: AbonnementTypeComponent
