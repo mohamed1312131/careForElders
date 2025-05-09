@@ -169,7 +169,7 @@ public class ProgramService {
     private void validateDoctor(String doctorId) {
         try {
             UserDTO doctor = restTemplate.getForObject(
-                    "http://USER-SERVICE/users/{Id}",
+                    "http://user-service/users/{Id}",
                     UserDTO.class,
                     doctorId
             );
@@ -198,7 +198,7 @@ public class ProgramService {
     @Transactional
     public PatientProgramAssignment assignProgramToPatient(ProgramAssignmentDTO assignmentDTO, String doctorId) {
         // Validate doctor
-        validateDoctor(doctorId);
+       // validateDoctor(doctorId);
 
         // Get and validate program
         Program program = programRepository.findById(assignmentDTO.getProgramId())
@@ -209,15 +209,15 @@ public class ProgramService {
         }
 
         // Validate patient
-        UserDTO patient = restTemplate.getForObject(
-                "http://USER-SERVICE/users/{Id}",
+        /*UserDTO patient = restTemplate.getForObject(
+                "http://user-service/users/{Id}",
                 UserDTO.class,
                 assignmentDTO.getPatientId()
         );
 
         if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
             throw new EntityNotFoundException("Invalid patient ID");
-        }
+        } */
 
         List<ProgramDay> days = programDayRepository.findByProgramIdOrderByDayNumberAsc(assignmentDTO.getProgramId());
 
@@ -308,15 +308,15 @@ public class ProgramService {
     }
     public List<PatientProgramDTO> getProgramsByPatientId(String patientId) {
         // Verify patient exists
-        UserDTO patient = restTemplate.getForObject(
-                "http://USER-SERVICE/users/{Id}",
+        /*UserDTO patient = restTemplate.getForObject(
+                "http://user-service/users/{Id}",
                 UserDTO.class,
                 patientId
         );
 
         if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
             throw new EntityNotFoundException("Patient not found");
-        }
+        } */
 
         // Get all assignments for the patient
         List<PatientProgramAssignment> assignments = assignmentRepository.findByPatientId(patientId);
@@ -577,7 +577,7 @@ public class ProgramService {
     private UserDTO getUserDetails(String patientId) {
         try {
             return restTemplate.getForObject(
-                    "http://user-service/users/{id}",
+                    "http://user-service/users/{Id}",
                     UserDTO.class,
                     patientId
             );

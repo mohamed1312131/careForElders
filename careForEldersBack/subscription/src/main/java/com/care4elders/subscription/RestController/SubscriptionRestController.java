@@ -25,7 +25,7 @@ public class SubscriptionRestController {
         return subscriptionService.createPlan(adminId, planDTO);
     }
     @GetMapping("/plans")
-    public SubscriptionPlan getAllPlans() {
+    public List<SubscriptionPlan> getAllPlans() {
         return subscriptionService.getAllPlans();
     }
 
