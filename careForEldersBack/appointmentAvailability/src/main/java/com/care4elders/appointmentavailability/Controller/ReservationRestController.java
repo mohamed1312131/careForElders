@@ -25,11 +25,13 @@ public class ReservationRestController {
 
     @GetMapping
     public List<Reservation> getAll() {
+
         return Service.getAllReservations();
     }
 
     @GetMapping("/{id}")
     public Optional<Reservation> getById(@PathVariable String id) {
+
         return Service.getReservationById(id);
     }
 
@@ -40,6 +42,7 @@ public class ReservationRestController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
+
         Service.deleteReservation(id);
     }
 
@@ -52,15 +55,18 @@ public class ReservationRestController {
 
     @GetMapping("/getUser/{userId}")
     public UserDTO getUserById(@PathVariable String userId) {
+
         return Service.getUserById(userId);
     }
     @GetMapping("/getAllDoctors")
     public List<UserDTO> getAllDoctors() {
+
         return Service.getAllDoctors();
     }
 
     @GetMapping("/getDoctor/{doctorId}")
     public UserDTO getDoctorById(@PathVariable String doctorId) {
+
         return Service.getDoctorById(doctorId);
     }
 

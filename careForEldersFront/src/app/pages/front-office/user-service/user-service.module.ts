@@ -4,6 +4,7 @@ import { UserServiceRoutingModule } from './user-service-routing.module';
 import { UserLayoutComponent } from './userProfile/user-layout/user-layout.component';
 import { ChatModule } from '../chat/chat.module';
 import { AppointmentAvailabilityModule } from '../appointment-availability/appointment-availability.module';
+import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { AppointmentAvailabilityModule } from '../appointment-availability/appoi
   imports: [
     CommonModule,
     UserServiceRoutingModule,
-    ChatModule
+    ChatModule,
+    AppointmentAvailabilityModule
   ]
 })
 export class UserModule { }
