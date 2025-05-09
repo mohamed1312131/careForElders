@@ -1,7 +1,10 @@
 <div class="post-list-container">
   <div class="header">
-    <h1>Blog Posts</h1>
-    <button mat-raised-button color="primary" routerLink="/blog-forum/post/create">
+    <div class="header-content">
+      <h1>Medical Blog Posts</h1>
+      <p class="subtitle">Expert health insights from our doctors</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/blog-forum/post/create" class="create-button">
       <mat-icon>add</mat-icon> Create New Post
     </button>
   </div>
@@ -26,7 +29,7 @@
           </button>
         </mat-form-field>
 
-        <button mat-raised-button color="primary" type="submit">
+        <button mat-raised-button color="primary" type="submit" class="search-button">
           <mat-icon>search</mat-icon> Search
         </button>
       </div>
@@ -59,48 +62,58 @@
 
   <div class="posts-grid" *ngIf="!isLoading">
     <mat-card *ngFor="let post of posts" class="post-card">
-      <mat-card-header>
-        <mat-card-title>{{ post.title }}</mat-card-title>
-        <mat-card-subtitle>
-          <div class="post-meta">
-            <span>By {{ post.authorName }}</span>
-            <span>{{ post.createdAt | date:'medium' }}</span>
+      <div class="card-content-wrapper">
+        <mat-card-header>
+          <div class="header-image" *ngIf="post.authorName === 'Doctor'">
+            <mat-icon class="doctor-icon">local_hospital</mat-icon>
           </div>
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p class="post-content">{{ post.content | slice:0:150 }}{{ post.content.length > 150 ? '...' : '' }}</p>
-        <div class="post-tags">
-          <!-- Replace mat-chip-list with custom tags -->
-          <div class="tag-container">
-            <span class="tag-item" *ngFor="let tag of post.tags">{{ tag }}</span>
+          <mat-card-title>{{ post.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <div class="post-meta">
+              <span class="author"><mat-icon>person</mat-icon> {{ post.authorName }}</span>
+              <span class="date"><mat-icon>event</mat-icon> {{ post.createdAt | date:'mediumDate' }}</span>
+            </div>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="post-content">{{ post.content | slice:0:150 }}{{ post.content.length > 150 ? '...' : '' }}</p>
+          <div class="post-tags">
+            <div class="tag-container">
+              <span class="tag-item" *ngFor="let tag of post.tags">{{ tag }}</span>
+            </div>
           </div>
-        </div>
-        <div class="post-stats">
-          <span><mat-icon>visibility</mat-icon> {{ post.viewCount }} views</span>
-        </div>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button [routerLink]="['/blog-forum/post', post.id]">READ MORE</button>
-        <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Post actions" *ngIf="isAuthor(post)">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #menu="matMenu">
-          <button mat-menu-item [routerLink]="['/blog-forum/post/edit', post.id]">
-            <mat-icon>edit</mat-icon>
-            <span>Edit</span>
+          <div class="post-stats">
+            <span class="views"><mat-icon>visibility</mat-icon> {{ post.viewCount }} views</span>
+            <span class="time"><mat-icon>access_time</mat-icon> {{ post.createdAt | date:'shortTime' }}</span>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button [routerLink]="['/blog-forum/post', post.id]" class="read-more-btn">
+            READ MORE
           </button>
-          <button mat-menu-item (click)="deletePost(post.id)">
-            <mat-icon>delete</mat-icon>
-            <span>Delete</span>
-          </button>
-        </mat-menu>
-      </mat-card-actions>
+          <div class="action-buttons">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Post actions" *ngIf="isAuthor(post)" class="menu-button">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item [routerLink]="['/blog-forum/post/edit', post.id]">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="deletePost(post.id)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </div>
+        </mat-card-actions>
+      </div>
     </mat-card>
 
     <div class="no-posts" *ngIf="posts.length === 0">
       <mat-icon>sentiment_dissatisfied</mat-icon>
       <p>No posts found. Try adjusting your search criteria.</p>
+      <button mat-raised-button color="primary" (click)="loadPosts()">Reset Filters</button>
     </div>
   </div>
 
@@ -110,6 +123,7 @@
     [pageSizeOptions]="pageSizeOptions"
     [pageIndex]="currentPage"
     (page)="onPageChange($event)"
-    *ngIf="totalPosts > 0">
+    *ngIf="totalPosts > 0"
+    class="custom-paginator">
   </mat-paginator>
 </div>
