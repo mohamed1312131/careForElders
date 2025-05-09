@@ -1,9 +1,75 @@
 <p>abonnement-type works!</p>
-<div class="abonnement-container">
-  <h2>Abonnement Types</h2>
-  <div *ngFor="let abonnement of abonnementTypes" class="abonnement-card">
-    <h3>{{ abonnement.name }}</h3>
-    <p>Price: {{ abonnement.price }}</p>
-    <p>Duration: {{ abonnement.duration }}</p>
+<div class="container">
+  <h2 class="text-center my-4">Your Subscription</h2>
+  
+  <!-- Current Subscription Section -->
+  <div *ngIf="currentSubscription" class="card mb-5">
+    <div class="card-header bg-info text-white">
+      <h3 class="card-title">Your Current Subscription</h3>
+    </div>
+    <div class="card-body">
+      <h4 class="card-title">{{ currentSubscription.planName }}</h4>
+      <p class="card-text">
+        <strong>Price:</strong> ${{ currentSubscription.price }} for {{ currentSubscription.durationDays }} days<br>
+        <strong>Started:</strong> {{ currentSubscription.startDate | date }}<br>
+        <strong>Expires:</strong> {{ currentSubscription.endDate | date }}
+      </p>
+    </div>
+  </div>
+
+  
+  
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  
+
+<p>heyyy </p>
+<div class="container">
+  <h2 class="text-center my-4">Available Subscription Plans</h2>
+  
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <div class="row">
+    <div *ngFor="let plan of subscriptionPlans" class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title">{{ plan.name }}</h3>
+        </div>
+        <div class="card-body">
+          <h4 class="card-price">
+            ${{ plan.price }}<span class="period">/{{ plan.durationDays }} days</span>
+          </h4>
+          <ul class="list-unstyled mt-3 mb-4">
+            <li *ngFor="let feature of plan.features">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>{{ feature }}
+            </li>
+          </ul>
+        </div>
+        <div class="card-footer bg-transparent">
+          <button 
+            (click)="subscribe(plan.id)" 
+            class="btn btn-primary w-100"
+          >
+            Subscribe Now
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -9,6 +9,7 @@ export const FrontOfficeRoutes: Routes = [
   {
     path: '',
     component: HomePageComponent, // Home page is now restored at the root
+    pathMatch: 'full',
   },
   {
     path: 'user',
@@ -35,17 +36,17 @@ export const FrontOfficeRoutes: Routes = [
     path:'medicalRecord',
     component:MedicalRecordComponent,
   },
-  {
+  /*{
     path: 'bill',
     loadChildren: () =>
-      import('./patient-bill/patient-bills.module').then((m) => m.PatientBillModule),
+      import('./patient-bill/patient-bills.module').then((m) => m.PatientBillsModule),
     // Remove the component property here
   },
+  
   {
-    path: "",
-    redirectTo: "bill",
-    pathMatch: "full",
-  },
-
+    path: "blog-forum",
+    loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
+  }, */
+ 
   
 ];

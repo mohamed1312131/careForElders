@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,13 +27,14 @@ import com.care4elders.blogforum.model.Post;
 import com.care4elders.blogforum.service.PostService;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/posts")
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class PostController {
     
     private final PostService postService;
@@ -61,16 +63,16 @@ public class PostController {
             post = postService.incrementViewCount(id);
             return ResponseEntity.ok(post);
         } catch (PostNotFoundException e) {
-            log.error("Post not found with id: {}", id);
+            //log.error("Post not found with id: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
     
-    @GetMapping("/author/{authorId}")
-    public ResponseEntity<List<Post>> getPostsByAuthor(@PathVariable String authorId) {
+    /*@GetMapping("/doctor/{docId}")
+    public ResponseEntity<List<Post>> getPostsByDoctor(@PathVariable String authorId) {
         List<Post> posts = postService.getPostsByAuthor(authorId);
         return ResponseEntity.ok(posts);
-    }
+    }*/
     
     @GetMapping("/search")
     public ResponseEntity<List<Post>> searchPosts(
@@ -90,23 +92,23 @@ public class PostController {
     }
     
     @PostMapping
-    public ResponseEntity<?> createPost(
-            @Valid @RequestBody PostRequest postRequest,
-            BindingResult bindingResult) {
-        
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(createValidationErrorResponse(bindingResult));
-        }
-        
-        // TODO: Get actual user ID and name from authentication
-        String authorId = "user123";
-        String authorName = "John Doe";
-        
-        Post createdPost = postService.createPost(postRequest, authorId, authorName);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+public ResponseEntity<?> createPost(
+        @Valid @RequestBody PostRequest postRequest,
+        BindingResult bindingResult) {
+    
+    if (bindingResult.hasErrors()) {
+        return ResponseEntity
+                .badRequest()
+                .body(createValidationErrorResponse(bindingResult));
     }
+    
+    // TODO: Get actual user ID and name from authentication
+    String authorId = "doctor123";  // Changed from "user123"
+    String authorName = "Doctor";   // Changed from "John Doe"
+    
+    Post createdPost = postService.createPost(postRequest, authorId, authorName);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+}
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(
@@ -124,7 +126,7 @@ public class PostController {
             Post updatedPost = postService.updatePost(id, postRequest);
             return ResponseEntity.ok(updatedPost);
         } catch (PostNotFoundException e) {
-            log.error("Post not found with id: {}", id);
+            //log.error("Post not found with id: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
@@ -135,7 +137,7 @@ public class PostController {
             postService.deletePost(id);
             return ResponseEntity.noContent().build();
         } catch (PostNotFoundException e) {
-            log.error("Post not found with id: {}", id);
+           // log.error("Post not found with id: {}", id);
             return ResponseEntity.notFound().build();
         }
     }

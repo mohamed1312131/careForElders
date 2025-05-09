@@ -11,6 +11,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="patientBill" />
+        <module name="blogForum" />
         <module name="user-service" />
         <module name="appointmentAvailability" />
         <module name="subscription" />
@@ -27,6 +28,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="appointmentAvailability" options="-parameters" />
+      <module name="blogForum" options="-parameters" />
       <module name="patientBill" options="" />
       <module name="planAndExercise" options="-parameters" />
       <module name="service-registry" options="-parameters" />

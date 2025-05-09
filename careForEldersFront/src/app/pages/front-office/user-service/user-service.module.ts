@@ -5,7 +5,7 @@ import { UserLayoutComponent } from './userProfile/user-layout/user-layout.compo
 import { ChatModule } from '../chat/chat.module';
 import { AppointmentAvailabilityModule } from '../appointment-availability/appointment-availability.module';
 import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
-import { PlanAndExerciseModule } from '../plan-and-exercise/plan-and-exercise.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 
 @NgModule({
@@ -15,7 +15,7 @@ import { PlanAndExerciseModule } from '../plan-and-exercise/plan-and-exercise.mo
     UserServiceRoutingModule,
     ChatModule,
     AppointmentAvailabilityModule,
-    PlanAndExerciseModule,
+    SubscriptionModule
   ]
 })
 export class UserModule { }

@@ -11,10 +11,11 @@ import { SearchDoctorComponent } from './search-doctor/search-doctor.component';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DoctorDetailsComponent } from './doctor-details/doctor-details.component';
+import { MyReservationsComponent } from './my-reservations/my-reservations.component';
 
 
 @NgModule({
-  declarations: [TestingComponent,SearchDoctorComponent,DoctorDetailsComponent,DoctorDetailsComponent],
+  declarations: [TestingComponent,SearchDoctorComponent,DoctorDetailsComponent,DoctorDetailsComponent,MyReservationsComponent],
   imports: [
     CommonModule,
     AppointmentAvailabilityRoutingModule,
