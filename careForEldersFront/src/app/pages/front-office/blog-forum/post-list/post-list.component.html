@@ -62,6 +62,23 @@
 
   <div class="posts-grid" *ngIf="!isLoading">
     <mat-card *ngFor="let post of posts" class="post-card">
+      <!-- Removed *ngIf="isAuthor(post)" to show menu for all posts -->
+      <div class="post-actions">
+        <button mat-icon-button [matMenuTriggerFor]="actionMenu" aria-label="Post actions" matTooltip="Post actions">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #actionMenu="matMenu">
+          <button mat-menu-item [routerLink]="['/blog-forum/post/edit', post.id]">
+            <mat-icon>edit</mat-icon>
+            <span>Edit</span>
+          </button>
+          <button mat-menu-item (click)="deletePost(post.id)">
+            <mat-icon>delete</mat-icon>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
+      </div>
+      
       <div class="card-content-wrapper">
         <mat-card-header>
           <div class="header-image" *ngIf="post.authorName === 'Doctor'">
@@ -91,21 +108,6 @@
           <button mat-button [routerLink]="['/blog-forum/post', post.id]" class="read-more-btn">
             READ MORE
           </button>
-          <div class="action-buttons">
-            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Post actions" *ngIf="isAuthor(post)" class="menu-button">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item [routerLink]="['/blog-forum/post/edit', post.id]">
-                <mat-icon>edit</mat-icon>
-                <span>Edit</span>
-              </button>
-              <button mat-menu-item (click)="deletePost(post.id)">
-                <mat-icon>delete</mat-icon>
-                <span>Delete</span>
-              </button>
-            </mat-menu>
-          </div>
         </mat-card-actions>
       </div>
     </mat-card>

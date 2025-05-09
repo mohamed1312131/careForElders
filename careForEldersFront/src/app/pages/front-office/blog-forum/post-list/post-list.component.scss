@@ -153,10 +153,47 @@ $transition: all 0.3s ease;
   flex-direction: column;
   height: 100%;
   border-radius: $border-radius;
-  overflow: hidden;
+  overflow: visible; // Important to allow the menu to overflow
   box-shadow: $box-shadow;
   transition: $transition;
   position: relative;
+  
+  // Post actions menu in top-right corner
+  .post-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    opacity: 0.8;
+    transition: $transition;
+    
+    button {
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      background-color: rgba($card-background, 0.9);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: $transition;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        color: $text-light;
+      }
+      
+      &:hover {
+        background-color: $card-background;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        
+        mat-icon {
+          color: $primary-color;
+        }
+      }
+    }
+  }
   
   &:hover {
     transform: translateY(-5px);
@@ -169,12 +206,19 @@ $transition: all 0.3s ease;
         width: 100%;
       }
     }
+    
+    .post-actions {
+      opacity: 1;
+    }
   }
   
   .card-content-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background-color: $card-background;
+    border-radius: $border-radius;
+    overflow: hidden;
   }
   
   mat-card-header {
@@ -285,7 +329,7 @@ $transition: all 0.3s ease;
   mat-card-actions {
     padding: 0 20px 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; // Changed from space-between since we removed the action buttons
     align-items: center;
     
     .read-more-btn {
@@ -303,18 +347,6 @@ $transition: all 0.3s ease;
         height: 2px;
         background-color: $primary-color;
         transition: width 0.3s ease;
-      }
-    }
-    
-    .action-buttons {
-      display: flex;
-      
-      .menu-button {
-        color: $text-light;
-        
-        &:hover {
-          color: $primary-color;
-        }
       }
     }
   }
@@ -370,6 +402,53 @@ $transition: all 0.3s ease;
   }
 }
 
+// Menu styling
+::ng-deep {
+  .mat-mdc-menu-panel {
+    border-radius: $border-radius;
+    overflow: hidden;
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    
+    .mat-mdc-menu-content {
+      padding: 0;
+    }
+    
+    .mat-mdc-menu-item {
+      font-size: 14px;
+      height: 44px;
+      line-height: 44px;
+      
+      .mat-icon {
+        margin-right: 8px;
+      }
+      
+      &:hover {
+        background-color: rgba($primary-color, 0.05);
+      }
+    }
+    
+    button[mat-menu-item]:first-child {
+      .mat-icon {
+        color: $primary-color;
+      }
+    }
+    
+    button[mat-menu-item]:last-child {
+      .mat-icon {
+        color: #f44336; // Warning/delete color
+      }
+    }
+  }
+  
+  // Tooltip styling
+  .mat-mdc-tooltip {
+    font-size: 12px;
+    background-color: rgba(97, 97, 97, 0.9);
+    border-radius: 4px;
+  }
+}
+
 // Responsive adjustments
 @media (max-width: 599px) {
   .post-list-container {
@@ -415,6 +494,24 @@ $transition: all 0.3s ease;
     
     mat-card-actions {
       padding: 0 16px 16px;
+    }
+    
+    .post-actions {
+      top: 8px;
+      right: 8px;
+      
+      button {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          line-height: 18px;
+        }
+      }
     }
   }
 }
