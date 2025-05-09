@@ -46,6 +46,10 @@ export const FrontOfficeRoutes: Routes = [
     redirectTo: "bill",
     pathMatch: "full",
   },
-
+  {
+    path: "blog-forum",
+    loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
+  },
+  { path: "", redirectTo: "blog-forum", pathMatch: "full" },
   
 ];
