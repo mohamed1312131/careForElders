@@ -3,6 +3,7 @@ package com.care4elders.appointmentavailability.Controller;
 import com.care4elders.appointmentavailability.dto.UserDTO;
 import com.care4elders.appointmentavailability.entity.Reservation;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.care4elders.appointmentavailability.service.IService;
 
@@ -58,15 +59,14 @@ public class ReservationRestController {
 
         return Service.getUserById(userId);
     }
-    @GetMapping("/getAllDoctors")
-    public List<UserDTO> getAllDoctors() {
 
-        return Service.getAllDoctors();
+    @GetMapping("/getAllDoctors")
+    public ResponseEntity<List<UserDTO>> getAllDoctors() {
+        return ResponseEntity.ok(Service.getAllDoctors());
     }
 
     @GetMapping("/getDoctor/{doctorId}")
     public UserDTO getDoctorById(@PathVariable String doctorId) {
-
         return Service.getDoctorById(doctorId);
     }
 

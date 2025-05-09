@@ -22,7 +22,7 @@ export class AbonnementTypeComponent implements OnInit {
 
   loadCurrentSubscription(): void {
     // In a real app, you'd get userId from auth service
-    const userId = '681d3cd033fa1d5d0c0ddc89';
+    const userId = '681d4e2c83d11505d70b9b6e';
     this.subscriptionService.getCurrentSubscription(userId).subscribe({
       next: (subscription) => {
         this.currentSubscription = subscription;

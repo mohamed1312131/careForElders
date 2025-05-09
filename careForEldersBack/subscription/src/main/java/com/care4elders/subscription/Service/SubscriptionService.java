@@ -12,6 +12,7 @@ import com.care4elders.subscription.repository.UserSubscriptionRepo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
+
 public class SubscriptionService {
     private final SubscriptionPlanRepo subscriptionPlanRepository;
     private final UserSubscriptionRepo userSubscriptionRepository;
@@ -38,6 +40,7 @@ public class SubscriptionService {
         plan.setFeatures(planDTO.getFeatures());
         return subscriptionPlanRepository.save(plan);
     }
+
     public List<SubscriptionPlan> getAllPlans() {
         return subscriptionPlanRepository.findAll();
     }
@@ -83,7 +86,7 @@ public class SubscriptionService {
     }
 
     public List<UserSubscription> getUserSubscriptions(String userId) {
-        validateUser(userId);
+
         return userSubscriptionRepository.findByUserId(userId);
     }
 

@@ -167,4 +167,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+    public List<UserResponse> getAllDoctors() {
+        return userRepository.getUsersByRole("DOCTOR").stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 }
