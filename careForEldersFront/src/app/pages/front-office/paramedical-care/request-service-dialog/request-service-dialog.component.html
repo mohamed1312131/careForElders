@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>Request Service</h2>
+    <mat-dialog-content>
+      <p>You're requesting: {{ data.service.name }}</p>
+      <mat-form-field appearance="fill">
+        <mat-label>Special Instructions</mat-label>
+        <textarea matInput [formControl]="instructionsControl"></textarea>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Duration (hours)</mat-label>
+        <input matInput type="number" [formControl]="durationControl">
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" 
+              [disabled]="!formValid()"
+              (click)="onSubmit()">
+        Submit Request
+      </button>
+    </mat-dialog-actions>
