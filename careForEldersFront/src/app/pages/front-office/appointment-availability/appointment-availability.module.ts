@@ -12,10 +12,17 @@ import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DoctorDetailsComponent } from './doctor-details/doctor-details.component';
 import { MyReservationsComponent } from './my-reservations/my-reservations.component';
+import { MyScheduleComponent } from './my-schedule/my-schedule.component';
 
 
 @NgModule({
-  declarations: [TestingComponent,SearchDoctorComponent,DoctorDetailsComponent,DoctorDetailsComponent,MyReservationsComponent],
+  declarations: [TestingComponent,
+    SearchDoctorComponent,
+    DoctorDetailsComponent,
+    DoctorDetailsComponent,
+    MyReservationsComponent,
+  MyScheduleComponent],
+  
   imports: [
     CommonModule,
     AppointmentAvailabilityRoutingModule,

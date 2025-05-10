@@ -19,4 +19,8 @@ getDoctorById(doctorId: string): Observable<any> {
 getAllDoctors(): Observable<any>{
   return this.http.get('http://localhost:8083/reservations/getAllDoctors');
 }
+getReservationsByUserId(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:8083/reservations/user/${userId}`);
+  }
+
 }

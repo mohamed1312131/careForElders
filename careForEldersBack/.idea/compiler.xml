@@ -28,10 +28,17 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
       <module name="appointmentAvailability" options="-parameters" />
       <module name="blogForum" options="-parameters" />
       <module name="chat" options="-parameters" />
-      <module name="patientBill" options="" />
+      <module name="config-server" options="-parameters" />
+      <module name="event" options="-parameters" />
+      <module name="medicalRecord" options="-parameters" />
+      <module name="notification" options="-parameters" />
+      <module name="nutrition" options="-parameters" />
+      <module name="paramedicalCare" options="-parameters" />
+      <module name="patientBill" options="-parameters" />
       <module name="planAndExercise" options="-parameters" />
       <module name="service-registry" options="-parameters" />
       <module name="subscription" options="-parameters" />

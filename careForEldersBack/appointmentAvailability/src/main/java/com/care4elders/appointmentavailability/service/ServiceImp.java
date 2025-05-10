@@ -102,4 +102,15 @@ public class ServiceImp implements IService {
             throw new RuntimeException("User with ID: " + doctorId + " is not a doctor.");
         }
     }
+    @Override
+    public List<Reservation> getReservationsByUserId(String userId) {
+        // First verify the user exists
+        UserDTO user = getUserById(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+
+        // Then fetch their reservations
+        return reservationRepository.findByUserId(userId);
+    }
 }
