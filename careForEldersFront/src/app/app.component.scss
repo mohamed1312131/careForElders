@@ -37,3 +37,29 @@
 .toast-warning {
   background-color: #ff9800 !important;
 }
+/* Document Preview Dialog */
+.document-preview-dialog {
+  .mat-dialog-container {
+    padding: 0;
+    overflow: hidden;
+
+    .mat-dialog-title {
+      margin: 0;
+      padding: 16px 24px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mat-dialog-content {
+      margin: 0;
+      padding: 0;
+    }
+
+    .mat-dialog-actions {
+      margin: 0;
+      padding: 12px 24px;
+      background: #f5f5f5;
+      border-top: 1px solid #e0e0e0;
+    }
+  }
+}

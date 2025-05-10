@@ -40,38 +40,24 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            JwtAuthFilter jwtAuthFilter
-    ) throws Exception {
-        // Configure CORS first
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-
-        // Disable CSRF (since we use JWT)
-        http.csrf(csrf -> csrf.disable());
-
-        // Permit all public endpoints
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                        "/users",
-                        "/auth/**",
-                        "/api/**",
-                        "/request-reset/**",
-                        "/reset-password/**",
-                        "/request-reset",
-                        "/reset-password",
-                        "/users/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-        );
-
-        // Stateless session (JWT)
-        http.sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
-
-        // Add JWT filter (but skip public endpoints)
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/auth/**",
+                                "/users/**",
+                                "/request-reset/**",
+                                "/reset-password/**",
+                                "/api/**"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Important for preflight!
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -88,3 +74,4 @@ public class SecurityConfig {
         return source;
     }
 }
+
