@@ -1,35 +1,33 @@
 import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DatePipe } from '@angular/common';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-appointment-dialog',
-  template: ` `,
-  providers: [DatePipe]
+  template: `
+    <h2 mat-dialog-title>Book Appointment</h2>
+    <mat-dialog-content>
+      <p>With Dr. {{data.doctor?.firstName}} {{data.doctor?.lastName}}</p>
+      <p>On {{data.startTime | date:'fullDate'}}</p>
+      <p>From {{data.startTime | date:'shortTime'}} to {{data.endTime | date:'shortTime'}}</p>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button (click)="dialogRef.close()">Cancel</button>
+      <button mat-button color="primary" (click)="dialogRef.close('confirm')">Confirm</button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    :host {
+      display: block;
+      background: white;
+      padding: 24px;
+      border-radius: 4px;
+      box-shadow: 0 11px 15px -7px rgba(0,0,0,.2);
+    }
+  `]
 })
 export class AppointmentDialogComponent {
-  patientName = '';
-  notes = '';
-
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private datePipe: DatePipe
+    public dialogRef: MatDialogRef<AppointmentDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {}
-
-  onCancel(): void {
-    // Close without saving
-  }
-
-  onBook(): void {
-    // Here you would call your appointment service to book the appointment
-    console.log('Booking appointment:', {
-      doctorId: this.data.doctor.id,
-      startTime: this.data.startTime,
-      endTime: this.data.endTime,
-      patientName: this.patientName,
-      notes: this.notes
-    });
-    
-    // Close the dialog
-  }
 }
