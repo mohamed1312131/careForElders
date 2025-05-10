@@ -76,11 +76,32 @@ export class ProgramService {
   getProgramPatients(programId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/getPatients/${programId}/patients`);
   }
-  createExercise(exerciseDto: any, doctorId: string): Observable<any> {
+  createExercise(
+    exerciseData: any, // This will be your ExerciseDTO content
+    imageFile: File | null,
+    videoFile: File | null,
+    doctorId: string
+  ): Observable<any> {
+    const formData = new FormData();
+
+    // Append exerciseDTO as a JSON string blob
+    // The backend expects a part named "exerciseDTO"
+    formData.append('exerciseDTO', new Blob([JSON.stringify(exerciseData)], { type: 'application/json' }));
+
+    if (imageFile) {
+      formData.append('imageFile', imageFile, imageFile.name);
+    }
+    if (videoFile) {
+      formData.append('videoFile', videoFile, videoFile.name);
+    }
+
     const headers = new HttpHeaders().set('X-User-ID', doctorId);
+    // When sending FormData, HttpClient sets the Content-Type to multipart/form-data automatically,
+    // including the boundary. So, we don't explicitly set Content-Type here.
+
     return this.http.post<any>(
       `${this.exerciseUrl}/create`,
-      exerciseDto,
+      formData, // Send formData as the body
       { headers }
     );
   }

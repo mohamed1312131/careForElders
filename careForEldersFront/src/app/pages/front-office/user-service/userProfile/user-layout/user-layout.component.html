@@ -20,9 +20,10 @@
       <li>
       <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
       <ul *ngIf="isPlanMenuOpen">
-        <li><a routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
-        <li><a routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
+        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
+        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
          <li><a routerLink="/user/userProfile/plan/userprogram" routerLinkActive="active">My plan</a></li>
+         <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
       </ul>
     </li>
       <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
