@@ -19,6 +19,7 @@ import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.comp
 import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
+import {AdminDashboardComponent} from "../nutrition/admin-dashboard/admin-dashboard.component";
 
 
 
@@ -31,15 +32,15 @@ const routes: Routes = [
 {
     path: 'userProfile',
     component: UserLayoutComponent,
-    children: [ 
+    children: [
       {
-        path: 'AI', 
+        path: 'AI',
         component: ChatAIComponent
       },{
-        path: 'bill', 
+        path: 'bill',
         component: PatientBillListComponent
       },
-      
+
       {path:'search',
         component: SearchDoctorComponent
       },
@@ -56,7 +57,7 @@ const routes: Routes = [
         component: AbonnementTypeComponent
       },
       {
-        path: 'plan', 
+        path: 'plan',
         children: [
         {
           path:'add-program',
@@ -84,8 +85,25 @@ const routes: Routes = [
           },
         ]
       },
+      {path:'nutrition',
+      children: [
+        {
+          path:'nutritionplanlist',
+          component:PlanListComponent,
+        },
+        {
+          path:'nutritionplandetails/:id',
+          component:PlanDetailsComponent ,
+        },
+        {
+
+          path:'nutritionplainadmin',
+          component:AdminDashboardComponent,
+        }
+      ]}
     ]
   },
+
   {
     path: 'userinfo/:id',
     component: UserinfoComponent,

@@ -17,6 +17,15 @@
          <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
       </ul>
     </li>
+      <ul>
+        <li>
+          <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isPlanMenuOpen }">Nutrition</a>
+          <ul *ngIf="inNutritionmenu">
+            <li><a  routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+            <li><a  routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
+          </ul>
+        </li>
+      </ul>
       <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
