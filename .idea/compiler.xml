@@ -34,21 +34,21 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="api-gateway" options="-parameters" />
-      <module name="appointmentAvailability" options="-parameters" />
-      <module name="blogForum" options="-parameters" />
-      <module name="chat" options="-parameters" />
-      <module name="config-server" options="-parameters" />
-      <module name="event" options="-parameters" />
+      <module name="api-gateway" options="" />
+      <module name="appointmentAvailability" options="" />
+      <module name="blogForum" options="" />
+      <module name="chat" options="" />
+      <module name="config-server" options="" />
+      <module name="event" options="" />
       <module name="medicalRecord" options="-parameters" />
-      <module name="notification" options="-parameters" />
+      <module name="notification" options="" />
       <module name="nutrition" options="-parameters" />
-      <module name="paramedicalCare" options="-parameters" />
-      <module name="patientBill" options="-parameters" />
-      <module name="planAndExercise" options="-parameters" />
-      <module name="service-registry" options="-parameters" />
-      <module name="subscription" options="-parameters" />
-      <module name="user-service" options="-parameters" />
+      <module name="paramedicalCare" options="" />
+      <module name="patientBill" options="" />
+      <module name="planAndExercise" options="" />
+      <module name="service-registry" options="" />
+      <module name="subscription" options="" />
+      <module name="user-service" options="" />
     </option>
   </component>
 </project>

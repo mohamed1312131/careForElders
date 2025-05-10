@@ -33,7 +33,7 @@ export class PatientBillHistoryComponent implements OnInit {
     } else {
       this.errorMessage = "Bill ID not found in route parameters"
       this.toastr.error(this.errorMessage)
-      this.router.navigate(["/front-office/patient-bill"])
+      this.router.navigate(["/user/userProfile/patient-bill"])
     }
   }
 
@@ -123,7 +123,7 @@ export class PatientBillHistoryComponent implements OnInit {
     }
 
     console.log(`Navigating to payment page for bill ID: ${this.billId}`)
-    this.router.navigate(["/front-office/patient-bill/payment", this.billId])
+    this.router.navigate(["/user/userProfile/patient-bill/payment", this.billId])
   }
 
   viewBillDetails(): void {
@@ -133,12 +133,12 @@ export class PatientBillHistoryComponent implements OnInit {
     }
 
     console.log(`Navigating to bill details for ID: ${this.billId}`)
-    this.router.navigate(["/front-office/patient-bill", this.billId])
+    this.router.navigate(["/user/userProfile/patient-bill", this.billId])
   }
 
   backToBills(): void {
     console.log("Navigating back to bills list")
-    this.router.navigate(["/front-office/patient-bill"])
+    this.router.navigate(["/user/userProfile/patient-bill"])
   }
 
   formatDate(dateString: string): string {

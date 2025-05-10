@@ -172,4 +172,10 @@ public class UserServiceImpl implements UserService {
                 .map(this::mapToResponse)
                 .toList();
     }
+    @Override
+    public List<UserResponse> getUsersByRole(String role) {
+        return userRepository.getUsersByRole(role).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 }

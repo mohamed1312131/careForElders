@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProgramService } from '../../ProgramService';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgramInfoComponent } from '../program-info/program-info.component';
+import { DoctorEditPlanComponent } from '../doctor-edit-plan/doctor-edit-plan.component';
 
 export interface ProgramData {
   id: string;
@@ -127,15 +128,30 @@ export class DoctorPlanListComponent implements AfterViewInit {
     // You can open a dialog or navigate to a details page
   }
   
-  editProgram(program: ProgramData): void {
-    console.log('Editing program:', program);
-    // You can open a form pre-filled with program data
-  }
+  
   openInfo(program: ProgramData): void {
     this.dialog.open(ProgramInfoComponent, {
       width: '800px',
       maxHeight: '90vh',
       data: { programId: program.id }
+    });
+  }
+  editProgram(program: ProgramData): void { // Use your ProgramData interface
+    console.log('Opening edit dialog for program:', program);
+    const dialogRef = this.dialog.open(DoctorEditPlanComponent, {
+      width: '70vw', // Or a fixed width like '800px'
+      maxWidth: '900px',
+      maxHeight: '90vh',
+      data: { programId: program.id /*, program: program */ } // Pass programId
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The edit dialog was closed', result);
+      if (result?.updated || result?.assigned) {
+        // If the program was updated or patients were assigned, refresh the list
+        this.snackBar.open('Program data may have changed. Refreshing list...', 'Close', { duration: 2000 });
+        this.loadPrograms(); 
+      }
     });
   }
 }

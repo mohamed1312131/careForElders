@@ -50,6 +50,7 @@ export class PatientBillListComponent implements OnInit {
     this.patientBillService.getAllBills().subscribe({
       next: (bills) => {
         this.dataSource.data = bills
+        console.log("Fetched bills:", bills)
         this.isLoading = false
       },
       error: (error) => {
@@ -123,21 +124,21 @@ export class PatientBillListComponent implements OnInit {
 
   createNewBill(): void {
     console.log("Navigating to create bill form")
-    this.router.navigate(["/bill/create"])
+    this.router.navigate(["/user/userProfile/create"])
   }
 
   editBill(id: string): void {
-    this.router.navigate(["/bill/edit", id])
+    this.router.navigate(["/user/userProfile/edit", id])
   }
 
   viewBillDetails(id: string): void {
-    this.router.navigate(["/bill/view", id])
+    this.router.navigate(["/user/userProfile/view", id])
   }
 
   // Add new method to navigate to payment view
   navigateToPayment(id: string): void {
     console.log("Navigating to payment view for bill:", id)
-    this.router.navigate(["/bill/payment", id])
+    this.router.navigate(["/user/userProfile/payment", id])
   }
 
   // Add method to check if a bill is eligible for payment before the deletePatientBill method
@@ -173,6 +174,7 @@ export class PatientBillListComponent implements OnInit {
   }
 
   downloadPdf(id: string): void {
+    console.log("Generating PDF for bill:", id)
     this.patientBillService.generatePdf(id).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob)

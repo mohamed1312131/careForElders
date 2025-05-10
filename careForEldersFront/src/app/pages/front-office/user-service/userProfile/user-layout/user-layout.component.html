@@ -9,15 +9,6 @@
 
     <ul>
       <li>
-        <a (click)="toggleDealsMenu()" [ngClass]="{ active: isDealsMenuOpen }">Deals</a>
-        <ul *ngIf="isDealsMenuOpen">
-          <li><a routerLink="/chat/test/deals/create" routerLinkActive="active">Create New Deal</a></li>
-          <li><a routerLink="/chat/test/deals/modify" routerLinkActive="active">Modify Deal</a></li>
-          <li><a routerLink="/chat/test/deals/pipeline" routerLinkActive="active">Pipeline</a></li>
-        </ul>
-      </li>
-      <li><a routerLink="/chat/test/activities" routerLinkActive="active">Activities</a></li>
-      <li>
       <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
       <ul *ngIf="isPlanMenuOpen">
         <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
@@ -26,14 +17,26 @@
          <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
       </ul>
     </li>
+      <ul>
+        <li>
+          <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isPlanMenuOpen }">Nutrition</a>
+          <ul *ngIf="inNutritionmenu">
+            <li><a  routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+            <li><a  routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
+          </ul>
+        </li>
+      </ul>
       <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
-       <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
       <li><a *ngIf="isDoctor" routerLink="mySchedule" routerLinkActive="active">My Schedule</a></li>
       <li><a routerLink="bill" routerLinkActive="active">Billing</a></li>
       <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
+      <li><a routerLink="userServices" routerLinkActive="active">Services</a></li>
+      <li><a routerLink="UserRequests" routerLinkActive="active">UserRequests</a></li>
+            <li><a routerLink="SoignantRequests" routerLinkActive="active">SoignantRequests</a></li>
       <li><a routerLink="Abonnement" routerLinkActive="active">Abonnement</a></li>
+      <li><a routerLink="blog" routerLinkActive="active">Check Post</a></li>
       <li><a (click)="logout()">Logout</a></li>
     </ul>
   </nav>

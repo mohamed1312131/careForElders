@@ -204,7 +204,7 @@ export class PatientBillFormComponent implements OnInit {
           panelClass: ["error-snackbar"],
         })
         this.isLoading = false
-        this.router.navigate(["/bill"])
+        this.router.navigate(["/user/userProfile/bill"])
       },
     })
   }
@@ -256,7 +256,7 @@ export class PatientBillFormComponent implements OnInit {
             this.snackBar.open("Bill updated successfully", "Close", {
               duration: 3000,
             })
-            this.router.navigate(["/bill"])
+            this.router.navigate(["/user/userProfile/bill"])
           },
           error: (error) => {
             this.handleSubmitError(error, "update")
@@ -273,7 +273,7 @@ export class PatientBillFormComponent implements OnInit {
             this.snackBar.open("Bill created successfully", "Close", {
               duration: 3000,
             })
-            this.router.navigate(["/bill"])
+            this.router.navigate(["/user/userProfile/bill"])
           },
           error: (error) => {
             this.handleSubmitError(error, "create")
@@ -316,7 +316,7 @@ export class PatientBillFormComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(["/bill"])
+    this.router.navigate(["/user/userProfile/bill"])
   }
 
   private formatDate(date: Date): string {
