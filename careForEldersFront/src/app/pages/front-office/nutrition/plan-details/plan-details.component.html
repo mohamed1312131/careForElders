@@ -1,0 +1,104 @@
+<div class="container mt-4" *ngIf="plan; else loadingOrError">
+  <div class="row">
+    <div class="col-md-6">
+      <img [src]="plan.pictureUrl || 'assets/default-meal.jpg'"
+           class="img-fluid rounded" alt="{{plan.meal}}">
+    </div>
+    <div class="col-md-6">
+      <h2>{{plan.meal}}</h2>
+      <p class="lead">{{plan.description}}</p>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Nutrition Information</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Calories:</strong> {{plan.calories}}
+            </li>
+            <li class="list-group-item">
+              <strong>Meal Time:</strong> {{plan.mealTime}}
+            </li>
+            <li class="list-group-item">
+              <strong>Recommended Age Group:</strong> {{plan.recommendedAgeGroup}}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Additional Notes</h5>
+          <p>{{plan.notes || 'No additional notes provided.'}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h4>Ingredients</h4>
+        </div>
+        <div class="card-body">
+          <ul class="list-group" *ngIf="plan.ingredients && plan.ingredients.length; else noIngredients">
+            <li class="list-group-item" *ngFor="let ingredient of plan.ingredients">
+              {{ingredient}}
+            </li>
+          </ul>
+          <ng-template #noIngredients>
+            <p class="text-muted">No ingredients listed</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4>Comments</h4>
+          <button class="btn btn-sm btn-primary" (click)="showCommentForm = !showCommentForm">
+            Add Comment
+          </button>
+        </div>
+        <div class="card-body">
+          <div *ngIf="showCommentForm" class="mb-3">
+            <textarea class="form-control mb-2" [(ngModel)]="newComment" placeholder="Your comment..."></textarea>
+            <button class="btn btn-sm btn-success" (click)="addComment()">Submit</button>
+            <button class="btn btn-sm btn-secondary ms-2" (click)="showCommentForm = false">Cancel</button>
+          </div>
+
+          <div *ngIf="plan.comments && plan.comments.length; else noComments">
+            <div class="mb-2 p-2 border rounded" *ngFor="let comment of plan.comments">
+              <p class="mb-0">{{comment}}</p>
+            </div>
+          </div>
+          <ng-template #noComments>
+            <p class="text-muted">No comments yet</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-body d-flex justify-content-center gap-3">
+      <button class="btn btn-outline-success" (click)="likePlan()">
+        <i class="bi bi-hand-thumbs-up"></i> Like ({{plan.likes}})
+      </button>
+      <button class="btn btn-outline-danger" (click)="dislikePlan()">
+        <i class="bi bi-hand-thumbs-down"></i> Dislike ({{plan.dislikes}})
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div class="text-center py-5">
+    <div *ngIf="loading" class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <div *ngIf="!loading" class="alert alert-danger">
+      Plan not found or error loading details.
+    </div>
+  </div>
+</ng-template>

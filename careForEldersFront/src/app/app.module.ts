@@ -32,6 +32,10 @@ import { FrontOfficeModule } from "./pages/front-office/front-office.module"
 import { ToastrModule } from 'ngx-toastr';
 import { UserinfoComponent } from './pages/front-office/user-service/userinfo/userinfo.component';
 import { MatIconModule } from "@angular/material/icon"
+import {PlanListComponent} from "./pages/front-office/nutrition/plan-list/plan-list.component";
+import {TruncatePipe} from "./pipes/truncate.pipe";
+import {PlanDetailsComponent} from "./pages/front-office/nutrition/plan-details/plan-details.component";
+import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dashboard/admin-dashboard.component";
 
 @NgModule({
   declarations: [
@@ -42,7 +46,11 @@ import { MatIconModule } from "@angular/material/icon"
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
-    UserinfoComponent
+    UserinfoComponent,
+    PlanListComponent,
+    TruncatePipe,
+    PlanDetailsComponent,
+    AdminDashboardComponent
   ],
   imports: [
     BrowserModule,

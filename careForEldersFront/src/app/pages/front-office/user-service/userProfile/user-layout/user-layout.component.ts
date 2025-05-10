@@ -8,30 +8,31 @@ import { UserService } from 'src/app/services/user.service'; // Adjust path as n
 @Component({
   selector: 'app-user-layout',
   templateUrl: './user-layout.component.html',
-  styleUrl: './user-layout.component.scss' 
+  styleUrl: './user-layout.component.scss'
 })
 export class UserLayoutComponent implements OnInit, OnDestroy {
   isPlanMenuOpen = false;
+  inNutritionmenu = false;
   isDealsMenuOpen = false;
-  currentTitle = 'Pipeline'; 
-  user: any = null; 
+  currentTitle = 'Pipeline';
+  user: any = null;
   breadcrumbs: Array<{ label: string, url: string }> = [];
   isDoctor: boolean = false;
 
-  
+
   private destroy$ = new Subject<void>();
 
   constructor(
-    public router: Router, 
+    public router: Router,
     private userService: UserService
   ) {}
 
   ngOnInit(): void {
     this.getUserInfo(); // Fetch user info on initialization
     this.router.events.pipe(
-      
+
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd),
-      
+
       takeUntil(this.destroy$)
     ).subscribe((event: NavigationEnd) => {
 
@@ -39,16 +40,21 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
       this.updateTitle(event.urlAfterRedirects);
     });
 
-   
+
     this.updateTitle(this.router.url);
   }
 togglePlanMenu(): void {
     this.isPlanMenuOpen = !this.isPlanMenuOpen;
   }
+
+  toggleNutritionMenu() :void {
+    this.inNutritionmenu = !this.inNutritionmenu;
+  }
+
   getUserInfo(): void {
     // Get user ID directly from localStorage
     const userId = localStorage.getItem('user_id');
-    
+
     if (!userId) {
         console.warn('User ID not found in local storage.');
         return;
@@ -83,11 +89,11 @@ togglePlanMenu(): void {
       this.currentTitle = 'my plan';}
     else if (url.includes('/user/userProfile/AI')) {
       this.currentTitle = 'AI Assistant';
-    } else if (url.includes('/deals/pipeline')) { 
+    } else if (url.includes('/deals/pipeline')) {
       this.currentTitle = 'Pipeline';
     } else if (url.includes('/deals/create')) {
       this.currentTitle = 'Create Deal';
-    } else if (url.includes('/user/userProfile')) { 
+    } else if (url.includes('/user/userProfile')) {
       this.currentTitle = 'User Profile';
     }
 
@@ -105,7 +111,7 @@ togglePlanMenu(): void {
 
     for (const segment of urlSegments) {
       accumulatedPath += `/${segment}`;
-      
+
       switch(segment) {
         case 'userProfile':
           breadcrumbs.push({ label: 'User Profile', url: accumulatedPath });
@@ -137,12 +143,12 @@ togglePlanMenu(): void {
 
   logout(): void {
     localStorage.removeItem('token');
-   
-    this.router.navigate(['/login']); 
+
+    this.router.navigate(['/login']);
   }
 
   ngOnDestroy(): void {
-    
+
     this.destroy$.next();
     this.destroy$.complete();
   }
