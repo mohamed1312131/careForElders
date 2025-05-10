@@ -70,6 +70,12 @@ public class ReservationRestController {
         return Service.getDoctorById(doctorId);
     }
 
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable String userId) {
+        List<Reservation> reservations = Service.getReservationsByUserId(userId);
+        return ResponseEntity.ok(reservations);
+    }
 }
 
 

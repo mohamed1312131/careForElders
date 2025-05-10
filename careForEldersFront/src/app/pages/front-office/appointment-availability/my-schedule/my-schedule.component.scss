@@ -17,8 +17,18 @@
   text-overflow: ellipsis;
 }
 
-.alert {
-  margin-top: 20px;
+.availability-badge {
+  background-color: #5cb85c;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+}
+
+.appointment-badge {
+  background-color: #0275d8;
+  width: 15px;
+  height: 15px;
+  display: inline-block;
 }
 
 .btn-group {
