@@ -12,6 +12,7 @@ import { DoctorDetailsComponent } from '../appointment-availability/doctor-detai
 import { AddAvailabilityComponent } from '../appointment-availability/add-availability/add-availability.component';
 import { AbonnementTypeComponent } from '../subscription/abonnement-type/abonnement-type.component';
 import { MyReservationsComponent } from '../appointment-availability/my-reservations/my-reservations.component';
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
 
 
 
@@ -40,6 +41,8 @@ const routes: Routes = [
       },
       {path:'Reservation',
         component: MyReservationsComponent
+      },{path:'Schedule',
+        component: MyScheduleComponent
       },
       {path:'Abonnement',
         component: AbonnementTypeComponent
