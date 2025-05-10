@@ -20,6 +20,7 @@ interface MedicalRecord {
   chronicConditions: string[];
   lastPhysicalExam: string;
   updatedAt?: string; // Added optional field to match your template
+
 }
 
 @Component({
@@ -86,7 +87,7 @@ export class MedicalRecordListComponent implements OnInit {
       console.error('Invalid record ID');
       return;
     }
-    this.router.navigate(['medicalRecord']);
+    this.router.navigate(['/user/userProfile/medicalRecord/medicalrecord/', id]);
   }
 
   viewPatientDetails(patientId: string): void {
@@ -101,7 +102,7 @@ export class MedicalRecordListComponent implements OnInit {
     this.loadMedicalRecords();
   }
   goToDetails(id: number) {
-    this.router.navigate(['/medical-record', id]);
+    this.router.navigate(['/user/userProfile/medicalRecord/medicalrecord/', id]);
   }
 
 }

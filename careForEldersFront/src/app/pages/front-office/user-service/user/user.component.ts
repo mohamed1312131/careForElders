@@ -8,7 +8,7 @@ import {ConfirmDialogComponent} from "./confirm-dialog/confirm-dialog.component"
 @Component({
   selector: 'app-users',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.scss']
+  //styleUrls: ['./user.component.scss']
 })export class UsersComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];

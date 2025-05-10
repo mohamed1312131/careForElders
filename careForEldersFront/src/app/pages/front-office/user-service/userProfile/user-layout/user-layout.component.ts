@@ -12,7 +12,9 @@ import { UserService } from 'src/app/services/user.service'; // Adjust path as n
 })
 export class UserLayoutComponent implements OnInit, OnDestroy {
   isPlanMenuOpen = false;
+  isPMedicalRecordMenuOpen = false;
   inNutritionmenu = false;
+  inMedicalRecordmenu = false;
   isDealsMenuOpen = false;
   currentTitle = 'Pipeline';
   user: any = null;
@@ -21,6 +23,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
 
 
   private destroy$ = new Subject<void>();
+  userId!: string;
 
   constructor(
     public router: Router,
@@ -42,13 +45,29 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
 
 
     this.updateTitle(this.router.url);
-  }
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        this.userId = user.id; // Assuming `id` is the property name
+      } catch (error) {
+        console.error('Failed to parse user from localStorage', error);
+      }
+    } else {
+      console.error('No user is stored in localStorage');
+    }
+
+
+}
 togglePlanMenu(): void {
     this.isPlanMenuOpen = !this.isPlanMenuOpen;
   }
 
   toggleNutritionMenu() :void {
     this.inNutritionmenu = !this.inNutritionmenu;
+  }
+  toggleMedicalRecordMenu() :void {
+    this.inMedicalRecordmenu = !this.inMedicalRecordmenu;
   }
 
   getUserInfo(): void {
@@ -152,4 +171,5 @@ togglePlanMenu(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
 }

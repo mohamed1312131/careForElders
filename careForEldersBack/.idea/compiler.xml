@@ -31,14 +31,14 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="api-gateway" options="-parameters" />
+      <module name="api-gateway" options="" />
       <module name="appointmentAvailability" options="-parameters" />
       <module name="blogForum" options="-parameters" />
       <module name="chat" options="-parameters" />
-      <module name="config-server" options="-parameters" />
-      <module name="event" options="-parameters" />
+      <module name="config-server" options="" />
+      <module name="event" options="" />
       <module name="medicalRecord" options="-parameters" />
-      <module name="notification" options="-parameters" />
+      <module name="notification" options="" />
       <module name="nutrition" options="-parameters" />
       <module name="paramedicalCare" options="-parameters" />
       <module name="patientBill" options="-parameters" />
