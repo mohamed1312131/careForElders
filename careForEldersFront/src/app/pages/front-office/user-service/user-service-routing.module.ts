@@ -21,6 +21,8 @@ import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-det
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
 import {AdminDashboardComponent} from "../nutrition/admin-dashboard/admin-dashboard.component";
+import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
+import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
 
 
 
@@ -102,14 +104,27 @@ const routes: Routes = [
           path:'nutritionplainadmin',
           component:AdminDashboardComponent,
         }
-      ]}
+      ]},
+      {path:'medicalRecord',
+        children: [
+          {
+            path:'medicalrecordlist',
+            component:MedicalRecordListComponent,
+          },
+          {
+            path:'medicalrecord/:id',
+            component:MedicalRecordComponent ,
+          },
+
+        ]},
+      {
+        path: 'userinfo/:id',
+        component: UserinfoComponent,
+      },
     ]
   },
 
-  {
-    path: 'userinfo/:id',
-    component: UserinfoComponent,
-  },
+
 
 
 ];

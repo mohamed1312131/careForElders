@@ -7,17 +7,19 @@ import { ChatModule } from '../chat/chat.module';
 import { AppointmentAvailabilityModule } from '../appointment-availability/appointment-availability.module';
 import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
 import { SubscriptionModule } from '../subscription/subscription.module';
+import {FormsModule} from "@angular/forms";
 
 
 @NgModule({
   declarations: [UsersComponent],
-  imports: [
-    CommonModule,
-    UserServiceRoutingModule,
-    ChatModule,
-    AppointmentAvailabilityModule,
-    SubscriptionModule
-  ]
+    imports: [
+        CommonModule,
+        UserServiceRoutingModule,
+        ChatModule,
+        AppointmentAvailabilityModule,
+        SubscriptionModule,
+        FormsModule
+    ]
 })
 export class UserModule { }
 
