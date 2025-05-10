@@ -16,4 +16,5 @@ public interface UserService {
     UserResponse updateProfileImage(String userId, String imageUrl);
     User getUserEntityByEmail(String email);
     List<UserResponse> getAllDoctors();
+    List<UserResponse> getUsersByRole(String role);
 }
