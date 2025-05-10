@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
 
@@ -14,11 +15,44 @@ export class MyScheduleComponent implements OnInit {
   events: CalendarEvent[] = [];
   doctor: any;
   loading = false;
-  constructor(private router : Router){}
-  ngOnInit(): void {
+  doctorId: string | null = null;
 
-    
+  constructor(private router: Router, private snackBar: MatSnackBar) {}
+
+  ngOnInit(): void {
+    this.logLocalStorageContents();
+    this.doctorId = this.getDoctorIdFromLocalStorage();
     this.loadScheduleFromLocalStorage();
+  }
+
+  private logLocalStorageContents(): void {
+    console.log('LocalStorage contents:');
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        console.log(`Key: ${key}, Value:`, localStorage.getItem(key));
+      }
+    }
+  }
+
+  private getDoctorIdFromLocalStorage(): string | null {
+    try {
+      const professionalString = localStorage.getItem('currentProfessional');
+      if (!professionalString) {
+        console.warn('No professional data found in localStorage');
+        return null;
+      }
+      
+      const professional = JSON.parse(professionalString);
+      const doctorId = professional?.id || null;
+      
+      console.log('Retrieved Doctor ID:', doctorId);
+      return doctorId;
+      
+    } catch (error) {
+      console.error('Error parsing professional data from localStorage:', error);
+      return null;
+    }
   }
 
   loadScheduleFromLocalStorage(): void {
@@ -86,15 +120,18 @@ export class MyScheduleComponent implements OnInit {
     }
   }
 
-   onAddAvailability(): void {
-  try {
-    const professional = JSON.parse(localStorage.getItem('currentProfessional') || '{}');
-    if (!professional?.id) throw new Error('Doctor ID not found');
+  onAddAvailability(): void {
+    console.log('Current Doctor ID when clicking Add Availability:', this.doctorId);
     
-    this.router.navigate([`user/userProfile/doctor/${professional.id}/AddAvailability`]);
-  } catch (error) {
-    console.error('Failed to navigate:', error);
-    // Optionally show user feedback
+    if (!this.doctorId) {
+      this.snackBar.open('Doctor ID is missing. Please log in again.', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      return;
+    }
+
+    // Navigate to the "Add Availability" page using the stored doctor ID
+    this.router.navigate([`user/userProfile/doctor/${this.doctorId}/AddAvailability`]);
   }
-}
 }
