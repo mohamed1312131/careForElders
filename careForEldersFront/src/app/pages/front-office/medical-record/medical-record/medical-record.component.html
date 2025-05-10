@@ -1,15 +1,16 @@
 <div class="container medical-record-wrapper">
   <div class="patient-header d-flex align-items-center justify-between p-4 shadow">
     <div class="d-flex align-items-center">
-      <img [src]="patient.avatar" alt="avatar" class="avatar rounded-circle m-r-16">
+      <img [src]="patient.avatar" alt="Profile Image" class="profile-img"/>
       <div>
         <h3 class="mat-headline">{{ patient.name }}</h3>
         <p class="text-muted mat-body-1">{{ patient.info }}</p>
       </div>
     </div>
-
   </div>
+</div>
 
+<div class="container medical-record-wrapper">
   <mat-tab-group class="full-tabs">
     <!-- Patient Information Tab -->
     <mat-tab label="Patient Information">
@@ -20,7 +21,7 @@
           <!-- Blood Type -->
           <mat-form-field appearance="outline">
             <mat-label>Blood Type</mat-label>
-            <mat-select [(ngModel)]="medicalRecord.bloodType" name="bloodType">
+            <mat-select [(ngModel)]="medicalRecord.bloodType" name="bloodType" required>
               <mat-option value="">Unknown</mat-option>
               <mat-option value="A+">A+</mat-option>
               <mat-option value="A-">A-</mat-option>
@@ -31,6 +32,9 @@
               <mat-option value="O+">O+</mat-option>
               <mat-option value="O-">O-</mat-option>
             </mat-select>
+            <mat-error *ngIf="medicalRecord?.controls?.['bloodType']?.hasError('required')">
+              Blood type is required.
+            </mat-error>
           </mat-form-field>
 
           <!-- Allergies -->
@@ -50,7 +54,7 @@
               <div class="add-item">
                 <mat-form-field appearance="outline" class="flex-grow-1">
                   <mat-label>Add Allergy</mat-label>
-                  <input matInput [(ngModel)]="newAllergy" name="newAllergy" (keyup.enter)="addAllergy()">
+                  <input matInput [(ngModel)]="newAllergy" name="newAllergy" (keyup.enter)="addAllergy()"  required minlength="2">
                 </mat-form-field>
                 <button mat-icon-button color="primary" (click)="addAllergy()">
                   <mat-icon>add</mat-icon>

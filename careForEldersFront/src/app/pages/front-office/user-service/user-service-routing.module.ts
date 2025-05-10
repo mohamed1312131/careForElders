@@ -33,6 +33,8 @@ import { PostFormComponent } from '../blog-forum/post-form/post-form.component';
 import { PostListComponent } from '../blog-forum/post-list/post-list.component';
 
 import {AdminDashboardComponent} from "../nutrition/admin-dashboard/admin-dashboard.component";
+import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
+import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
 
 
 
@@ -164,18 +166,28 @@ const routes: Routes = [
           path:'nutritionplainadmin',
           component:AdminDashboardComponent,
         }
+      ]},
+      {path:'medicalRecord',
+        children: [
+          {
+            path:'medicalrecordlist',
+            component:MedicalRecordListComponent,
+          },
+          {
+            path:'medicalrecord/:id',
+            component:MedicalRecordComponent ,
+          },
       ]}
 
     ]
   },
 
-  {
-    path: 'userinfo/:id',
-    component: UserinfoComponent,
-  },
 
-
-];
+      {
+        path: 'userinfo/:id',
+        component: UserinfoComponent,
+      },
+    ];
 
 
 @NgModule({
