@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UsersComponent} from './user/user.component';
 
 //import { UsersComponent } from './user/user.component';
 
@@ -22,24 +23,25 @@ import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/a
 
 
 
+
 const routes: Routes = [
   {
 
     path: '',
     component: UserLayoutComponent,
   },
-{
+  {
     path: 'userProfile',
     component: UserLayoutComponent,
-    children: [ 
+    children: [
       {
-        path: 'AI', 
+        path: 'AI',
         component: ChatAIComponent
       },{
-        path: 'bill', 
+        path: 'bill',
         component: PatientBillListComponent
       },
-      
+
       {path:'search',
         component: SearchDoctorComponent
       },
@@ -56,29 +58,29 @@ const routes: Routes = [
         component: AbonnementTypeComponent
       },
       {
-        path: 'plan', 
+        path: 'plan',
         children: [
-        {
-          path:'add-program',
-          component: DoctorAddProgramComponent
-        },
-        {
-          path:'list',
-          component: DoctorPlanListComponent
-        },
-        {
-          path:'userprogram',
-          component: PlanListComponent
-        },
-        {
-        path: 'plandetails/:programId',
-        component: PlanDetailsComponent,
-        },
-        {
+          {
+            path:'add-program',
+            component: DoctorAddProgramComponent
+          },
+          {
+            path:'list',
+            component: DoctorPlanListComponent
+          },
+          {
+            path:'userprogram',
+            component: PlanListComponent
+          },
+          {
+            path: 'plandetails/:programId',
+            component: PlanDetailsComponent,
+          },
+          {
             path:'program/:assignmentId/day/:dayNumber',
             component: ProgramComponent,
           },
-        {
+          {
             path:'addExercise',
             component: AddExerciseComponent,
           },
@@ -93,6 +95,7 @@ const routes: Routes = [
 
 
 ];
+
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

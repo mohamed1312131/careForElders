@@ -6,17 +6,22 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { PatientBillsModule } from './patient-bill/patient-bills.module';
 import { BlogForumModule } from './blog-forum/blog-forum.module';
 
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @NgModule({
   declarations: [
     HomePageComponent,
-
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(FrontOfficeRoutes),
     PatientBillsModule,
-    BlogForumModule
+    BlogForumModule,
+    MatDatepickerModule
+  ],
+  providers: [
+    provideNativeDateAdapter()  // Add this line to provide the DateAdapter
   ]
 })
 export class FrontOfficeModule { }
