@@ -25,7 +25,7 @@ public class Bill {
     @Id
     private String id;
     
-    @NotBlank(message = "Bill number is required")
+
     private String billNumber;
     
     @NotNull(message = "Patient ID is required")

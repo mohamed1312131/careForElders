@@ -4,7 +4,7 @@
       <h1>Medical Blog Posts</h1>
       <p class="subtitle">Expert health insights from our doctors</p>
     </div>
-    <button mat-raised-button color="primary" routerLink="/blog-forum/post/create" class="create-button">
+    <button mat-raised-button color="primary" routerLink="/user/userProfile/post/create" class="create-button">
       <mat-icon>add</mat-icon> Create New Post
     </button>
   </div>
@@ -68,7 +68,7 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #actionMenu="matMenu">
-          <button mat-menu-item [routerLink]="['/blog-forum/post/edit', post.id]">
+          <button mat-menu-item [routerLink]="['/user/userProfile/post/edit', post.id]">
             <mat-icon>edit</mat-icon>
             <span>Edit</span>
           </button>
@@ -105,7 +105,7 @@
           </div>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-button [routerLink]="['/blog-forum/post', post.id]" class="read-more-btn">
+          <button mat-button [routerLink]="['/user/userProfile/post', post.id]" class="read-more-btn">
             READ MORE
           </button>
         </mat-card-actions>
