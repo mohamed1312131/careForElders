@@ -9,15 +9,6 @@
 
     <ul>
       <li>
-        <a (click)="toggleDealsMenu()" [ngClass]="{ active: isDealsMenuOpen }">Deals</a>
-        <ul *ngIf="isDealsMenuOpen">
-          <li><a routerLink="/chat/test/deals/create" routerLinkActive="active">Create New Deal</a></li>
-          <li><a routerLink="/chat/test/deals/modify" routerLinkActive="active">Modify Deal</a></li>
-          <li><a routerLink="/chat/test/deals/pipeline" routerLinkActive="active">Pipeline</a></li>
-        </ul>
-      </li>
-      <li><a routerLink="/chat/test/activities" routerLinkActive="active">Activities</a></li>
-      <li>
       <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
       <ul *ngIf="isPlanMenuOpen">
         <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
@@ -27,7 +18,6 @@
       </ul>
     </li>
       <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
-       <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
       <li><a routerLink="bill" routerLinkActive="active">Billing</a></li>
