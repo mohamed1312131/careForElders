@@ -1,8 +1,36 @@
-.w-full {
-    width: 100%;
-    margin-bottom: 16px;
-  }
-  
-  mat-dialog-actions {
-    justify-content: flex-end;
-  }
+/* Ensure overlay container is properly positioned */
+.cdk-overlay-container {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Backdrop styling */
+.cdk-overlay-backdrop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+/* Dialog positioning */
+.cdk-global-overlay-wrapper {
+  display: flex;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}

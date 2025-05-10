@@ -95,7 +95,7 @@ export class DoctorDetailsComponent implements OnInit {
     }
   }
   
-  handleEventClick(event: any): void {
+  /*handleEventClick(event: any): void {
     const clickedEvent = event.event || event;
     console.log('Event clicked', clickedEvent);
     
@@ -108,9 +108,53 @@ export class DoctorDetailsComponent implements OnInit {
         endTime: clickedEvent.end
       }
     });
-  }
+  }*/
+
+  handleEventClick(event: any): void {
+  const clickedEvent = event.event || event;
+  this.dialog.open(AppointmentDialogComponent, {
+      width: '500px',
+      data: {
+        doctor: this.doctor,
+        availability: clickedEvent,
+        startTime: clickedEvent.start,
+        endTime: clickedEvent.end
+      }
+    });
+  console.log('Dialog opening with data:', {
+    doctor: this.doctor,
+    availability: clickedEvent,
+    startTime: clickedEvent.start,
+    endTime: clickedEvent.end
+  });
+
+  const dialogRef = this.dialog.open(AppointmentDialogComponent, {
+    width: '500px',
+    data: {
+      doctor: this.doctor,
+      availability: clickedEvent,
+      startTime: clickedEvent.start,
+      endTime: clickedEvent.end
+    }
+  });
+
+  dialogRef.afterOpened().subscribe(() => console.log('Dialog opened successfully!'));
+  dialogRef.afterClosed().subscribe(() => console.log('Dialog closed'));
+}
+
   onAddAvailability(doctorId: string) {
     console.log('doctorId',doctorId),
     this.router.navigate(['user/userProfile/doctor/', doctorId, 'AddAvailability']);
   }
+  
+  ngAfterViewInit() {
+  const container = document.querySelector('.cdk-overlay-container');
+  if (!container) {
+    console.error('CDK Overlay Container not found in DOM!');
+    // Manually create it if missing
+    const newContainer = document.createElement('div');
+    newContainer.className = 'cdk-overlay-container';
+    document.body.appendChild(newContainer);
+  }
+}
 }

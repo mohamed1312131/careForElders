@@ -13,6 +13,11 @@ import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
 import { DoctorDetailsComponent } from './doctor-details/doctor-details.component';
 import { MyReservationsComponent } from './my-reservations/my-reservations.component';
 import { MyScheduleComponent } from './my-schedule/my-schedule.component';
+import { AppointmentDialogComponent } from './appointment-dialog/appointment-dialog.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 
 @NgModule({
@@ -21,7 +26,8 @@ import { MyScheduleComponent } from './my-schedule/my-schedule.component';
     DoctorDetailsComponent,
     DoctorDetailsComponent,
     MyReservationsComponent,
-  MyScheduleComponent],
+  MyScheduleComponent,
+  AppointmentDialogComponent],
   
   imports: [
     CommonModule,
@@ -33,6 +39,11 @@ import { MyScheduleComponent } from './my-schedule/my-schedule.component';
         FormsModule,
         ReactiveFormsModule,
         CalendarModule.forRoot({ provide: DateAdapter, useFactory: adapterFactory }),
+        MatDialogModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule
   ],
   exports:[TestingComponent]
 })
