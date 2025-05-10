@@ -1,4 +1,4 @@
-package com.care4elders.userservice.service;
+package com.care4elders.userservice.Service;
 
 import com.care4elders.userservice.dto.UpdateUserRequest;
 import com.care4elders.userservice.dto.UserRequest;
@@ -15,4 +15,6 @@ public interface UserService {
     void deleteUser(String id);
     UserResponse updateProfileImage(String userId, String imageUrl);
     User getUserEntityByEmail(String email);
+    List<UserResponse> getAllDoctors();
+    List<UserResponse> getUsersByRole(String role);
 }

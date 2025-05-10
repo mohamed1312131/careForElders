@@ -3,6 +3,7 @@ package com.care4elders.appointmentavailability.Controller;
 import com.care4elders.appointmentavailability.dto.UserDTO;
 import com.care4elders.appointmentavailability.entity.Reservation;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.care4elders.appointmentavailability.service.IService;
 
@@ -25,11 +26,13 @@ public class ReservationRestController {
 
     @GetMapping
     public List<Reservation> getAll() {
+
         return Service.getAllReservations();
     }
 
     @GetMapping("/{id}")
     public Optional<Reservation> getById(@PathVariable String id) {
+
         return Service.getReservationById(id);
     }
 
@@ -40,6 +43,7 @@ public class ReservationRestController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
+
         Service.deleteReservation(id);
     }
 
@@ -52,7 +56,25 @@ public class ReservationRestController {
 
     @GetMapping("/getUser/{userId}")
     public UserDTO getUserById(@PathVariable String userId) {
+
         return Service.getUserById(userId);
+    }
+
+    @GetMapping("/getAllDoctors")
+    public ResponseEntity<List<UserDTO>> getAllDoctors() {
+        return ResponseEntity.ok(Service.getAllDoctors());
+    }
+
+    @GetMapping("/getDoctor/{doctorId}")
+    public UserDTO getDoctorById(@PathVariable String doctorId) {
+        return Service.getDoctorById(doctorId);
+    }
+
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Reservation>> getReservationsByUserId(@PathVariable String userId) {
+        List<Reservation> reservations = Service.getReservationsByUserId(userId);
+        return ResponseEntity.ok(reservations);
     }
 }
 

@@ -1,0 +1,21 @@
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .user-card {
+    background-color: #f4f4f4;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 250px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  
+  .user-card:hover {
+    transform: translateY(-5px);
+  }
+  

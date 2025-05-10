@@ -1,16 +1,12 @@
 package com.care4elders.appointmentavailability.service;
 
-
 import com.care4elders.appointmentavailability.dto.UserDTO;
-
 import com.care4elders.appointmentavailability.entity.Reservation;
+import com.care4elders.appointmentavailability.repository.IReservationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.care4elders.appointmentavailability.repository.IReservationRepository;
-
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,15 +14,12 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+public class ServiceImp implements IService {
 
-public class ServiceImp implements IService{
-    IReservationRepository reservationRepository;
+    private final IReservationRepository reservationRepository;
     private final RestTemplate restTemplate;
 
-    /*@Override
-    public Reservation AjouterReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
-    }*/
+    private static final String USER_SERVICE_BASE_URL = "http://USER-SERVICE/users";
 
     @Override
     public List<Reservation> getAllReservations() {
@@ -39,64 +32,85 @@ public class ServiceImp implements IService{
     }
 
     @Override
-    public Reservation updateReservation(String id, Reservation r) {
+    public Reservation updateReservation(String id, Reservation updatedReservation) {
         return reservationRepository.findById(id)
                 .map(existing -> {
-                    existing.setDate(r.getDate());
-                    existing.setHeure(r.getHeure());
-                    existing.setStatut(r.getStatut());
+                    existing.setDate(updatedReservation.getDate());
+                    existing.setHeure(updatedReservation.getHeure());
+                    existing.setStatut(updatedReservation.getStatut());
                     return reservationRepository.save(existing);
                 })
-                .orElseThrow(() -> new RuntimeException("Reservation not found"));
+                .orElseThrow(() -> new RuntimeException("Reservation not found with ID: " + id));
     }
 
     @Override
     public void deleteReservation(String id) {
+        if (!reservationRepository.existsById(id)) {
+            throw new RuntimeException("Reservation not found with ID: " + id);
+        }
         reservationRepository.deleteById(id);
     }
 
-
-
     @Override
     public Reservation AjouterReservation(Reservation reservation) {
-        // Assume reservation contains a userId field (you can add it if it doesn't exist)
-        String userId = reservation.getUserId();
+        // Validate user existence via User Service
+        UserDTO user = getUserById(reservation.getUserId());
 
-        // Fetch user from user-service
-        String userServiceUrl = "http://USER-SERVICE/users/" + userId;
-
-        try {
-            UserDTO user = restTemplate.getForObject(userServiceUrl, UserDTO.class);
-            if (user == null) {
-                throw new RuntimeException("User not found");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("User not found in user-service", e);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + reservation.getUserId());
         }
 
         return reservationRepository.save(reservation);
     }
 
-    
-
+    // === Communication with USER-SERVICE ===
 
     public List<UserDTO> getAllUsers() {
-        String userServiceUrl = "http://USER-SERVICE/users"; // Remove trailing slash
-          try {        UserDTO[] users = restTemplate.getForObject(userServiceUrl, UserDTO[].class);
-              assert users != null;
-              return Arrays.asList(users);    }
-          catch (RestClientException e) {
-              throw new RuntimeException("Failed to fetch users from User Service", e);
-          }
+        try {
+            UserDTO[] users = restTemplate.getForObject(USER_SERVICE_BASE_URL, UserDTO[].class);
+            return users != null ? Arrays.asList(users) : List.of();
+        } catch (RestClientException e) {
+            throw new RuntimeException("Failed to fetch users from User Service", e);
+        }
     }
 
     public UserDTO getUserById(String userId) {
-        String url = "http://USER-SERVICE/users/" + userId;
         try {
-            return restTemplate.getForObject(url, UserDTO.class);
+            return restTemplate.getForObject(USER_SERVICE_BASE_URL + "/" + userId, UserDTO.class);
         } catch (RestClientException e) {
             throw new RuntimeException("Failed to fetch user with ID: " + userId, e);
         }
     }
 
+    public List<UserDTO> getAllDoctors() {
+        try {
+            UserDTO[] doctors = restTemplate.getForObject(
+                    USER_SERVICE_BASE_URL + "/doctors",
+                    UserDTO[].class
+            );
+            return doctors != null ? Arrays.asList(doctors) : List.of();
+        } catch (RestClientException e) {
+            throw new RuntimeException("Failed to fetch doctors from User Service", e);
+        }
     }
+
+    public UserDTO getDoctorById(String doctorId) {
+        UserDTO user = getUserById(doctorId);
+        if ("DOCTOR".equalsIgnoreCase(user.getRole())) {
+            return user;
+        } else {
+            throw new RuntimeException("User with ID: " + doctorId + " is not a doctor.");
+        }
+    }
+    @Override
+    public List<Reservation> getReservationsByUserId(String userId) {
+        // First verify the user exists
+        UserDTO user = getUserById(userId);
+        if (user == null) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+
+        // Then fetch their reservations
+        return reservationRepository.findByUserId(userId);
+    }
+}

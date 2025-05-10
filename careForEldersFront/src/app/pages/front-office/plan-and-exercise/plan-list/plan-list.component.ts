@@ -18,7 +18,7 @@ export class PlanListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.userId = this.route.snapshot.paramMap.get('userId') || '';
+    this.userId = localStorage.getItem('user_id') ?? '';
     this.loadPrograms();
   }
 
