@@ -1,38 +1,52 @@
-// Define variables for easier theme management
-$primary-blue: #007aff; // iOS-like blue
-$light-grey: #e5e5ea;  // Separator color
-$medium-grey: #8e8e93; // Reps text color
-$dark-grey: #1c1c1e;   // Primary text color
-$icon-grey: #c7c7cc;   // Icon color
-$background-color: #ffffff;
-$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; // System font stack
+// Define variables
+$primary-blue: #007aff;
+$accent-color: #ff9500; // A good accent for "Start"
+$success-green: #34c759; // iOS-like green for success
+$light-grey: #f2f2f7;  // Page background
+$card-background: #ffffff;
+$separator-color: #e5e5ea;
+$medium-grey: #8e8e93; // Reps text, subtitles
+$dark-grey: #1c1c1e;   // Primary text
+$icon-grey: #c7c7cc;
+$font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+// Difficulty Level Colors
+$difficulty-easy: #4caf50; // Softer green
+$difficulty-medium: #ffc107; // Amber
+$difficulty-hard: #f44336; // Red
+$difficulty-default: $medium-grey;
+
 
 .workout-screen {
   font-family: $font-family;
-  background-color: $background-color;
-  height: 100vh; // Full viewport height
+  background-color: $light-grey;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  padding: 16px;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .workout-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  flex-shrink: 0; // Prevent header from shrinking
+  padding: 8px 4px; // Reduced top/bottom padding
+  margin-bottom: 20px;
+  flex-shrink: 0;
 
   .header-info {
     font-size: 0.95em;
     color: $dark-grey;
 
-    .duration {
-      font-weight: 600; // Semi-bold
+    .duration, .count {
+      font-weight: 500;
     }
-
     .separator {
-      margin: 0 5px;
+      margin: 0 10px;
+      color: $separator-color;
     }
   }
 
@@ -42,209 +56,253 @@ $font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, 
     font-size: 0.95em;
     font-weight: 500;
     cursor: pointer;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-.workout-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex-grow: 1; // Takes up available vertical space
-  overflow-y: auto; // Allows scrolling if content exceeds height
-
-  .workout-item {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
-    border-bottom: 1px solid $light-grey; // Separator line
-
-    &:last-child {
-      border-bottom: none; // Remove border from last item
-    }
-
-    .icon {
-      color: $icon-grey;
-      font-size: 1.3em; // Adjust icon size
-      cursor: grab; // Indicate draggable/interactive element
-    }
-
-    .drag-handle {
-      margin-right: 15px;
-    }
-
-    .reorder-handle {
-      margin-left: 15px;
-    }
-
-    .item-icon {
-      width: 45px; // Adjust icon container size
-      height: 45px;
-      margin-right: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-      }
-    }
-
-    .item-details {
-      flex-grow: 1; // Pushes the reorder handle to the right
-      display: flex;
-      flex-direction: column;
-      justify-content: center; // Align text vertically if needed
-
-      .item-name {
-        font-size: 1em;
-        font-weight: 500; // Medium weight
-        color: $dark-grey;
-        margin-bottom: 2px; // Space between name and reps
-      }
-
-      .item-reps {
-        font-size: 0.85em;
-        color: $medium-grey;
-      }
-    }
-  }
-}
-
-.workout-footer {
-  padding: 15px 20px 25px 20px; // Add more bottom padding
-  background-color: $background-color; // Ensure it covers scrolled content
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05); // Subtle shadow on top edge
-  flex-shrink: 0; // Prevent footer from shrinking
-
-  .start-button {
-    display: block;
-    width: 100%;
-    padding: 14px 20px;
-    background-color: $primary-blue;
-    color: $background-color;
-    border: none;
-    border-radius: 10px; // Rounded corners
-    font-size: 1.1em;
-    font-weight: 600; // Semi-bold
-    text-align: center;
-    cursor: pointer;
+    padding: 4px 0; // Clickable area
+    border-radius: 6px;
     transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: darken($primary-blue, 10%); // Darken button on hover
+      background-color: rgba($primary-blue, 0.1);
     }
-
-    &:active {
-       background-color: darken($primary-blue, 15%);
-       transform: scale(0.99); // Slight press effect
-    }
-  }
-}
-
-// Optional: Style for scrollbar (Webkit browsers)
-.workout-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.workout-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.workout-list::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-.workout-screen {
-  padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.workout-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  
-  .header-info {
-    color: #666;
-    
-    .duration, .count {
-      margin: 0 5px;
+    .edit-icon {
+      font-size: 1.2em; // Slightly larger chevron
+      height: auto; width: auto; // Ensure icon sizes correctly
     }
   }
 }
 
-.workout-list {
-  list-style: none;
-  padding: 0;
-}
+.workout-accordion {
+  flex-grow: 1;
+  margin-bottom: 20px; // Space before footer
 
-.workout-item {
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  margin-bottom: 15px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  
-  .item-icon {
-    width: 60px;
-    height: 60px;
-    margin-right: 15px;
-    
-    .exercise-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 4px;
+  .workout-expansion-panel {
+    background-color: $card-background;
+    border-radius: 12px !important; // Material override
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07); // Softer shadow
+    transition: box-shadow 0.3s ease;
+
+    &.active-exercise-panel {
+      border-left: 4px solid $accent-color;
+      box-shadow: 0 4px 12px rgba($accent-color, 0.3);
     }
-  }
-  
-  .item-details {
-    flex-grow: 1;
-    
-    .item-name {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 5px;
+
+    &:not(.mat-expanded):hover {
+       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-    
-    .item-duration {
-      color: #666;
+    &.mat-expanded {
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .mat-expansion-panel-header {
+      padding: 12px 16px;
+      min-height: 72px; // Good height for touch targets
+      border-radius: 12px !important; // Match panel for unexpanded state
+
+      &.mat-expanded { // Style when expanded (optional, if different needed)
+        // border-bottom: 1px solid $separator-color;
+      }
+
+      .panel-title {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        color: $dark-grey;
+        font-size: 1.05em; // Slightly larger name
+
+        .item-icon-container {
+          width: 50px;
+          height: 50px;
+          margin-right: 16px;
+          border-radius: 10px; // Softer radius
+          overflow: hidden;
+          background-color: $light-grey;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          .exercise-image-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+        }
+        .exercise-name {
+          line-height: 1.3; // For potentially longer names
+        }
+      }
+
+      .panel-description {
+        font-size: 0.9em;
+        color: $medium-grey;
+        display: flex;
+        align-items: center;
+        font-weight: 400;
+        white-space: nowrap; // Prevent wrap of "X min"
+
+        .expand-indicator {
+          margin-left: 10px;
+          color: $icon-grey;
+          transition: transform 0.25s cubic-bezier(0.4,0.0,0.2,1);
+        }
+      }
+      // Rotation handled by Angular Material by default for .mat-expansion-indicator
+      // if you use that specific class on the icon
+    }
+
+    .exercise-details-content {
+      padding: 8px 20px 20px 20px;
       font-size: 0.9em;
+      color: $dark-grey;
+      line-height: 1.6;
+
+      .detail-item {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        color: $medium-grey;
+
+        .detail-icon {
+          margin-right: 10px;
+          color: $icon-grey;
+          font-size: 1.2em;
+        }
+
+        strong {
+          margin-right: 6px;
+          color: $dark-grey;
+          font-weight: 500;
+        }
+
+        .difficulty-tag {
+            padding: 4px 10px;
+            border-radius: 16px; // Pill shape
+            font-size: 0.85em;
+            font-weight: 500;
+            color: white;
+            text-transform: capitalize;
+            margin-left: 5px;
+
+            &.easy { background-color: $difficulty-easy; }
+            &.medium { background-color: $difficulty-medium; color: $dark-grey; /* Adjust text color for yellow */ }
+            &.hard { background-color: $difficulty-hard; }
+            &.undefined, &.n\/a { background-color: $difficulty-default; color: white; }
+        }
+      }
+
+      .video-container {
+        margin-top: 16px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        iframe {
+            display: block; // Remove extra space
+            border: none; // Ensure no iframe border
+        }
+      }
+      .no-video-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 25px 15px;
+        margin-top: 16px;
+        background-color: rgba($light-grey, 0.7);
+        border-radius: 10px;
+        color: $medium-grey;
+        text-align: center;
+        mat-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        span {
+            font-size: 0.95em;
+        }
+      }
     }
   }
+}
+
+.no-exercises-message {
+    text-align: center;
+    padding: 50px 20px;
+    color: $medium-grey;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .empty-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+        color: $icon-grey;
+    }
+    p {
+        font-size: 1.2em;
+        color: $dark-grey;
+        margin-bottom: 8px;
+    }
+    .sub-message {
+        font-size: 0.9em;
+        color: $medium-grey;
+    }
 }
 
 .workout-footer {
-  margin-top: 30px;
-  text-align: center;
-  
-  .start-button {
-    padding: 15px 30px;
-    background: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background 0.3s;
-    
-    &:hover {
-      background: #45a049;
-    }
-    
-    &:disabled {
-      background: #ccc;
-      cursor: not-allowed;
+  padding: 10px 0px; // Only top/bottom padding, rely on screen padding for sides
+  background-color: $light-grey; // Match screen background
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; // Space between buttons
+
+  .action-button {
+    width: 100%;
+    padding: 14px 20px; // Generous padding for touch
+    border-radius: 10px; // Consistent radius
+    font-size: 1.05em;
+    font-weight: 500; // Medium weight for buttons
+    text-transform: none; // Keep natural casing
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; // Space between icon and text
+
+    mat-icon {
+      font-size: 1.3em; // Slightly larger icons in buttons
     }
   }
+  .start-workout-button {
+    // Accent color is applied by mat-flat-button color="accent"
+    color: white; // Ensure text is white on accent background
+  }
+}
+
+.active-workout-indicator { // Simple indicator on this page
+    padding: 10px;
+    text-align: center;
+    background-color: rgba($primary-blue, 0.1);
+    margin-top: 15px;
+    border-radius: 8px;
+    p {
+        margin: 0 0 8px 0;
+        font-size: 0.9em;
+        color: $primary-blue;
+        font-weight: 500;
+    }
+}
+
+// Scrollbar styling (Webkit)
+.workout-accordion::-webkit-scrollbar, .workout-screen::-webkit-scrollbar {
+  width: 6px;
+}
+.workout-accordion::-webkit-scrollbar-track, .workout-screen::-webkit-scrollbar-track {
+  background: transparent;
+}
+.workout-accordion::-webkit-scrollbar-thumb, .workout-screen::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }

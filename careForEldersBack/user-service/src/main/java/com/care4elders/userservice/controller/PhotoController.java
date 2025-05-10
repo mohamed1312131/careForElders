@@ -2,7 +2,7 @@ package com.care4elders.userservice.controller;
 
 import com.care4elders.userservice.dto.UserResponse;
 import com.care4elders.userservice.Service.CloudinaryService;
-import com.care4elders.userservice.service.UserService;
+import com.care4elders.userservice.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

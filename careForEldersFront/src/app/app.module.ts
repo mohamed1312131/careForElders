@@ -1,14 +1,14 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from "@angular/core"
+import { BrowserModule } from "@angular/platform-browser"
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
+import { HttpClientModule } from "@angular/common/http"
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import { AppRoutingModule } from "./app-routing.module"
+import { AppComponent } from "./app.component"
 
 // icons
-import { TablerIconsModule } from 'angular-tabler-icons';
-import * as TablerIcons from 'angular-tabler-icons/icons';
+import { TablerIconsModule } from "angular-tabler-icons"
+import * as TablerIcons from "angular-tabler-icons/icons"
 
 // Import all material modules
 import { MaterialModule } from './material.module';
@@ -19,10 +19,14 @@ import { FullComponent } from './layouts/full/full.component';
 import { BlankComponent } from './layouts/blank/blank.component';
 
 // Vertical Layout
-import { SidebarComponent } from './layouts/full/sidebar/sidebar.component';
-import { HeaderComponent } from './layouts/full/header/header.component';
-import { BrandingComponent } from './layouts/full/sidebar/branding.component';
-import { AppNavItemComponent } from './layouts/full/sidebar/nav-item/nav-item.component';
+import { SidebarComponent } from "./layouts/full/sidebar/sidebar.component"
+import { HeaderComponent } from "./layouts/full/header/header.component"
+import { BrandingComponent } from "./layouts/full/sidebar/branding.component"
+import { AppNavItemComponent } from "./layouts/full/sidebar/nav-item/nav-item.component"
+import { FrontOfficeModule } from "./pages/front-office/front-office.module"
+//import { ApiTestComponent } from "./test/api-test.component"
+
+
 
 // ToastrModule for Toastr notifications
 import { ToastrModule } from 'ngx-toastr';
@@ -56,6 +60,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatIconModule} from "@angular/material/icon";
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -66,11 +71,12 @@ import {MatIconModule} from "@angular/material/icon";
     BrandingComponent,
     AppNavItemComponent,
     UserinfoComponent,
-    UsersComponent,
+
     MedicalRecordComponent,
     AddNoteDialogComponent,
     TruncatePipe,
     DocumentPreviewDialogComponent,
+    UserinfoComponent
   ],
   imports: [
     BrowserModule,
@@ -79,6 +85,7 @@ import {MatIconModule} from "@angular/material/icon";
     BrowserAnimationsModule, // Required for animations
     FormsModule,
     ReactiveFormsModule,
+
     MaterialModule,
     TablerIconsModule.pick(TablerIcons),
     ToastrModule.forRoot({

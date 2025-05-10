@@ -1,4 +1,7 @@
 /* Add these to your global styles.scss file */
+/* Import calendar styles */
+@import 'node_modules/angular-calendar/css/angular-calendar.css';
+
 
 .custom-toastr {
   border-radius: 8px !important;

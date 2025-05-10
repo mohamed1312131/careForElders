@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements com.care4elders.userservice.service.UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -166,5 +166,16 @@ public class UserServiceImpl implements com.care4elders.userservice.service.User
     public User getUserEntityByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    public List<UserResponse> getAllDoctors() {
+        return userRepository.getUsersByRole("DOCTOR").stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+    @Override
+    public List<UserResponse> getUsersByRole(String role) {
+        return userRepository.getUsersByRole(role).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 }
