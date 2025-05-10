@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>Service Details</h2>
+    <mat-dialog-content>
+      <div *ngIf="serviceDetails">
+        <h3>{{ serviceDetails.name }}</h3>
+        
+        <mat-list>
+          <mat-list-item>
+            <span matListItemTitle>Category</span>
+            <span matListItemLine>{{ serviceDetails.category }}</span>
+          </mat-list-item>
+          
+          <mat-list-item>
+            <span matListItemTitle>Price/Hour</span>
+            <span matListItemLine>${{ serviceDetails.pricePerHour }}</span>
+          </mat-list-item>
+          
+          <mat-list-item>
+            <span matListItemTitle>Total Requests</span>
+            <span matListItemLine>{{ serviceDetails.totalRequests }}</span>
+          </mat-list-item>
+          
+          <mat-list-item>
+            <span matListItemTitle>Completed Requests</span>
+            <span matListItemLine>{{ serviceDetails.completedRequests }}</span>
+          </mat-list-item>
+        </mat-list>
+
+        <h4>Recent Requests</h4>
+        <mat-table [dataSource]="serviceDetails.recentRequests">
+          <ng-container matColumnDef="user">
+            <mat-header-cell *matHeaderCellDef>User</mat-header-cell>
+            <mat-cell *matCellDef="let req">
+              {{ req.user.firstName }} {{ req.user.lastName }}
+            </mat-cell>
+          </ng-container>
+          
+          <ng-container matColumnDef="status">
+            <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+            <mat-cell *matCellDef="let req">
+              <span [class]="req.status.toLowerCase()">{{ req.status }}</span>
+            </mat-cell>
+          </ng-container>
+          
+          <mat-header-row *matHeaderRowDef="['user', 'status']"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: ['user', 'status'];"></mat-row>
+        </mat-table>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button mat-dialog-close>Close</button>
+    </mat-dialog-actions>

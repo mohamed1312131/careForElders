@@ -78,7 +78,7 @@ export class PostFormComponent implements OnInit {
           duration: 3000,
         })
         this.isLoading = false
-        this.router.navigate(["/blog-forum/post"])
+        this.router.navigate(["/user/userProfile/blog"])
       },
     })
   }
@@ -140,7 +140,7 @@ export class PostFormComponent implements OnInit {
           duration: 3000,
         })
         this.isSubmitting = false
-        this.router.navigate(["/blog-forum/post", post.id])
+        this.router.navigate(["/user/userProfile/blog"])
       },
       error: (error) => {
         this.handleError(error)
@@ -155,7 +155,7 @@ export class PostFormComponent implements OnInit {
           duration: 3000,
         })
         this.isSubmitting = false
-        this.router.navigate(["/blog-forum/post", post.id])
+        this.router.navigate(["/user/userProfile/blog"])
       },
       error: (error) => {
         this.handleError(error)
@@ -191,9 +191,9 @@ export class PostFormComponent implements OnInit {
 
   cancel(): void {
     if (this.isEditMode && this.postId) {
-      this.router.navigate(["/blog-forum/post", this.postId])
+      this.router.navigate(["/user/userProfile/blog", this.postId])
     } else {
-      this.router.navigate(["/blog-forum/post"])
+      this.router.navigate(["/user/userProfile/blog"])
     }
   }
 }

@@ -20,9 +20,22 @@ import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.comp
 import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
+
+import { UserServicesComponent } from '../paramedical-care/user-services/user-services.component';
+import { UserRequestsComponent } from '../paramedical-care/user-requests/user-requests.component';
+import { SoignantRequestsComponent } from '../paramedical-care/soignant-requests/soignant-requests.component';
+import { PatientBillFormComponent } from '../patient-bill/patient-bill-form/patient-bill-form.component';
+import { PatientBillPaymentComponent } from '../patient-bill/patient-bill-payment/patient-bill-payment.component';
+import { PatientBillHistoryComponent } from '../patient-bill/patient-bill-history/patient-bill-history.component';
+import { PostDetailComponent } from '../blog-forum/post-detail/post-detail.component';
+import { PostFormComponent } from '../blog-forum/post-form/post-form.component';
+import { PostListComponent } from '../blog-forum/post-list/post-list.component';
+
 import {AdminDashboardComponent} from "../nutrition/admin-dashboard/admin-dashboard.component";
 import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
 import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
+
 
 
 
@@ -45,6 +58,33 @@ const routes: Routes = [
         component: PatientBillListComponent
       },
 
+{
+    path: "edit/:id",
+    component: PatientBillFormComponent,
+  },
+  {
+    path: "view/:id",
+    component: PatientBillFormComponent, // You can create a dedicated view component later
+  },
+  // Payment related routes
+  {
+    path: "payment/:id",
+    component: PatientBillPaymentComponent,
+    //data: { title: "Process Payment" },
+  },
+  {
+    path: "history/:id",
+    component: PatientBillHistoryComponent,
+    //data: { title: "Payment History" },
+  },
+      {
+        path: 'create',
+        component: PatientBillFormComponent
+      },
+
+
+
+
       {path:'search',
         component: SearchDoctorComponent
       },
@@ -57,8 +97,24 @@ const routes: Routes = [
       {path:'Reservation',
         component: MyReservationsComponent
       },
+      {path:'mySchedule',
+        component: MyScheduleComponent
+      },
       {path:'Abonnement',
         component: AbonnementTypeComponent
+      },
+      {
+
+        path:'userServices',
+        component: UserServicesComponent
+      },
+      {
+        path:'SoignantRequests',
+        component: SoignantRequestsComponent
+      },
+      {
+        path:'UserRequests',
+        component: UserRequestsComponent
       },
       {
         path: 'plan',
@@ -89,6 +145,12 @@ const routes: Routes = [
           },
         ]
       },
+
+      { path: "blog", component: PostListComponent },
+            { path: "post/create", component: PostFormComponent },
+            { path: "post/edit/:id", component: PostFormComponent },
+            { path: "post/:id", component: PostDetailComponent },
+
       {path:'nutrition',
       children: [
         {
@@ -115,19 +177,17 @@ const routes: Routes = [
             path:'medicalrecord/:id',
             component:MedicalRecordComponent ,
           },
+      ]}
 
-        ]},
-      {
-        path: 'userinfo/:id',
-        component: UserinfoComponent,
-      },
     ]
   },
 
 
-
-
-];
+      {
+        path: 'userinfo/:id',
+        component: UserinfoComponent,
+      },
+    ];
 
 
 @NgModule({

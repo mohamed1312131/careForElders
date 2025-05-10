@@ -18,6 +18,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatCardModule } from '@angular/material/card';
 
 
 @NgModule({
@@ -32,7 +34,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   imports: [
     CommonModule,
     AppointmentAvailabilityRoutingModule,
-       
         MaterialModule,
         HttpClientModule,
         RouterModule,
@@ -40,10 +41,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
         ReactiveFormsModule,
         CalendarModule.forRoot({ provide: DateAdapter, useFactory: adapterFactory }),
         MatDialogModule,
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        MatButtonModule
+    MatButtonModule,
+    MatDividerModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule
   ],
   exports:[TestingComponent]
 })

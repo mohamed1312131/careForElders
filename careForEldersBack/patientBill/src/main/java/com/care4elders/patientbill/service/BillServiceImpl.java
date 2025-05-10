@@ -6,6 +6,8 @@ import com.care4elders.patientbill.exception.BillNotFoundException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.SecureRandom;
 import java.util.List;
 import java.math.BigDecimal;
 
@@ -58,9 +60,22 @@ public class BillServiceImpl implements BillService {
     @Override
     public Bill createBill(Bill bill) {
         log.debug("Creating new bill for patient: {}", bill.getPatientName());
+        bill.setBillNumber(generateRandomBillNumber());
         return billRepository.save(bill);
     }
-    
+    private String generateRandomBillNumber() {
+        int length = 5;
+        String characters = "0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            sb.append(characters.charAt(index));
+        }
+
+        return sb.toString();
+    }
     @Override
     public Bill updateBill(String id, Bill bill) throws BillNotFoundException {
         log.debug("Updating bill with id: {}", id);
