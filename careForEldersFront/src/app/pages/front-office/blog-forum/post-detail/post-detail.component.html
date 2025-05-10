@@ -6,7 +6,7 @@
     <div class="error-message" *ngIf="error">
       <mat-icon>error_outline</mat-icon>
       <p>{{ error }}</p>
-      <button mat-raised-button color="primary" routerLink="/blog-forum/post">
+      <button mat-raised-button color="primary" routerLink="/user/userProfile/blog">
         Back to Posts
       </button>
     </div>
@@ -14,7 +14,7 @@
     <div class="post-content" *ngIf="post && !isLoading">
       <div class="post-header">
         <div class="back-button">
-          <button mat-icon-button routerLink="/blog-forum/post">
+          <button mat-icon-button routerLink="/user/userProfile/blog">
             <mat-icon>arrow_back</mat-icon>
           </button>
         </div>

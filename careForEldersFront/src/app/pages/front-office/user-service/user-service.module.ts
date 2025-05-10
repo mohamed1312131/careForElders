@@ -7,16 +7,21 @@ import { ChatModule } from '../chat/chat.module';
 import { AppointmentAvailabilityModule } from '../appointment-availability/appointment-availability.module';
 import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
 import { SubscriptionModule } from '../subscription/subscription.module';
+import { ParamedicalCareModule } from '../paramedical-care/paramedical-care.module';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
-  declarations: [UsersComponent],
+  declarations: [UsersComponent,UserLayoutComponent],
   imports: [
     CommonModule,
     UserServiceRoutingModule,
     ChatModule,
     AppointmentAvailabilityModule,
-    SubscriptionModule
+    SubscriptionModule,
+    ParamedicalCareModule,
+    RouterModule
+
   ]
 })
 export class UserModule { }

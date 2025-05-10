@@ -84,6 +84,7 @@ public class BillController {
         
         log.info("Creating new bill for patient: {}", bill.getPatientName());
         Bill createdBill = billService.createBill(bill);
+        System.out.println("working");
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBill);
     }
 
