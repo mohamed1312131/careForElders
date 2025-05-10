@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentResponse {
-    private String paymentId;
-    private String billId;
-    private String status;
     private String message;
-    private String transactionId;
+    private String paymentId;
+    private String status;
+    private String redirectUrl; // For online payments
 }

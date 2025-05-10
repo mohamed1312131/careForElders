@@ -31,14 +31,16 @@ export class DoctorAddProgramComponent {
   programDays: ProgramDay[] = [];
   nextDayNumber = 1;
   isLoading = false;
-  doctorId = "680983836074c5474f84aaae";
+  doctorId!: string;
 
   constructor(
     public dialog: MatDialog,
     private programService: ProgramService,
     private snackBar: MatSnackBar
   ) {}
-
+  ngOnInit(): void {
+    this.doctorId = localStorage.getItem('user_id') || this.doctorId; // Default to a test ID if not found
+  }
   addDay(): void {
     this.programDays.push({
       dayNumber: this.nextDayNumber++,

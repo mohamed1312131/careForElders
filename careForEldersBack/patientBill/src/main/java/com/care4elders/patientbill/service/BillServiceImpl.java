@@ -2,11 +2,12 @@ package com.care4elders.patientbill.service;
 
 import com.care4elders.patientbill.model.Bill;
 import com.care4elders.patientbill.repository.BillRepository;
-//import com.care4elders.patientbill.service.BillService;
 import com.care4elders.patientbill.exception.BillNotFoundException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.math.BigDecimal;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,4 +82,37 @@ public class BillServiceImpl implements BillService {
         billRepository.deleteById(id);
     }
     
+    @Override
+    @Transactional
+    public Bill updateBillStatusAfterPayment(String billId, double paymentAmount) throws BillNotFoundException {
+        log.debug("Updating bill status after payment of {} for bill id: {}", paymentAmount, billId);
+        
+        // Get the bill
+        Bill bill = getBillById(billId);
+        
+        // Convert payment amount to BigDecimal for precise calculations
+        BigDecimal paymentAmountBD = BigDecimal.valueOf(paymentAmount);
+        
+        // Update paid amount
+        BigDecimal currentPaidAmount = bill.getPaidAmount() != null ? bill.getPaidAmount() : BigDecimal.ZERO;
+        BigDecimal newPaidAmount = currentPaidAmount.add(paymentAmountBD);
+        bill.setPaidAmount(newPaidAmount);
+        
+        // Calculate balance
+        BigDecimal totalAmount = bill.getTotalAmount() != null ? bill.getTotalAmount() : BigDecimal.ZERO;
+        BigDecimal balance = totalAmount.subtract(newPaidAmount);
+        bill.setBalanceAmount(balance);
+        
+        // Update status based on balance
+        if (balance.compareTo(BigDecimal.ZERO) <= 0) {
+            log.info("Bill {} is now fully paid", billId);
+            bill.setStatus("PAID");
+        } else if (newPaidAmount.compareTo(BigDecimal.ZERO) > 0) {
+            log.info("Bill {} is now partially paid", billId);
+            bill.setStatus("PARTIALLY_PAID");
+        }
+        
+        // Save and return the updated bill
+        return billRepository.save(bill);
+    }
 }

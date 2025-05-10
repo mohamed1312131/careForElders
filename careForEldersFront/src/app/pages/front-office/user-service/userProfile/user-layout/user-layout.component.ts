@@ -11,9 +11,11 @@ import { UserService } from 'src/app/services/user.service'; // Adjust path as n
   styleUrl: './user-layout.component.scss' 
 })
 export class UserLayoutComponent implements OnInit, OnDestroy {
+  isPlanMenuOpen = false;
   isDealsMenuOpen = false;
   currentTitle = 'Pipeline'; 
   user: any = null; 
+  breadcrumbs: Array<{ label: string, url: string }> = [];
 
   
   private destroy$ = new Subject<void>();
@@ -39,7 +41,9 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
    
     this.updateTitle(this.router.url);
   }
-
+togglePlanMenu(): void {
+    this.isPlanMenuOpen = !this.isPlanMenuOpen;
+  }
   getUserInfo(): void {
     // Get user ID directly from localStorage
     const userId = localStorage.getItem('user_id');
@@ -65,10 +69,17 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   }
 
   private updateTitle(url: string): void {
-    if (!url) return; 
+    if (!url) return;
 
-    
-    if (url.includes('/user/userProfile/AI')) {
+    // Existing title logic
+    if (url.includes('/plan/add-program')) {
+      this.currentTitle = 'Add Program';
+    } else if (url.includes('/plan/list')) {
+      this.currentTitle = 'Plan List';
+    }
+    else if (url.includes('/user/userProfile/my-plans')) {
+      this.currentTitle = 'my plan';}
+    else if (url.includes('/user/userProfile/AI')) {
       this.currentTitle = 'AI Assistant';
     } else if (url.includes('/deals/pipeline')) { 
       this.currentTitle = 'Pipeline';
@@ -77,7 +88,49 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
     } else if (url.includes('/user/userProfile')) { 
       this.currentTitle = 'User Profile';
     }
-    
+
+    // Update breadcrumbs
+    this.breadcrumbs = this.buildBreadcrumbs(url);
+  }
+
+  private buildBreadcrumbs(url: string): Array<{ label: string, url: string }> {
+    const breadcrumbs = [];
+    const urlSegments = url.split('/').filter(segment => segment !== '');
+    let accumulatedPath = '';
+
+    // Always start with Home
+    breadcrumbs.push({ label: 'Home', url: '/' });
+
+    for (const segment of urlSegments) {
+      accumulatedPath += `/${segment}`;
+      
+      switch(segment) {
+        case 'userProfile':
+          breadcrumbs.push({ label: 'User Profile', url: accumulatedPath });
+          break;
+        case 'plan':
+          breadcrumbs.push({ label: 'Plan', url: accumulatedPath });
+          break;
+        case 'add-program':
+          breadcrumbs.push({ label: 'Add Program', url: accumulatedPath });
+          break;
+        case 'list':
+          breadcrumbs.push({ label: 'Plan List', url: accumulatedPath });
+          break;
+        case 'my plans':
+          breadcrumbs.push({ label: 'Plan List', url: accumulatedPath });
+          break;
+        case 'AI':
+          breadcrumbs.push({ label: 'AI Assistant', url: accumulatedPath });
+          break;
+        case 'deals':
+          breadcrumbs.push({ label: 'Deals', url: accumulatedPath });
+          break;
+        // Add more cases as needed for other routes
+      }
+    }
+
+    return breadcrumbs;
   }
 
   logout(): void {

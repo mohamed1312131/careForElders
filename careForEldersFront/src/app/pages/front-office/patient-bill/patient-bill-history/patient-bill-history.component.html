@@ -1,0 +1,140 @@
+<div class="history-container">
+    <!-- Header with navigation -->
+    <div class="history-header">
+      <div class="header-actions">
+        <button class="btn btn-outline-secondary" (click)="backToBills()">
+          <i class="fas fa-arrow-left"></i> Back to Bills
+        </button>
+        <h2 class="header-title">Payment History</h2>
+      </div>
+      <div class="header-buttons">
+        <button class="btn btn-primary" (click)="viewBillDetails()">
+          <i class="fas fa-file-invoice"></i> View Bill Details
+        </button>
+        <button class="btn btn-success" (click)="makePayment()" [disabled]="!bill || bill.status === 'PAID'">
+          <i class="fas fa-credit-card"></i> Make Payment
+        </button>
+      </div>
+    </div>
+  
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p>Loading payment history...</p>
+    </div>
+  
+    <!-- Error message -->
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle"></i> {{ errorMessage }}
+    </div>
+  
+    <!-- Content when data is loaded -->
+    <div *ngIf="!isLoading && !errorMessage && bill" class="history-content">
+      <!-- Bill summary card -->
+      <div class="card bill-summary-card">
+        <div class="card-header">
+          <h3>Bill Summary</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="info-group">
+                <label>Bill Number:</label>
+                <span>{{ bill.billNumber || 'N/A' }}</span>
+              </div>
+              <div class="info-group">
+                <label>Patient:</label>
+                <span>{{ bill.patientName || 'N/A' }}</span>
+              </div>
+              <div class="info-group">
+                <label>Bill Date:</label>
+                <span>{{ formatDate(bill.billDate) }}</span>
+              </div>
+              <div class="info-group">
+                <label>Due Date:</label>
+                <span>{{ formatDate(bill.dueDate) }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="info-group">
+                <label>Total Amount:</label>
+                <span class="amount">{{ bill.totalAmount | currency }}</span>
+              </div>
+              <div class="info-group">
+                <label>Paid Amount:</label>
+                <span class="amount">{{ bill.paidAmount | currency }}</span>
+              </div>
+              <div class="info-group">
+                <label>Balance:</label>
+                <span class="amount">{{ bill.balanceAmount | currency }}</span>
+              </div>
+              <div class="info-group">
+                <label>Status:</label>
+                <span class="badge" [class]="getStatusClass(bill.status)">{{ bill.status }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Payment history section -->
+      <div class="card payment-history-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3>Payment History</h3>
+          <button class="btn btn-outline-primary btn-sm" (click)="refreshPayments()">
+            <i class="fas fa-sync-alt"></i> Refresh
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- No payments message -->
+          <div *ngIf="!payments || payments.length === 0" class="no-payments">
+            <i class="fas fa-info-circle"></i>
+            <p>No payment records found for this bill.</p>
+          </div>
+  
+          <!-- Payments table -->
+          <div *ngIf="payments && payments.length > 0" class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of payments">
+                  <td>{{ formatDate(payment.timestamp) }}</td>
+                  <td>{{ payment.amount | currency }}</td>
+                  <td>{{ payment.paymentMethod }}</td>
+                  <td>
+                    <span class="badge" [class]="getStatusClass(payment.status)">
+                      {{ payment.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-outline-primary" 
+                      (click)="downloadReceipt(payment.id)"
+                      [disabled]="payment.status !== 'COMPLETED'">
+                      <i class="fas fa-download"></i> Receipt
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- No bill found message -->
+    <div *ngIf="!isLoading && !bill && !errorMessage" class="alert alert-warning">
+      <i class="fas fa-exclamation-circle"></i> Bill information could not be loaded. Please try again or contact support.
+    </div>
+  </div>
+  
