@@ -48,6 +48,8 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/extra/extra.module').then((m) => m.ExtraModule),
       },
+      { path: 'medical-record', component: MedicalRecordComponent },
+
     ],
   },
 
