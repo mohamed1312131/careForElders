@@ -31,6 +31,7 @@ import { FrontOfficeModule } from "./pages/front-office/front-office.module"
 // ToastrModule for Toastr notifications
 import { ToastrModule } from 'ngx-toastr';
 import { UserinfoComponent } from './pages/front-office/user-service/userinfo/userinfo.component';
+import { MatIconModule } from "@angular/material/icon"
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { UserinfoComponent } from './pages/front-office/user-service/userinfo/us
     BrowserAnimationsModule, // Required for animations
     FormsModule,
     ReactiveFormsModule,
+    MatIconModule,
     MaterialModule,
     TablerIconsModule.pick(TablerIcons),
     ToastrModule.forRoot({

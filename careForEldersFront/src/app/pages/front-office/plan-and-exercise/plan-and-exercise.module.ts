@@ -37,6 +37,17 @@ import { AddExerciseComponent } from './doctor/add-exercise/add-exercise.compone
     RouterModule,
     FormsModule,
     ReactiveFormsModule 
+  ],
+  exports: [
+    UserPEComponent,
+    PlanListComponent,
+    PlanDetailsComponent,
+    ProgramComponent,
+    WorkoutPlayerComponent,
+    DoctorPlanListComponent,
+    DoctorAddProgramComponent,
+    ProgramInfoComponent,
+    AddExerciseComponent
   ]
 })
 export class PlanAndExerciseModule { }

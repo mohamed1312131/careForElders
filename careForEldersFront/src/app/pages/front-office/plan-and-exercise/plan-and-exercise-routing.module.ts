@@ -26,7 +26,7 @@ const routes: Routes = [
     component: DoctorPlanListComponent,
   },
   {
-    path:'addProgram/:doctorId',
+    path:'addProgram',
     component: DoctorAddProgramComponent,
   },
   {

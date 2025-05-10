@@ -48,4 +48,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        // Skip filtering for GET requests to /users/**
+        return method.equalsIgnoreCase("GET") && path.matches("^/users/.*");
+    }
 }
