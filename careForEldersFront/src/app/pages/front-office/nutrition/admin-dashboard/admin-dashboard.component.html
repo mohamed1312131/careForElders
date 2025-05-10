@@ -1,0 +1,114 @@
+<div class="container mt-4">
+  <h2>Admin Dashboard</h2>
+
+  <button class="btn btn-primary mb-3" (click)="createNewPlan()">
+    Add New Plan
+  </button>
+
+  <div class="card mb-4" *ngIf="showForm">
+    <div class="card-header">
+      {{isEditing ? 'Edit Plan' : 'Create New Plan'}}
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="submitPlan()">
+        <div class="mb-3">
+          <label class="form-label">Meal Name</label>
+          <input type="text" class="form-control"
+                 [(ngModel)]="(isEditing ? selectedPlan?.meal : newPlan.meal)"
+                 name="meal" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" rows="3"
+                    [(ngModel)]="(isEditing ? selectedPlan?.description : newPlan.description)"
+                    name="description" required></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Calories</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="(isEditing ? selectedPlan?.calories : newPlan.calories)"
+                   name="calories" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Meal Time</label>
+            <select class="form-select"
+                    [(ngModel)]="(isEditing ? selectedPlan?.mealTime : newPlan.mealTime)"
+                    name="mealTime">
+              <option value="Breakfast">Breakfast</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Dinner">Dinner</option>
+              <option value="Snack">Snack</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Ingredients (comma-separated)</label>
+          <input type="text" class="form-control"
+                 [(ngModel)]="ingredientsInput"
+                 name="ingredientsInput">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Upload Image</label>
+          <input type="file" class="form-control" (change)="onImageSelected($event)">
+          <div *ngIf="imagePreview" class="mt-2">
+            <img [src]="imagePreview" alt="Preview" class="img-thumbnail" style="max-width: 200px;">
+          </div>
+        </div>
+
+
+        <div class="mb-3">
+          <label class="form-label">Recommended Age Group</label>
+          <input type="text" class="form-control"
+                 [(ngModel)]="(isEditing ? selectedPlan?.recommendedAgeGroup : newPlan.recommendedAgeGroup)"
+                 name="recommendedAgeGroup">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" rows="2"
+                    [(ngModel)]="(isEditing ? selectedPlan?.notes : newPlan.notes)"
+                    name="notes"></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            {{isEditing ? 'Update' : 'Create'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+      <tr>
+        <th>Meal</th>
+        <th>Description</th>
+        <th>Calories</th>
+        <th>Meal Time</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let plan of plans">
+        <td>{{plan.meal}}</td>
+        <td>{{plan.description | truncate:50}}</td>
+        <td>{{plan.calories}}</td>
+        <td>{{plan.mealTime}}</td>
+        <td>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-primary" (click)="editPlan(plan)">Edit</button>
+            <button class="btn btn-outline-danger" (click)="deletePlan(plan.id)">Delete</button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
