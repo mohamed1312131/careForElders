@@ -8,18 +8,23 @@ import { AppointmentAvailabilityModule } from '../appointment-availability/appoi
 import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import {FormsModule} from "@angular/forms";
+import { ParamedicalCareModule } from '../paramedical-care/paramedical-care.module';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
-  declarations: [UsersComponent],
-    imports: [
-        CommonModule,
-        UserServiceRoutingModule,
-        ChatModule,
-        AppointmentAvailabilityModule,
-        SubscriptionModule,
-        FormsModule
-    ]
+
+  declarations: [UsersComponent,UserLayoutComponent],
+  imports: [
+    CommonModule,
+    UserServiceRoutingModule,
+    ChatModule,
+    AppointmentAvailabilityModule,
+    SubscriptionModule,
+    ParamedicalCareModule,
+    RouterModule
+
+  ]
 })
 export class UserModule { }
 
