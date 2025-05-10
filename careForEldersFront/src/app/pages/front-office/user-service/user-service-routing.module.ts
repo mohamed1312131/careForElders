@@ -18,6 +18,7 @@ import { DoctorPlanListComponent } from '../plan-and-exercise/doctor/doctor-plan
 import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.component';
 import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
+import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
 
 
 
@@ -76,6 +77,10 @@ const routes: Routes = [
         {
             path:'program/:assignmentId/day/:dayNumber',
             component: ProgramComponent,
+          },
+        {
+            path:'addExercise',
+            component: AddExerciseComponent,
           },
         ]
       },
