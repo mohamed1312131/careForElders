@@ -6,6 +6,8 @@ import { PatientBillFormComponent } from './patient-bill/patient-bill-form/patie
 import {PlanListComponent} from "./nutrition/plan-list/plan-list.component";
 import {PlanDetailsComponent} from "./nutrition/plan-details/plan-details.component";
 import {AdminDashboardComponent} from "./nutrition/admin-dashboard/admin-dashboard.component";
+import {UsersComponent} from "./user-service/user/user.component";
+import {MedicalRecordListComponent} from "./medical-record/medical-records-list/medical-records-list.component";
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -33,6 +35,25 @@ export const FrontOfficeRoutes: Routes = [
     path: 'appointement-availability',
     loadChildren: () => import('./appointment-availability/appointment-availability.module').then(m => m.AppointmentAvailabilityModule),
     data: { preload: true }
+  },
+  {
+    path: 'users',
+    component: UsersComponent,
+  },
+  {
+    path: 'userinfo/:id',
+    component: UserinfoComponent,
+  },
+  {
+    path:'medical-record/:id',
+    component:MedicalRecordComponent,
+  },
+  {
+    path:'medicalRecord',
+    component:MedicalRecordComponent,},
+  {
+    path:'medicalRecordsList',
+    component:MedicalRecordListComponent,
   },
 
   {
