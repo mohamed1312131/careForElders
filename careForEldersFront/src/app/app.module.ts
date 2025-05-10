@@ -63,6 +63,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {PlanListComponent} from "./pages/front-office/nutrition/plan-list/plan-list.component";
 import {PlanDetailsComponent} from "./pages/front-office/nutrition/plan-details/plan-details.component";
 import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dashboard/admin-dashboard.component";
+import {UserLayoutComponent} from "./pages/front-office/user-service/userProfile/user-layout/user-layout.component";
 
 @NgModule({
   declarations: [
@@ -74,7 +75,7 @@ import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dash
     BrandingComponent,
     AppNavItemComponent,
     UserinfoComponent,
-
+    UserLayoutComponent,
     MedicalRecordComponent,
     AddNoteDialogComponent,
     TruncatePipe,

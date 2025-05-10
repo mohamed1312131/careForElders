@@ -20,6 +20,7 @@ import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.comp
 import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
 
 import { UserServicesComponent } from '../paramedical-care/user-services/user-services.component';
 import { UserRequestsComponent } from '../paramedical-care/user-requests/user-requests.component';
@@ -32,6 +33,8 @@ import { PostFormComponent } from '../blog-forum/post-form/post-form.component';
 import { PostListComponent } from '../blog-forum/post-list/post-list.component';
 
 import {AdminDashboardComponent} from "../nutrition/admin-dashboard/admin-dashboard.component";
+import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
+import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
 
 
 
@@ -94,8 +97,10 @@ const routes: Routes = [
       {path:'Reservation',
         component: MyReservationsComponent
       },
-      {
-        path:'Abonnement',
+      {path:'mySchedule',
+        component: MyScheduleComponent
+      },
+      {path:'Abonnement',
         component: AbonnementTypeComponent
       },
       {
@@ -161,18 +166,28 @@ const routes: Routes = [
           path:'nutritionplainadmin',
           component:AdminDashboardComponent,
         }
+      ]},
+      {path:'medicalRecord',
+        children: [
+          {
+            path:'medicalrecordlist',
+            component:MedicalRecordListComponent,
+          },
+          {
+            path:'medicalrecord/:id',
+            component:MedicalRecordComponent ,
+          },
       ]}
 
     ]
   },
 
-  {
-    path: 'userinfo/:id',
-    component: UserinfoComponent,
-  },
 
-
-];
+      {
+        path: 'userinfo/:id',
+        component: UserinfoComponent,
+      },
+    ];
 
 
 @NgModule({
