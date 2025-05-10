@@ -82,9 +82,12 @@ export class MedicalRecordComponent implements OnInit {
     this.loadMedicalNotes();
     this.loadAppointments();
     this.loadAttachments();
-
+    const savedAvatar = localStorage.getItem('profileImage');
+    if (savedAvatar) {
+      this.patient.avatarBase64 = savedAvatar; // Load from localStorage
+    }
   }
-  loadUserData(): void {
+  private loadUserData(): void {
     const userStr = localStorage.getItem('user');
     if (!userStr) {
       this.toastr.error('No user found in localStorage');
@@ -94,30 +97,24 @@ export class MedicalRecordComponent implements OnInit {
     try {
       const user = JSON.parse(userStr);
       this.userId = user.id;
+      console.log("dzadza",user);  // Log the response to see the structure
+
+      // Load profile image from localStorage if available
+      const savedAvatar = localStorage.getItem('profileImage');
+      if (savedAvatar) {
+        this.patient.avatar = savedAvatar;
+        console.log("azddddddddddddddddd",this.patient.avatar);
+      }
 
       this.medicalService.getMedicalRecord(this.userId).subscribe({
         next: (record) => {
           if (record) {
             this.setPatientData(user, record);
           } else {
-            // No record found, create a new one
-            const newRecord = { userId: this.userId, bloodType: '', allergies: '', currentMedications: '', chronicConditions: '', primaryCarePhysician: '', lastPhysicalExam: null };
-            this.medicalService.createMedicalRecord(newRecord).subscribe({
-              next: (createdRecord) => {
-                this.setPatientData(user, createdRecord);
-                this.toastr.success('Medical record initialized');
-              },
-              error: (err) => {
-                console.error('Failed to create medical record', err);
-                this.toastr.error('Could not initialize medical record');
-              }
-            });
+            this.createNewMedicalRecord(user);
           }
         },
-        error: (err) => {
-          console.error('Error fetching medical record:', err);
-          this.toastr.error('Failed to load medical record');
-        }
+        error: (err) => this.handleMedicalRecordError(err)
       });
     } catch (e) {
       console.error('Failed to parse user from localStorage', e);
@@ -125,12 +122,36 @@ export class MedicalRecordComponent implements OnInit {
     }
   }
 
+  private createNewMedicalRecord(user: any): void {
+    const newRecord = {
+      userId: this.userId,
+      bloodType: '',
+      allergies: [],
+      currentMedications: [],
+      chronicConditions: [],
+      primaryCarePhysician: '',
+      lastPhysicalExam: null
+    };
+
+    this.medicalService.createMedicalRecord(newRecord).subscribe({
+      next: (createdRecord) => {
+        this.setPatientData(user, createdRecord);
+        this.toastr.success('Medical record initialized');
+      },
+      error: (err) => {
+        console.error('Failed to create medical record', err);
+        this.toastr.error('Could not initialize medical record');
+      }
+    });
+  }
+
   private setPatientData(user: any, record: any): void {
     this.patient = {
       ...record,
       name: `${user.firstName} ${user.lastName}`,
-      avatar: user.avatar || 'https://i.pravatar.cc/100?img=12',
-      info: record?.chronicConditions || 'General health info',
+      avatar: user.profileImage
+        ? this.sanitizer.bypassSecurityTrustUrl(`data:image/png;base64,${user.profileImage}`)
+        : 'https://i.pravatar.cc/100?img=12',      info: record?.chronicConditions || 'General health info',
     };
 
     this.medicalRecord = {
@@ -498,5 +519,16 @@ export class MedicalRecordComponent implements OnInit {
     if (type.includes('word')) return 'assets/doc-icon-large.png';
     if (type.includes('excel')) return 'assets/xls-icon-large.png';
     return 'assets/file-icon-large.png';
+  }
+
+  private handleMedicalRecordError(err: any): void {
+    console.error('Error fetching medical record:', err);
+    this.toastr.error('Failed to load medical record');
+  }
+  getSafeAvatar(): SafeUrl {
+    if (this.patient.avatar?.startsWith('data:')) {
+      return this.sanitizer.bypassSecurityTrustUrl(this.patient.avatar);
+    }
+    return this.patient.avatar;
   }
 }
