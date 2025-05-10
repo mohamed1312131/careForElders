@@ -19,6 +19,7 @@ import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.comp
 import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
 
 
 
@@ -51,6 +52,9 @@ const routes: Routes = [
       },
       {path:'Reservation',
         component: MyReservationsComponent
+      },
+      {path:'mySchedule',
+        component: MyScheduleComponent
       },
       {path:'Abonnement',
         component: AbonnementTypeComponent
