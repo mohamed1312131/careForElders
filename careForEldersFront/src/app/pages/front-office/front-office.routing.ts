@@ -3,6 +3,7 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { UsersComponent } from './user-service/user/user.component'; // Import the User component
 import { UserinfoComponent } from './user-service/userinfo/userinfo.component';
 import {MedicalRecordComponent} from "./medical-record/medical-record/medical-record.component";
+import {MedicalRecordListComponent} from "./medical-record/medical-records-list/medical-records-list.component";
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -20,6 +21,17 @@ export const FrontOfficeRoutes: Routes = [
       {
         path: 'userinfo/:id',
         component: UserinfoComponent,
+      },
+      {
+        path:'medical-record/:id',
+        component:MedicalRecordComponent,
+      },
+      {
+        path:'medicalRecord',
+        component:MedicalRecordComponent,},
+      {
+        path:'medicalRecordsList',
+        component:MedicalRecordListComponent,
       },
       {
         path: 'plan',

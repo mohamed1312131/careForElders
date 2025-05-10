@@ -1,42 +1,99 @@
-<h2 mat-dialog-title>{{ isEditMode ? 'Edit User' : 'Add New User' }}</h2>
-<mat-dialog-content>
-  <form [formGroup]="userForm">
-    <mat-form-field appearance="outline" class="w-100">
-      <mat-label>First Name</mat-label>
-      <input matInput formControlName="firstName" required>
-    </mat-form-field>
+<div class="user-dialog">
+  <!-- Header Section -->
+  <div class="header">
 
-    <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Last Name</mat-label>
-      <input matInput formControlName="lastName" required>
-    </mat-form-field>
 
-    <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" type="email" required>
-      <mat-error *ngIf="userForm.get('email')?.hasError('email')">
-        Please enter a valid email
-      </mat-error>
-    </mat-form-field>
+    <div class="header-content">
+      <button class="close-btn" (click)="dialogRef.close()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <h2 class="dialog-title">Edit User</h2>
+      <p class="dialog-subtitle">Update user information below</p>
+    </div>
+  </div>
 
-    <mat-form-field appearance="outline" class="w-100">
-      <mat-label>Role</mat-label>
-      <mat-select formControlName="role">
-        <mat-option value="admin">Admin</mat-option>
-        <mat-option value="manager">Manager</mat-option>
-        <mat-option value="user">User</mat-option>
-      </mat-select>
-    </mat-form-field>
+  <!-- Main Content -->
+  <div class="content">
+    <!-- Profile Picture Section -->
+    <div class="profile-section">
+      <div class="avatar-container">
+        <div class="avatar" [style.background-image]="'url(' + profileImage + ')'">
+          <span *ngIf="!profileImage">{{ getInitials() }}</span>
+        </div>
+        <button class="upload-btn">
+          <mat-icon>edit</mat-icon>
+          <input type="file" class="file-input" accept="image/*" (change)="onFileSelected($event)">
+        </button>
+      </div>
+    </div>
 
-    <mat-slide-toggle formControlName="active">Active</mat-slide-toggle>
-  </form>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary"
-          (click)="onSubmit()"
-          [disabled]="!userForm.valid"a
-  >
-    {{ isEditMode ? 'Update' : 'Save' }}
-  </button>
-</mat-dialog-actions>
+    <!-- Form Section -->
+    <form [formGroup]="userForm" class="form-section">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>First name</mat-label>
+          <input matInput type="text" formControlName="firstName">
+          <mat-error *ngIf="userForm.get('firstName')?.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="userForm.get('firstName')?.hasError('maxlength')">Maximum 50 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Last name</mat-label>
+          <input matInput type="text" formControlName="lastName">
+          <mat-error *ngIf="userForm.get('lastName')?.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="userForm.get('lastName')?.hasError('maxlength')">Maximum 50 characters</mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email">
+        <mat-error *ngIf="userForm.get('email')?.hasError('required')">Required</mat-error>
+        <mat-error *ngIf="userForm.get('email')?.hasError('email')">Invalid email format</mat-error>
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Role</mat-label>
+          <mat-select formControlName="role">
+            <mat-option *ngFor="let role of roles" [value]="role">{{ role }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('role')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option value="active">
+              <span class="status-indicator active"></span> Active
+            </mat-option>
+            <mat-option value="inactive">
+              <span class="status-indicator inactive"></span> Inactive
+            </mat-option>
+            <mat-option value="pending">
+              <span class="status-indicator pending"></span> Pending
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-slide-toggle class="auth-toggle" formControlName="twoFactorAuth">
+        Enable two-factor authentication
+      </mat-slide-toggle>
+    </form>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button class="delete-btn" (click)="onDelete()">
+      <mat-icon>delete</mat-icon> DELETE USER
+    </button>
+    <div class="spacer"></div>
+    <button class="cancel-btn" (click)="dialogRef.close()">
+      CANCEL
+    </button>
+    <button class="save-btn" (click)="onSave()" [disabled]="userForm.invalid">
+      SAVE CHANGES
+    </button>
+  </div>
+</div>

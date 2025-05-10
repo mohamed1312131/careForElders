@@ -38,6 +38,15 @@ public class User {
     private String currentPlanName;  // Cached for quick access ("Basic", "Standard", "Premium")
     private List<String> accessibleFeatures;  // Derived from the plan (e.g., ["chat", "nutrition"])
 
+
+    //medical related
+    private String bloodType;
+    private String knownAllergies;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
+    private Double height; // in cm
+    private Double weight; // in kg
+    private String organDonorStatus;
     public User(Object o, String admin, String smith, String mail, String admin1, Object o1, String s, Role role) {
     }
 

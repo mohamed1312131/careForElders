@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Document Preview</h2>
+<mat-dialog-content class="preview-content">
+  <div *ngIf="isImage(data.type)" class="image-preview">
+    <img [src]="data.src" [alt]="data.name">
+  </div>
+
+  <div *ngIf="isPDF(data.type)" class="pdf-preview">
+    <iframe [src]="getSafeUrl(data.src)" width="100%" height="100%"></iframe>
+  </div>
+
+  <div *ngIf="!isViewable(data.type)" class="unsupported-preview">
+    <mat-icon>insert_drive_file</mat-icon>
+    <p>Preview not available for this file type</p>
+    <p class="file-name">{{data.name}}</p>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="closeDialog()">Close</button>
+  <button mat-raised-button color="primary" (click)="downloadDocument()" *ngIf="isViewable(data.type)">
+    <mat-icon>download</mat-icon> Download
+  </button>
+</mat-dialog-actions>

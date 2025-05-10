@@ -43,9 +43,12 @@
             </span>
         </td>
         <td>
-          <button class="btn btn-sm btn-primary" [routerLink]="['/edit-user', user.id]">Edit</button>
-          <button class="btn btn-sm btn-warning" (click)="onToggleStatus(user)">Toggle</button>
-          <button class="btn btn-sm btn-danger" (click)="onDeleteUser(user.id)">Delete</button>
+          <button class="btn btn-sm btn-primary" (click)="openEditDialog(user)">Edit</button>
+          <button class="btn btn-sm btn-info"
+                  (click)="makeDoctor(user)"
+                  [disabled]="user.role === 'doctor'">
+            {{ user.role === 'doctor' ? 'Already Doctor' : 'Make Doctor' }}
+          </button>          <button class="btn btn-sm btn-danger" (click)="onDeleteUser(user.id)">Delete</button>
         </td>
       </tr>
       </tbody>
