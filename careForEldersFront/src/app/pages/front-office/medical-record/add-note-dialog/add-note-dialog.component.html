@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>Add Medical Note</h2>
+<mat-dialog-content>
+  <form [formGroup]="noteForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Note Content</mat-label>
+      <textarea matInput formControlName="content" rows="5" required></textarea>
+      <mat-error *ngIf="noteForm.get('content')?.hasError('required')">
+        Content is required
+      </mat-error>
+      <mat-error *ngIf="noteForm.get('content')?.hasError('minlength')">
+        Note must be at least 10 characters
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary"
+          (click)="onSubmit()"
+          [disabled]="noteForm.invalid || isLoading">
+    <span *ngIf="!isLoading">Save</span>
+    <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+  </button>
+</mat-dialog-actions>
