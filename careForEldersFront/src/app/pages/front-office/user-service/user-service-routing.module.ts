@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UsersComponent} from './user/user.component';
 
 //import { UsersComponent } from './user/user.component';
 
@@ -23,13 +24,14 @@ import {AdminDashboardComponent} from "../nutrition/admin-dashboard/admin-dashbo
 
 
 
+
 const routes: Routes = [
   {
 
     path: '',
     component: UserLayoutComponent,
   },
-{
+  {
     path: 'userProfile',
     component: UserLayoutComponent,
     children: [
@@ -59,27 +61,27 @@ const routes: Routes = [
       {
         path: 'plan',
         children: [
-        {
-          path:'add-program',
-          component: DoctorAddProgramComponent
-        },
-        {
-          path:'list',
-          component: DoctorPlanListComponent
-        },
-        {
-          path:'userprogram',
-          component: PlanListComponent
-        },
-        {
-        path: 'plandetails/:programId',
-        component: PlanDetailsComponent,
-        },
-        {
+          {
+            path:'add-program',
+            component: DoctorAddProgramComponent
+          },
+          {
+            path:'list',
+            component: DoctorPlanListComponent
+          },
+          {
+            path:'userprogram',
+            component: PlanListComponent
+          },
+          {
+            path: 'plandetails/:programId',
+            component: PlanDetailsComponent,
+          },
+          {
             path:'program/:assignmentId/day/:dayNumber',
             component: ProgramComponent,
           },
-        {
+          {
             path:'addExercise',
             component: AddExerciseComponent,
           },
@@ -111,6 +113,7 @@ const routes: Routes = [
 
 
 ];
+
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
