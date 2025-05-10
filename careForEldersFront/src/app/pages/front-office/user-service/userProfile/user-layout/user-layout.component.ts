@@ -16,6 +16,7 @@ export class UserLayoutComponent implements OnInit, OnDestroy {
   currentTitle = 'Pipeline'; 
   user: any = null; 
   breadcrumbs: Array<{ label: string, url: string }> = [];
+  isDoctor: boolean = false;
 
   
   private destroy$ = new Subject<void>();
@@ -57,6 +58,7 @@ togglePlanMenu(): void {
         next: (data) => {
             this.user = data;
             console.log('✅ User Info:', this.user);
+            this.isDoctor = this.user.role === 'DOCTOR';
         },
         error: (err) => {
             console.error('❌ Failed to retrieve user info', err);
