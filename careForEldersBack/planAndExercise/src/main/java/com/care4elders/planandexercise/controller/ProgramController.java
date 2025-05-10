@@ -87,4 +87,30 @@ public class ProgramController {
     public ResponseEntity<List<PatientAssignmentDTO>> getProgramPatients(@PathVariable String programId) {
         return ResponseEntity.ok(programService.getProgramPatients(programId));
     }
+    @PutMapping("/{programId}/days/{dayId}")
+    public ResponseEntity<?> updateProgramDay(
+            @PathVariable String programId,
+            @PathVariable String dayId,
+            @Valid @RequestBody ProgramDayDTO dayDTO,
+            @RequestHeader("X-User-ID") String doctorId) {
+        try {
+            ProgramDay updatedDay = programService.updateProgramDay(programId, dayId, dayDTO, doctorId);
+            return ResponseEntity.ok(updatedDay);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{programId}/days/{dayId}")
+    public ResponseEntity<?> deleteProgramDay(
+            @PathVariable String programId,
+            @PathVariable String dayId,
+            @RequestHeader("X-User-ID") String doctorId) {
+        try {
+            programService.deleteProgramDay(programId, dayId, doctorId);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
 }

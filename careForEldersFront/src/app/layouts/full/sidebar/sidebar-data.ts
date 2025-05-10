@@ -22,7 +22,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'medical Record',
     iconName: 'lock',
-    route: '/front-office/medical-record',
+    route: '/user/medicalRecord',
   },
   {
     navCap: 'Ui Components',

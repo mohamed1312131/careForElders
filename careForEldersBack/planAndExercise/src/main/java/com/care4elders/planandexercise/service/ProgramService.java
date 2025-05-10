@@ -585,6 +585,59 @@ public class ProgramService {
             // Handle error or return default
             return new UserDTO("Unknown", "User", "N/A");
         }
+
+    }
+    @Transactional
+    public ProgramDay updateProgramDay(String programId, String dayId, ProgramDayDTO dayDTO, String doctorId) {
+        //validateDoctor(doctorId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        ProgramDay existingDay = programDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("Day not found"));
+
+        // Update day properties
+        existingDay.setRestDay(dayDTO.isRestDay());
+        existingDay.setInstructions(dayDTO.getInstructions());
+        existingDay.setNotesForPatient(dayDTO.getNotesForPatient());
+        existingDay.setWarmUpMinutes(dayDTO.getWarmUpMinutes());
+        existingDay.setCoolDownMinutes(dayDTO.getCoolDownMinutes());
+
+        if (!dayDTO.isRestDay()) {
+            List<Exercise> exercises = exerciseRepository.findAllById(dayDTO.getExerciseIds());
+            validateExercisesFound(dayDTO, exercises);
+            existingDay.setExerciseIds(dayDTO.getExerciseIds());
+            existingDay.setTotalDurationMinutes(calculateTotalDuration(exercises, dayDTO));
+        } else {
+            existingDay.setExerciseIds(Collections.emptyList());
+            existingDay.setTotalDurationMinutes(dayDTO.getWarmUpMinutes() + dayDTO.getCoolDownMinutes());
+        }
+
+        return programDayRepository.save(existingDay);
+    }
+
+    @Transactional
+    public void deleteProgramDay(String programId, String dayId, String doctorId) {
+        //validateDoctor(doctorId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        ProgramDay day = programDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("Day not found"));
+
+        // Remove from program's day list
+        program.getProgramDayIds().remove(dayId);
+        programRepository.save(program);
+
+        programDayRepository.delete(day);
     }
 }
 

@@ -1,0 +1,182 @@
+<div class="dialog-container">
+  <h1 mat-dialog-title>Edit Program & Assign Patients</h1>
+  <mat-dialog-content class="mat-typography">
+    <div *ngIf="isLoadingProgram || isLoadingPatients" class="loading-spinner-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading data...</p>
+    </div>
+
+    <div *ngIf="!isLoadingProgram && !isLoadingPatients">
+      <mat-tab-group animationDuration="0ms">
+        <mat-tab label="Edit Program Details">
+          <form [formGroup]="programForm" class="tab-content-padding">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Program ID</mat-label>
+              <input matInput formControlName="id">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Program Name</mat-label>
+              <input matInput formControlName="name" required>
+              <mat-error *ngIf="programForm.get('name')?.hasError('required')">Name is required.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Category</mat-label>
+              <input matInput formControlName="programCategory" required>
+               <mat-error *ngIf="programForm.get('programCategory')?.hasError('required')">Category is required.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status" required>
+                <mat-option value="DRAFT">Draft</mat-option>
+                <mat-option value="PUBLISHED">Published</mat-option>
+                <mat-option value="ARCHIVED">Archived</mat-option>
+              </mat-select>
+              <mat-error *ngIf="programForm.get('status')?.hasError('required')">Status is required.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Duration (Weeks)</mat-label>
+              <input matInput type="number" formControlName="durationWeeks" required min="1">
+              <mat-error *ngIf="programForm.get('durationWeeks')?.hasError('required')">Duration is required.</mat-error>
+              <mat-error *ngIf="programForm.get('durationWeeks')?.hasError('min')">Duration must be at least 1 week.</mat-error>
+            </mat-form-field>
+
+            </form>
+        </mat-tab>
+
+        <mat-tab label="Assign Patients">
+          <div class="tab-content-padding">
+            <section *ngIf="assignedPatients.length > 0" class="assigned-patients-section">
+              <h3>Currently Assigned Patients ({{ assignedPatients.length }})</h3>
+              <!-- <mat-chip-list aria-label="Assigned patients">
+                <mat-chip *ngFor="let patient of assignedPatients" selected color="primary">
+                  {{ patient.name || patient.id }}
+                  </mat-chip>
+              </mat-chip-list> -->
+            </section>
+            <mat-divider *ngIf="assignedPatients.length > 0 && getUnassignedPatients().length > 0"></mat-divider>
+
+            <section class="assign-new-patients-section">
+              <h3>Assign to New Patients</h3>
+              <div *ngIf="getUnassignedPatients().length > 0; else noNewPatients">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Select Patients to Assign</mat-label>
+                  <mat-select multiple [(ngModel)]="selectedPatientIdsForAssignment" name="patientsToAssign">
+                    <mat-option *ngFor="let patient of getUnassignedPatients()" [value]="patient.id">
+                      {{ patient.name || patient.id }} ({{ patient.email || 'No email' }})
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <button mat-stroked-button color="accent" 
+                        (click)="onAssignSelectedPatients()" 
+                        [disabled]="selectedPatientIdsForAssignment.length === 0 || isAssigning">
+                  <mat-icon>person_add</mat-icon>
+                  {{ isAssigning ? 'Assigning...' : 'Assign Selected (' + selectedPatientIdsForAssignment.length + ')' }}
+                </button>
+                <mat-progress-bar mode="indeterminate" *ngIf="isAssigning"></mat-progress-bar>
+              </div>
+              <ng-template #noNewPatients>
+                <p>No new patients available for assignment or all patients are already assigned.</p>
+              </ng-template>
+            </section>
+          </div>
+        </mat-tab>
+         <mat-tab label="Manage Days">
+          <div class="tab-content-padding">
+            <button mat-raised-button color="primary" (click)="openDayForm()">
+              <mat-icon>add</mat-icon> Add New Day
+            </button>
+
+            <mat-accordion class="mt-4">
+              <mat-expansion-panel *ngFor="let day of programDetails?.days">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Day {{ day.dayNumber }}
+                    <span *ngIf="day.restDay" class="text-red-500 ml-2">(Rest Day)</span>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="p-4 space-y-4">
+                  <div class="flex gap-2 mb-4">
+                    <button mat-icon-button color="primary" (click)="openDayForm(day)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteDay(day)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+
+                  <div *ngIf="!day.restDay">
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 class="font-semibold">Warm-up:</h4>
+                        <p>{{ day.warmUpMinutes }} minutes</p>
+                      </div>
+                      <div>
+                        <h4 class="font-semibold">Cool-down:</h4>
+                        <p>{{ day.coolDownMinutes }} minutes</p>
+                      </div>
+                    </div>
+
+                    <div *ngIf="day.instructions">
+                      <h4 class="font-semibold">Instructions:</h4>
+                      <p class="whitespace-pre-wrap">{{ day.instructions }}</p>
+                    </div>
+
+                    <div *ngIf="day.notesForPatient">
+                      <h4 class="font-semibold">Patient Notes:</h4>
+                      <p class="whitespace-pre-wrap">{{ day.notesForPatient }}</p>
+                    </div>
+
+                    <div *ngIf="day.exercises?.length" class="mt-4">
+                      <h3 class="text-lg font-semibold mb-2">Exercises</h3>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div *ngFor="let exercise of day.exercises" 
+                             class="border rounded-lg p-4 shadow-md bg-white">
+                          <img [src]="exercise.imageUrl || 'assets/default-exercise.png'" 
+                               alt="Exercise" 
+                               class="rounded-lg mb-2 w-full h-40 object-cover">
+                          <h4 class="font-bold">{{ exercise.name }}</h4>
+                          <p class="text-sm text-gray-600">{{ exercise.description }}</p>
+                          <div class="mt-2 space-y-1">
+                            <div class="text-sm">
+                              <span class="font-semibold">Duration:</span> 
+                              {{ exercise.defaultDurationMinutes }} minutes
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="day.restDay" class="text-center text-gray-500">
+                    Rest Day - No Exercises
+                  </div>
+                </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="closeDialog()">Cancel</button>
+    <button mat-raised-button color="primary" 
+            (click)="onSaveProgramDetails()" 
+            [disabled]="programForm.invalid || isSavingProgram || isLoadingProgram">
+      <mat-icon>save</mat-icon>
+      {{ isSavingProgram ? 'Saving Program...' : 'Save Program Details' }}
+    </button>
+  </mat-dialog-actions>
+  <mat-progress-bar mode="indeterminate" *ngIf="isSavingProgram"></mat-progress-bar>
+</div>

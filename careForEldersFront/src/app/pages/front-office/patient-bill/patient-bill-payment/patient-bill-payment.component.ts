@@ -39,7 +39,7 @@ export class PatientBillPaymentComponent implements OnInit {
       this.billId = id
     } else {
       this.toastr.error("Bill ID not found in route parameters")
-      this.router.navigate(["/front-office/patient-bill"])
+      this.router.navigate(["/user/userProfile/patient-bill"])
       return
     }
 
@@ -236,12 +236,12 @@ export class PatientBillPaymentComponent implements OnInit {
 
   viewBillDetails(): void {
     console.log(`Navigating to bill details for ID: ${this.billId}`)
-    this.router.navigate(["/front-office/patient-bill", this.billId])
+    this.router.navigate(["/user/userProfile/view", this.billId])
   }
 
   backToBills(): void {
     console.log("Navigating back to bills list")
-    this.router.navigate(["/front-office/patient-bill"])
+    this.router.navigate(["/user/userProfile/bill"])
   }
 
   markFormGroupTouched(formGroup: FormGroup): void {
