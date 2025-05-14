@@ -1,11 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { UserDialogComponent } from './user-dialog/user-dialog.component';
+import {ConfirmDialogComponent} from "./confirm-dialog/confirm-dialog.component"; // adjust path
 
 @Component({
   selector: 'app-users',
   templateUrl: './user.component.html',
-  styleUrls: ['./user.component.scss']
+  //styleUrls: ['./user.component.scss']
 })export class UsersComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
@@ -19,7 +22,7 @@ import { ToastrService } from 'ngx-toastr';
   pageSizes = [5, 10, 25, 50];
   totalPages = 1;
 
-  constructor(private userService: UserService, private toastr: ToastrService) {}
+  constructor(private userService: UserService, private toastr: ToastrService,  private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -68,7 +71,34 @@ import { ToastrService } from 'ngx-toastr';
       }
     });
   }
+  makeDoctor(user: { id: string; firstName: string; lastName: string; role?: string }): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Confirm Role Change',
+        message: `Are you sure you want to make ${user.firstName} ${user.lastName} a doctor?`
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        const updatedUser = { ...user, role: 'DOCTOR' };
+        this.userService.updateUser(updatedUser.id, updatedUser).subscribe({
+          next: () => {
+            const index = this.users.findIndex(u => u.id === user.id);
+            if (index !== -1) {
+              this.users[index].role = 'doctor';
+              this.onSearch(); // Refresh the filtered list
+            }
+          },
+          error: (err) => {
+            console.error('Error updating user role:', err);
+            // Optionally show error message to user
+          }
+        });
+      }
+    });
+  }
   onSearch(): void {
     const term = this.searchTerm.toLowerCase();
     this.filteredUsers = this.users.filter(user =>
@@ -98,4 +128,21 @@ import { ToastrService } from 'ngx-toastr';
       .fill(0)
       .map((_, i) => i + 1);
   }
+  openEditDialog(user: any): void {
+    const dialogRef = this.dialog.open(UserDialogComponent, {
+      width: '400px',
+      data: {
+        user: { ...user },
+        isEditMode: true
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'updated') {
+        this.toastr.success('User updated successfully!');
+        this.loadUsers();
+      }
+    });
+  }
+
 }

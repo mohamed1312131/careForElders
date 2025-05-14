@@ -19,6 +19,9 @@
 @import "helpers/custom-flex";
 @import "helpers/index";
 
+/* Import calendar styles */
+@import 'node_modules/angular-calendar/css/angular-calendar.css';
+
 
 // pages
 @import "pages/dashboards";

@@ -10,6 +10,7 @@ import java.util.List;
 @RequestMapping("/api/disponibilites")
 @RestController
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class DisponibiliteRestController {
 
     private DispoService dispoService;
@@ -23,7 +24,15 @@ public class DisponibiliteRestController {
     public List<Disponibilite> getAllDisponibilites() {
         return dispoService.getAllDisponibilites();
     }
-/*
+
+
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<List<Disponibilite>> getByDoctor(@PathVariable String doctorId) {
+        return ResponseEntity.ok(dispoService.getDisponibilitesByDoctor(doctorId));
+    }
+
+
+    /*
     @GetMapping("/medecin/{id}")
     public ResponseEntity<List<Disponibilite>> getByMedecin(@PathVariable Long id) {
         return ResponseEntity.ok(dispoService.getDisponibilitesByMedecin(id));

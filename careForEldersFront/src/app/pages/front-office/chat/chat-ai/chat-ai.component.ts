@@ -8,7 +8,7 @@ import { Chat, ChatService, Message } from '../ChatService';
   styleUrls: ['./chat-ai.component.scss']
 })
 export class ChatAIComponent implements OnInit {
-  userId = '680a2319bd2b9864caf53529'; // Replace with dynamic patient ID as needed
+  userId: string | null = null;
   chat: Chat | null = null;
   newMessage: string = '';
   isLoading = false;
@@ -16,10 +16,17 @@ export class ChatAIComponent implements OnInit {
   constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
-    // Optional: fetch existing chats if needed
+    this.userId = localStorage.getItem('user_id');
+    if (!this.userId) {
+      console.warn('No user ID found in localStorage');
+      // You might want to add redirect logic here
+      return;
+    }
   }
 
   startNewChat(): void {
+    if (!this.userId) return;
+
     this.chatService.createNewChat(this.userId).subscribe(chat => {
       this.chat = chat;
     });

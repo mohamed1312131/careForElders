@@ -169,7 +169,7 @@ public class ProgramService {
     private void validateDoctor(String doctorId) {
         try {
             UserDTO doctor = restTemplate.getForObject(
-                    "http://USER-SERVICE/users/{Id}",
+                    "http://user-service/users/{Id}",
                     UserDTO.class,
                     doctorId
             );
@@ -198,7 +198,7 @@ public class ProgramService {
     @Transactional
     public PatientProgramAssignment assignProgramToPatient(ProgramAssignmentDTO assignmentDTO, String doctorId) {
         // Validate doctor
-        validateDoctor(doctorId);
+       // validateDoctor(doctorId);
 
         // Get and validate program
         Program program = programRepository.findById(assignmentDTO.getProgramId())
@@ -209,15 +209,15 @@ public class ProgramService {
         }
 
         // Validate patient
-        UserDTO patient = restTemplate.getForObject(
-                "http://USER-SERVICE/users/{Id}",
+        /*UserDTO patient = restTemplate.getForObject(
+                "http://user-service/users/{Id}",
                 UserDTO.class,
                 assignmentDTO.getPatientId()
         );
 
         if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
             throw new EntityNotFoundException("Invalid patient ID");
-        }
+        } */
 
         List<ProgramDay> days = programDayRepository.findByProgramIdOrderByDayNumberAsc(assignmentDTO.getProgramId());
 
@@ -308,15 +308,15 @@ public class ProgramService {
     }
     public List<PatientProgramDTO> getProgramsByPatientId(String patientId) {
         // Verify patient exists
-        UserDTO patient = restTemplate.getForObject(
-                "http://USER-SERVICE/users/{Id}",
+        /*UserDTO patient = restTemplate.getForObject(
+                "http://user-service/users/{Id}",
                 UserDTO.class,
                 patientId
         );
 
         if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
             throw new EntityNotFoundException("Patient not found");
-        }
+        } */
 
         // Get all assignments for the patient
         List<PatientProgramAssignment> assignments = assignmentRepository.findByPatientId(patientId);
@@ -577,7 +577,7 @@ public class ProgramService {
     private UserDTO getUserDetails(String patientId) {
         try {
             return restTemplate.getForObject(
-                    "http://user-service/users/{id}",
+                    "http://user-service/users/{Id}",
                     UserDTO.class,
                     patientId
             );
@@ -585,6 +585,59 @@ public class ProgramService {
             // Handle error or return default
             return new UserDTO("Unknown", "User", "N/A");
         }
+
+    }
+    @Transactional
+    public ProgramDay updateProgramDay(String programId, String dayId, ProgramDayDTO dayDTO, String doctorId) {
+        //validateDoctor(doctorId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        ProgramDay existingDay = programDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("Day not found"));
+
+        // Update day properties
+        existingDay.setRestDay(dayDTO.isRestDay());
+        existingDay.setInstructions(dayDTO.getInstructions());
+        existingDay.setNotesForPatient(dayDTO.getNotesForPatient());
+        existingDay.setWarmUpMinutes(dayDTO.getWarmUpMinutes());
+        existingDay.setCoolDownMinutes(dayDTO.getCoolDownMinutes());
+
+        if (!dayDTO.isRestDay()) {
+            List<Exercise> exercises = exerciseRepository.findAllById(dayDTO.getExerciseIds());
+            validateExercisesFound(dayDTO, exercises);
+            existingDay.setExerciseIds(dayDTO.getExerciseIds());
+            existingDay.setTotalDurationMinutes(calculateTotalDuration(exercises, dayDTO));
+        } else {
+            existingDay.setExerciseIds(Collections.emptyList());
+            existingDay.setTotalDurationMinutes(dayDTO.getWarmUpMinutes() + dayDTO.getCoolDownMinutes());
+        }
+
+        return programDayRepository.save(existingDay);
+    }
+
+    @Transactional
+    public void deleteProgramDay(String programId, String dayId, String doctorId) {
+        //validateDoctor(doctorId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        ProgramDay day = programDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("Day not found"));
+
+        // Remove from program's day list
+        program.getProgramDayIds().remove(dayId);
+        programRepository.save(program);
+
+        programDayRepository.delete(day);
     }
 }
 

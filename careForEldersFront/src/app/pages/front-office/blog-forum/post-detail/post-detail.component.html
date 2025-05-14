@@ -1,0 +1,72 @@
+<div class="post-detail-container">
+    <div class="loading-spinner" *ngIf="isLoading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  
+    <div class="error-message" *ngIf="error">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" routerLink="/user/userProfile/blog">
+        Back to Posts
+      </button>
+    </div>
+  
+    <div class="post-content" *ngIf="post && !isLoading">
+      <div class="post-header">
+        <div class="back-button">
+          <button mat-icon-button routerLink="/user/userProfile/blog">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        </div>
+        
+        <h1>{{ post.title }}</h1>
+        
+        <div class="post-meta">
+          <div class="author-info">
+            <mat-icon>person</mat-icon>
+            <span>{{ post.authorName }}</span>
+          </div>
+          
+          <div class="date-info">
+            <mat-icon>calendar_today</mat-icon>
+            <span>{{ post.createdAt | date:'medium' }}</span>
+            <span *ngIf="post.updatedAt">(Updated: {{ post.updatedAt | date:'medium' }})</span>
+          </div>
+          
+          <div class="view-info">
+            <mat-icon>visibility</mat-icon>
+            <span>{{ post.viewCount }} views</span>
+          </div>
+        </div>
+        
+        <div class="post-tags">
+          <mat-chip-list>
+            <mat-chip *ngFor="let tag of post.tags" color="primary" selected>{{ tag }}</mat-chip>
+          </mat-chip-list>
+        </div>
+        
+        <div class="post-actions" *ngIf="isAuthor()">
+          <button mat-raised-button color="primary" (click)="editPost()">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-raised-button color="warn" (click)="deletePost()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <div class="post-body">
+        <p [innerHTML]="post.content"></p>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <div class="post-footer">
+        <h3>Comments</h3>
+        <p class="no-comments">Comments feature coming soon!</p>
+      </div>
+    </div>
+  </div>
+  

@@ -9,76 +9,144 @@ import { ProgramService } from '../../ProgramService';
   styleUrls: ['./add-exercise.component.scss']
 })
 export class AddExerciseComponent {
-  exerciseForm: FormGroup;
-  categories: string[] = ['Cardio', 'Strength', 'Flexibility', 'Balance', 'Mobility'];
-  difficultyLevels: string[] = ['Beginner', 'Intermediate', 'Advanced'];
-  doctorId = "680983836074c5474f84aaae"; // Get from auth service
+  exerciseForm!: FormGroup;
+  selectedImageFile: File | null = null;
+  selectedVideoFile: File | null = null;
+  isLoading = false;
+  doctorId! :string;
 
-  formSubmitted = false;
-  imageFile: File | null = null;
-  videoFile: File | null = null;
-  imageError = false;
-  videoError = false;
+  imageUploadError: string | null = null;
+  videoUploadError: string | null = null;
+  readonly MAX_FILE_SIZE_MB = 10; // Max file size in MB for frontend validation
+  readonly MAX_FILE_SIZE_BYTES = this.MAX_FILE_SIZE_MB * 1024 * 1024;
+
 
   constructor(
     private fb: FormBuilder,
-    private exerciseService: ProgramService,
+    private programService: ProgramService,
     private snackBar: MatSnackBar
-  ) {
+  ) { }
+
+  ngOnInit(): void {
+    this.doctorId = localStorage.getItem('user-id') || '';
     this.exerciseForm = this.fb.group({
       name: ['', Validators.required],
-      description: ['', Validators.required],
-      defaultDurationMinutes: ['', [Validators.required, Validators.min(1)]],
-      categories: [[], Validators.required],
-      difficultyLevel: ['', Validators.required]
+      description: [''],
+      defaultDurationMinutes: [null, [Validators.required, Validators.min(1)]],
+      categories: [''], // Comma-separated string
+      difficultyLevel: ['Beginner'],
+      equipmentNeeded: [''], // Comma-separated string
+      targetMuscleGroup: ['']
+      // imageUrl and videoTutorialUrl will be set by the backend
     });
   }
 
-  onImageSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.imageFile = file;
-      this.imageError = false;
+  onImageFileSelected(event: Event): void {
+    this.imageUploadError = null;
+    const element = event.currentTarget as HTMLInputElement;
+    const fileList: FileList | null = element.files;
+    if (fileList && fileList.length > 0) {
+      const file = fileList[0];
+      if (!file.type.startsWith('image/')) {
+        this.imageUploadError = 'Invalid file type. Please select an image.';
+        this.selectedImageFile = null;
+        element.value = ''; // Clear the input
+        return;
+      }
+      if (file.size > this.MAX_FILE_SIZE_BYTES) {
+        this.imageUploadError = `File is too large. Maximum size is ${this.MAX_FILE_SIZE_MB}MB.`;
+        this.selectedImageFile = null;
+        element.value = ''; // Clear the input
+        return;
+      }
+      this.selectedImageFile = file;
+    } else {
+      this.selectedImageFile = null;
+    }
+  }
+  clearImageFile(): void {
+    this.selectedImageFile = null;
+    this.imageUploadError = null;
+    // Also reset the input field if you have a reference to it
+    const imageInput = document.getElementById('imageFile') as HTMLInputElement;
+    if (imageInput) {
+        imageInput.value = '';
     }
   }
 
-  onVideoSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.videoFile = file;
-      this.videoError = false;
+  onVideoFileSelected(event: Event): void {
+    this.videoUploadError = null;
+    const element = event.currentTarget as HTMLInputElement;
+    const fileList: FileList | null = element.files;
+    if (fileList && fileList.length > 0) {
+      const file = fileList[0];
+      if (!file.type.startsWith('video/')) {
+        this.videoUploadError = 'Invalid file type. Please select a video.';
+        this.selectedVideoFile = null;
+        element.value = ''; // Clear the input
+        return;
+      }
+      // You might want a different (larger) size limit for videos
+      if (file.size > this.MAX_FILE_SIZE_BYTES * 5) { // Example: 50MB for videos
+        this.videoUploadError = `File is too large. Maximum size for videos is ${this.MAX_FILE_SIZE_MB * 5}MB.`;
+        this.selectedVideoFile = null;
+        element.value = ''; // Clear the input
+        return;
+      }
+      this.selectedVideoFile = file;
+    } else {
+      this.selectedVideoFile = null;
     }
   }
 
-  onSubmit() {
-    this.formSubmitted = true;
+  clearVideoFile(): void {
+    this.selectedVideoFile = null;
+    this.videoUploadError = null;
+    const videoInput = document.getElementById('videoFile') as HTMLInputElement;
+    if (videoInput) {
+        videoInput.value = '';
+    }
+  }
 
-    if (!this.imageFile) this.imageError = true;
-    if (!this.videoFile) this.videoError = true;
 
-    if (this.exerciseForm.invalid || this.imageError || this.videoError) {
+  onSubmit(): void {
+    if (this.exerciseForm.invalid || this.imageUploadError || this.videoUploadError) {
+      this.snackBar.open('Please correct the errors in the form.', 'Close', { duration: 3000, panelClass: ['error-snackbar'] });
       return;
     }
 
-    const formData = new FormData();
-    formData.append('name', this.exerciseForm.get('name')?.value);
-    formData.append('description', this.exerciseForm.get('description')?.value);
-    formData.append('defaultDurationMinutes', this.exerciseForm.get('defaultDurationMinutes')?.value);
-    formData.append('categories', JSON.stringify(this.exerciseForm.get('categories')?.value)); // It's an array
-    formData.append('difficultyLevel', this.exerciseForm.get('difficultyLevel')?.value);
-    formData.append('image', this.imageFile as File);
-    formData.append('video', this.videoFile as File);
-    formData.append('doctorId', this.doctorId);
+    this.isLoading = true;
 
-    this.exerciseService.createExercise(this.exerciseForm.value, this.doctorId)
-    .subscribe({
-      next: () => {
-        this.snackBar.open('Exercise created successfully!', 'Close', { duration: 3000 });
-        this.exerciseForm.reset();
+    const formValue = this.exerciseForm.value;
+    const exerciseData = {
+      name: formValue.name,
+      description: formValue.description,
+      defaultDurationMinutes: formValue.defaultDurationMinutes,
+      categories: formValue.categories ? formValue.categories.split(',').map((s: string) => s.trim()).filter((s: string) => s) : [],
+      difficultyLevel: formValue.difficultyLevel,
+      equipmentNeeded: formValue.equipmentNeeded ? formValue.equipmentNeeded.split(',').map((s: string) => s.trim()).filter((s: string) => s) : [],
+      targetMuscleGroup: formValue.targetMuscleGroup
+    };
+    console.log("execise data",exerciseData);
+    this.programService.createExercise(
+      exerciseData,
+      this.selectedImageFile,
+      this.selectedVideoFile,
+      this.doctorId
+    ).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.snackBar.open('Exercise created successfully!', 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
+        this.exerciseForm.reset({ difficultyLevel: 'Beginner' }); // Reset form to initial state
+        this.clearImageFile();
+        this.clearVideoFile();
+        // Optionally navigate or refresh list
       },
-      error: (err) => {
-        console.error(err);
-        this.snackBar.open('Error creating exercise', 'Close', { duration: 3000 });
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error creating exercise:', error);
+        const errorMessage = error.error?.message || error.message || 'Failed to create exercise. Please try again.';
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
       }
     });
   }
