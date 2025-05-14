@@ -14,7 +14,7 @@ export class UserinfoComponent implements OnInit {
   userForm!: FormGroup;
   userId: string = ''; // User ID from the route or logged-in user
   isLoading: boolean = false;
-  roles: string[] = ['NURSE', 'USER', 'ADMINISTRATOR', 'DOCTOR'];
+  roles: string[] = ['NURSE', 'USER'];
   originalUserData: any = {}; // Store the original user data for comparison
 
   constructor(
@@ -34,7 +34,7 @@ export class UserinfoComponent implements OnInit {
       email: ['', [Validators.email, Validators.minLength(5), Validators.maxLength(255)]],
       password: ['', [Validators.minLength(8), Validators.maxLength(100)]],
       birthDate: [''],
-      profileImage: ['', [Validators.pattern(/\.(jpeg|jpg|png|gif)$/i)]],
+      profileImage: [''],
       phoneNumber: ['', [Validators.pattern(/^\+?[0-9]{8}$/)]],
       role: ['', [Validators.minLength(3), Validators.maxLength(50)]],
     });
@@ -106,7 +106,10 @@ export class UserinfoComponent implements OnInit {
 
   // Update user data
   onUpdate(): void {
+    console.log('Updating user data...');
+    console.log('Form data:', this.userForm.getRawValue());
     if (this.userForm.valid) {
+      console.log('Form is valid');
       const changedFields = this.getChangedFields();
 
       if (Object.keys(changedFields).length === 0) {

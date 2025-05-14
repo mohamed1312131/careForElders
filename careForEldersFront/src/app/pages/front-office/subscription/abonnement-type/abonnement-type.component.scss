@@ -1,0 +1,29 @@
+/* src/app/components/abonnement/abonnement.component.css */
+.card {
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-price {
+  font-size: 2rem;
+  margin: 0;
+}
+
+.period {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.list-unstyled li {
+  padding: 0.25rem 0;
+}
+
+.bi-check-circle-fill {
+  font-size: 1.1rem;
+}

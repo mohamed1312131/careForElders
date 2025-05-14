@@ -12,9 +12,11 @@ public interface IService {
     Optional<Reservation> getReservationById(String id);         // Read by ID
     Reservation updateReservation(String id, Reservation r);     // Update
     void deleteReservation(String id);
-
+    List<Reservation> getReservationsByUserId(String userId);
   //  List<UserDTO> GetAllUsers();
     UserDTO getUserById(String userId);
 
     List<UserDTO> getAllUsers();
+    List<UserDTO> getAllDoctors();
+    UserDTO getDoctorById(String doctorId);
 }

@@ -7,7 +7,16 @@ spring:
   data:
     uri: mongodb://mongodb:27017/blogForum
 
+# use this while running with locally
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# user this while running docker-composee
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://service-registry:8761/eureka/

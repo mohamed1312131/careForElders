@@ -23,6 +23,6 @@ export class UserPEComponent {
   }
 
   navigateToDetails(): void {
-    this.router.navigate(['/plan/plandetails', this.program.programId]);
+    this.router.navigate(['user/userProfile/plan/plandetails', this.program.programId]);
   }
 }

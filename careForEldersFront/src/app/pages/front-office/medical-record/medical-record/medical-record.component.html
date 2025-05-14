@@ -1,1 +1,281 @@
-<p>medical-record works!</p>
+<div class="container medical-record-wrapper">
+  <div class="patient-header d-flex align-items-center justify-between p-4 shadow">
+    <div class="d-flex align-items-center">
+      <img [src]="patient.avatar" alt="Profile Image" class="profile-img"/>
+      <div>
+        <h3 class="mat-headline">{{ patient.name }}</h3>
+        <p class="text-muted mat-body-1">{{ patient.info }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container medical-record-wrapper">
+  <mat-tab-group class="full-tabs">
+    <!-- Patient Information Tab -->
+    <mat-tab label="Patient Information">
+      <form class="p-4" (ngSubmit)="updateMedicalRecord()">
+
+
+        <div class="info-grid">
+          <!-- Blood Type -->
+          <mat-form-field appearance="outline">
+            <mat-label>Blood Type</mat-label>
+            <mat-select [(ngModel)]="medicalRecord.bloodType" name="bloodType" required>
+              <mat-option value="">Unknown</mat-option>
+              <mat-option value="A+">A+</mat-option>
+              <mat-option value="A-">A-</mat-option>
+              <mat-option value="B+">B+</mat-option>
+              <mat-option value="B-">B-</mat-option>
+              <mat-option value="AB+">AB+</mat-option>
+              <mat-option value="AB-">AB-</mat-option>
+              <mat-option value="O+">O+</mat-option>
+              <mat-option value="O-">O-</mat-option>
+            </mat-select>
+            <mat-error *ngIf="medicalRecord?.controls?.['bloodType']?.hasError('required')">
+              Blood type is required.
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Allergies -->
+          <mat-card class="form-card">
+            <mat-card-header>
+              <mat-card-title>Allergies</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="item-list">
+                <div *ngFor="let allergy of medicalRecord.allergies; let i = index" class="item-row">
+                  <span>{{ allergy }}</span>
+                  <button mat-icon-button color="warn" (click)="removeAllergy(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="add-item">
+                <mat-form-field appearance="outline" class="flex-grow-1">
+                  <mat-label>Add Allergy</mat-label>
+                  <input matInput [(ngModel)]="newAllergy" name="newAllergy" (keyup.enter)="addAllergy()"  required minlength="2">
+                </mat-form-field>
+                <button mat-icon-button color="primary" (click)="addAllergy()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Medications -->
+          <mat-card class="form-card">
+            <mat-card-header>
+              <mat-card-title>Current Medications</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="item-list">
+                <div *ngFor="let med of medicalRecord.currentMedications; let i = index" class="item-row">
+                  <span>{{ med.name }} ({{ med.dosage }})</span>
+                  <button mat-icon-button color="warn" (click)="removeMedication(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <!-- Replace the current medication form with this: -->
+              <div class="add-item">
+                <mat-form-field appearance="outline" class="flex-grow-1">
+                  <mat-label>Add Medication (Name and Dosage)</mat-label>
+                  <input matInput [(ngModel)]="newMedication" name="newMedication"
+                         (keyup.enter)="addMedication()" placeholder="e.g., Ibuprofen 200mg">
+                </mat-form-field>
+                <button mat-icon-button color="primary" (click)="addMedication()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Chronic Conditions -->
+          <mat-card class="form-card">
+            <mat-card-header>
+              <mat-card-title>Chronic Conditions</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <div class="item-list">
+                <div *ngFor="let condition of medicalRecord.chronicConditions; let i = index" class="item-row">
+                  <span>{{ condition }}</span>
+                  <button mat-icon-button color="warn" (click)="removeCondition(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+              <div class="add-item">
+                <mat-form-field appearance="outline" class="flex-grow-1">
+                  <mat-label>Add Condition</mat-label>
+                  <input matInput [(ngModel)]="newCondition" name="newCondition" (keyup.enter)="addCondition()">
+                </mat-form-field>
+                <button mat-icon-button color="primary" (click)="addCondition()">
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Primary Physician -->
+          <mat-form-field appearance="outline">
+            <mat-label>Primary Physician</mat-label>
+            <input matInput [(ngModel)]="medicalRecord.primaryCarePhysician" name="primaryCarePhysician">
+          </mat-form-field>
+
+          <!-- Last Physical Exam -->
+          <mat-form-field appearance="outline">
+            <mat-label>Last Physical Exam</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="medicalRecord.lastPhysicalExam" name="lastPhysicalExam">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit">Save Changes</button>
+          <button mat-button type="button" (click)="cancelChanges()">Cancel</button>
+        </div>
+      </form>
+    </mat-tab>
+
+    <!-- Medical Notes Tab -->
+    <mat-tab label="Medical Notes">
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-center m-b-16">
+          <h4>Medical Notes</h4>
+          <button mat-icon-button color="primary" (click)="openAddNoteDialog()">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        <mat-card class="m-b-16" *ngFor="let note of records">
+          <mat-card-header>
+            <mat-card-title>{{ note.authorName }}</mat-card-title>
+            <mat-card-subtitle>{{ note.createdAt | date:'medium' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{ note.content }}</p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-icon-button color="warn" (click)="deleteMedicalNote(note.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <mat-paginator [length]="records.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25]">
+        </mat-paginator>
+      </div>
+    </mat-tab>
+
+    <!-- Attachments Tab -->
+    <mat-tab label="Attachments">
+      <div class="p-4">
+        <div class="section-header">
+          <h3>Medical Documents</h3>
+          <div class="upload-controls">
+            <input type="file" #fileInput style="display: none"
+                   (change)="onFileSelected($event)"
+                   accept="image/*,.pdf,.doc,.docx">
+            <button mat-raised-button color="primary" (click)="fileInput.click()">
+              <mat-icon>cloud_upload</mat-icon>
+              Upload Document
+            </button>
+            <mat-progress-bar *ngIf="uploadProgress !== null"
+                              mode="determinate"
+                              [value]="uploadProgress">
+            </mat-progress-bar>
+          </div>
+        </div>
+
+        <div *ngIf="isUploading" class="upload-status">
+          <p>Uploading... {{uploadProgress}}%</p>
+        </div>
+
+        <div *ngIf="attachments.length === 0 && !isLoading" class="empty-state">
+          <mat-icon>folder_open</mat-icon>
+          <p>No documents available</p>
+        </div>
+
+        <div class="documents-grid">
+          <mat-card *ngFor="let doc of attachments" class="document-card">
+            <div class="document-preview" (click)="viewDocument(doc)">
+              <img *ngIf="isImage(doc.fileType)"
+                   [src]="'data:' + doc.fileType + ';base64,' + doc.data"
+                   [alt]="doc.filename">
+
+              <div *ngIf="!isImage(doc.fileType)" class="file-icon">
+                <mat-icon>{{ getFileIcon(doc.fileType) }}</mat-icon>
+                <span>{{ getFileTypeLabel(doc.fileType) }}</span>
+              </div>
+            </div>
+
+            <mat-card-content class="document-info">
+              <h4 class="document-name">{{ doc.filename }}</h4>
+              <div class="document-meta">
+                <p>{{ formatFileSize(doc.fileSize) }}</p>
+                <p>{{ doc.uploadDate | date:'mediumDate' }}</p>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button mat-icon-button (click)="viewDocument(doc); $event.stopPropagation()">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="warn"
+                      (click)="deleteAttachment(doc._id); $event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+    <!-- Appointments Tab -->
+    <mat-tab label="Appointments">
+      <div class="p-4">
+        <div class="d-flex justify-content-between align-items-center m-b-16">
+          <h4>Appointments</h4>
+          <button mat-icon-button color="primary" (click)="refreshAppointments()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+
+        <mat-accordion>
+          <mat-expansion-panel *ngFor="let appt of appointments" [class.completed]="appt.status === 'completed'">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{ appt.appointmentDate | date:'medium' }}
+                <mat-chip [color]="appt.status === 'completed' ? 'primary' : 'accent'" selected>
+                  {{ appt.status }}
+                </mat-chip>
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ appt.treatment }}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="appointment-details">
+              <p><strong>Doctor:</strong> {{ appt.doctorId }}</p>
+              <p><strong>Nurse:</strong> {{ appt.nurseId }}</p>
+              <p><strong>Treatment:</strong> {{ appt.treatment }}</p>
+            </div>
+
+            <mat-action-row>
+              <button mat-button color="primary" *ngIf="appt.status !== 'completed'" (click)="markAppointmentComplete(appt.id)">
+                Mark Complete
+              </button>
+              <button mat-button color="warn" (click)="cancelAppointment(appt.id)">
+                Cancel
+              </button>
+            </mat-action-row>
+          </mat-expansion-panel>
+        </mat-accordion>
+
+        <mat-paginator [length]="appointments.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25]">
+        </mat-paginator>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

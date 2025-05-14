@@ -1,0 +1,51 @@
+.dialog-container {
+  min-width: 500px; // Adjust as needed
+  max-width: 800px; // Adjust as needed
+  max-height: 90vh; // Ensure dialog doesn't get too tall
+  display: flex;
+  flex-direction: column;
+}
+
+mat-dialog-content {
+  flex-grow: 1; // Allows content to take available space
+  overflow-y: auto; // Scroll content if it overflows
+}
+
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 200px; /* Ensure spinner is visible */
+}
+
+.tab-content-padding {
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.assigned-patients-section, .assign-new-patients-section {
+    margin-bottom: 20px;
+    h3 {
+        margin-bottom: 10px;
+        font-size: 1.1em;
+        font-weight: 500;
+    }
+}
+mat-chip-list {
+    margin-bottom: 10px;
+}
+
+mat-divider {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+mat-progress-bar {
+    margin-top: 10px;
+}

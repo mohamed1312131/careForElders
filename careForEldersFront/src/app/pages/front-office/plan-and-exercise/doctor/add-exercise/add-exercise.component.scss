@@ -1,0 +1,43 @@
+.add-exercise-card {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.file-input-container {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Spacing between button and file name */
+}
+
+.file-input-label {
+  font-weight: 500;
+  margin-right: 10px; /* Spacing after label */
+}
+
+.file-name {
+  font-style: italic;
+  color: grey;
+  margin-left: 10px;
+}
+
+.form-progress-bar {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.8em;
+}

@@ -1,0 +1,45 @@
+<div class="container mt-4">
+  <h2>Nutrition Plans</h2>
+
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search plans..."
+           [(ngModel)]="searchTerm" (input)="filterPlans()">
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let plan of filteredPlans">
+      <div class="card h-100">
+        <img [src]="plan.pictureUrl || 'assets/default-meal.jpg'" class="card-img-top" alt="{{plan.meal}}">
+        <div class="card-body">
+          <h5 class="card-title">{{plan.meal}}</h5>
+          <p class="card-text">{{plan.description | truncate:100}}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="badge bg-primary">{{plan.mealTime}}</span>
+            <span class="text-muted">{{plan.calories}} calories</span>
+          </div>
+        </div>
+
+        <div class="card-footer bg-transparent">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline-success" (click)="likePlan(plan.id, $event)">
+                <i class="bi bi-hand-thumbs-up"></i> {{plan.likes}}
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="dislikePlan(plan.id, $event)">
+                <i class="bi bi-hand-thumbs-down"></i> {{plan.dislikes}}
+              </button>
+            </div>
+
+                <button
+                  [routerLink]="['/plans', plan.id]"
+                  class="btn btn-sm btn-outline-primary"
+                  (click)="viewPlanDetails(plan.id)">
+                  View Details
+                </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
