@@ -75,7 +75,6 @@ import {UserLayoutComponent} from "./pages/front-office/user-service/userProfile
     BrandingComponent,
     AppNavItemComponent,
     UserinfoComponent,
-    UserLayoutComponent,
     MedicalRecordComponent,
     AddNoteDialogComponent,
     TruncatePipe,
@@ -83,7 +82,7 @@ import {UserLayoutComponent} from "./pages/front-office/user-service/userProfile
     UserinfoComponent,
     PlanListComponent,
     PlanDetailsComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
   ],
   imports: [
     BrowserModule,
@@ -121,8 +120,8 @@ import {UserLayoutComponent} from "./pages/front-office/user-service/userProfile
     MatExpansionModule,
     MatChipsModule,
     MatBadgeModule,
-    MatTabsModule
-
+    MatTabsModule,
+  
   ],
   exports: [TablerIconsModule],
   bootstrap: [AppComponent],

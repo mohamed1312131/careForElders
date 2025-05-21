@@ -50,8 +50,7 @@
             <li><a routerLink="SoignantRequests" routerLinkActive="active">SoignantRequests</a></li>
       <li><a routerLink="Abonnement" routerLinkActive="active">Abonnement</a></li>
       <li><a routerLink="blog" routerLinkActive="active">Check Post</a></li>
-      <li><a [routerLink]="['/user/userProfile/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
-
+      <li><a [routerLink]="['/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
       <li><a (click)="logout()">Logout</a></li>
     </ul>
   </nav>

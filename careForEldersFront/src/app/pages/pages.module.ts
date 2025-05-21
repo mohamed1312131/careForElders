@@ -35,6 +35,7 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatTableModule} from "@angular/material/table";
 import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
+import { UserLayoutComponent } from './front-office/user-service/userProfile/user-layout/user-layout.component';
 @NgModule({
   declarations: [AppDashboardComponent,
     UserDialogComponent,
@@ -73,7 +74,8 @@ import {MatIconModule} from "@angular/material/icon";
     MatExpansionModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-    CommonModule
+  
+    
 
   ],
   exports: [TablerIconsModule],
