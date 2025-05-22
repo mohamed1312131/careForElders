@@ -1,72 +1,310 @@
 <div class="post-detail-container">
-    <div class="loading-spinner" *ngIf="isLoading">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
-  
-    <div class="error-message" *ngIf="error">
-      <mat-icon>error_outline</mat-icon>
-      <p>{{ error }}</p>
-      <button mat-raised-button color="primary" routerLink="/user/userProfile/blog">
-        Back to Posts
-      </button>
-    </div>
-  
-    <div class="post-content" *ngIf="post && !isLoading">
-      <div class="post-header">
-        <div class="back-button">
-          <button mat-icon-button routerLink="/user/userProfile/blog">
-            <mat-icon>arrow_back</mat-icon>
+  <button mat-button class="back-button" (click)="goBack()" matTooltip="Return to posts list">
+    <mat-icon>arrow_back</mat-icon> Back to Posts
+  </button>
+
+  <div class="loading-spinner" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div class="post-content" *ngIf="!isLoading && post">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ post.title }}</mat-card-title>
+        <mat-card-subtitle>
+          Posted by {{ post.authorName }} on {{ post.createdAt | date:'medium' }}
+        </mat-card-subtitle>
+        
+        <!-- Action menu for post owner with tooltip -->
+        <div class="post-actions" >
+          <button mat-icon-button [matMenuTriggerFor]="postMenu" matTooltip="Post Actions">
+            <mat-icon>more_vert</mat-icon>
           </button>
+          <mat-menu #postMenu="matMenu">
+            <button mat-menu-item (click)="editPost()">
+              <mat-icon>edit</mat-icon>
+              <span>Edit</span>
+            </button>
+            <button mat-menu-item (click)="deletePost()">
+              <mat-icon>delete</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
         </div>
-        
-        <h1>{{ post.title }}</h1>
-        
-        <div class="post-meta">
-          <div class="author-info">
-            <mat-icon>person</mat-icon>
-            <span>{{ post.authorName }}</span>
-          </div>
-          
-          <div class="date-info">
-            <mat-icon>calendar_today</mat-icon>
-            <span>{{ post.createdAt | date:'medium' }}</span>
-            <span *ngIf="post.updatedAt">(Updated: {{ post.updatedAt | date:'medium' }})</span>
-          </div>
-          
-          <div class="view-info">
-            <mat-icon>visibility</mat-icon>
-            <span>{{ post.viewCount }} views</span>
-          </div>
-        </div>
-        
-        <div class="post-tags">
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="post-text">{{ post.content }}</p>
+
+        <div class="tags-container" *ngIf="post.tags && post.tags.length > 0">
           <mat-chip-list>
             <mat-chip *ngFor="let tag of post.tags" color="primary" selected>{{ tag }}</mat-chip>
           </mat-chip-list>
         </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button (click)="isPostLikedByUser() ? unlikePost() : likePost()" matTooltip="Like this post">
+          <mat-icon [color]="isPostLikedByUser() ? 'accent' : ''">thumb_up</mat-icon>
+          {{ post.likes.length || 0 }}
+        </button>
+        <button mat-button matTooltip="Comments count">
+          <mat-icon>comment</mat-icon> {{ comments.length || 0 }}
+        </button>
+        <button mat-button matTooltip="View count">
+          <mat-icon>visibility</mat-icon> {{ post.viewCount || 0 }}
+        </button>
         
-        <div class="post-actions" *ngIf="isAuthor()">
-          <button mat-raised-button color="primary" (click)="editPost()">
-            <mat-icon>edit</mat-icon> Edit
-          </button>
-          <button mat-raised-button color="warn" (click)="deletePost()">
-            <mat-icon>delete</mat-icon> Delete
-          </button>
-        </div>
+        <!-- Edit Button with tooltip (only for author) -->
+        <button 
+          mat-button 
+          color="accent" 
+          *ngIf="isAuthor(post.authorId)" 
+          (click)="editPost()" 
+          matTooltip="Edit this post">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        
+        <!-- Delete Button with tooltip (only for author) -->
+        <button 
+          mat-button 
+          color="warn" 
+          *ngIf="isAuthor(post.authorId)" 
+          (click)="deletePost()" 
+          matTooltip="Delete this post">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div class="comments-section">
+      <h2>Comments</h2>
+
+      <mat-card class="comment-form-card">
+        <mat-card-content>
+          <form [formGroup]="commentForm" (ngSubmit)="submitComment()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Add a comment</mat-label>
+              <textarea matInput formControlName="content" rows="3" placeholder="Write your comment here..."></textarea>
+              <mat-error *ngIf="commentForm.get('content')?.hasError('required')">
+                Comment is required
+              </mat-error>
+              <mat-error *ngIf="commentForm.get('content')?.hasError('minlength')">
+                Comment must be at least 3 characters
+              </mat-error>
+            </mat-form-field>
+            <div class="form-actions">
+              <button mat-raised-button color="primary" type="submit" [disabled]="commentForm.invalid" matTooltip="Post your comment">
+                Post Comment
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <div class="loading-spinner" *ngIf="isLoadingComments">
+        <mat-spinner diameter="30"></mat-spinner>
       </div>
-      
-      <mat-divider></mat-divider>
-      
-      <div class="post-body">
-        <p [innerHTML]="post.content"></p>
+
+      <div class="no-comments" *ngIf="!isLoadingComments && (!comments || comments.length === 0)">
+        <p>No comments yet. Be the first to comment!</p>
       </div>
-      
-      <mat-divider></mat-divider>
-      
-      <div class="post-footer">
-        <h3>Comments</h3>
-        <p class="no-comments">Comments feature coming soon!</p>
+
+      <div class="comments-list" *ngIf="!isLoadingComments && comments && comments.length > 0">
+        <mat-card class="comment-card" *ngFor="let comment of comments">
+          <mat-card-header>
+            <mat-card-subtitle>
+              {{ comment.authorName }} · {{ comment.createdAt | date:'medium' }}
+            </mat-card-subtitle>
+            
+            <!-- Action menu for comment owner with tooltip -->
+            <div class="comment-actions" *ngIf="isAuthor(comment.authorId)">
+              <button mat-icon-button [matMenuTriggerFor]="commentMenu" matTooltip="Comment Actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #commentMenu="matMenu">
+                <button mat-menu-item (click)="editComment(comment.id)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button mat-menu-item (click)="deleteComment(comment.id)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </div>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Regular comment content -->
+            <p *ngIf="editingCommentId !== comment.id">{{ comment.content }}</p>
+            
+            <!-- Edit comment form -->
+            <div class="edit-comment-form" *ngIf="editingCommentId === comment.id">
+              <form [formGroup]="editCommentForm" (ngSubmit)="submitEditComment()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Edit your comment</mat-label>
+                  <textarea matInput formControlName="content" rows="3"></textarea>
+                  <mat-error *ngIf="editCommentForm.get('content')?.hasError('required')">
+                    Comment is required
+                  </mat-error>
+                  <mat-error *ngIf="editCommentForm.get('content')?.hasError('minlength')">
+                    Comment must be at least 3 characters
+                  </mat-error>
+                </mat-form-field>
+                <div class="form-actions">
+                  <button mat-button type="button" (click)="cancelEditComment()" matTooltip="Cancel editing">Cancel</button>
+                  <button mat-raised-button color="primary" type="submit" [disabled]="editCommentForm.invalid" matTooltip="Save changes">
+                    Update Comment
+                  </button>
+                </div>
+              </form>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button (click)="isCommentLikedByUser(comment) ? unlikeComment(comment.id) : likeComment(comment.id)" matTooltip="Like this comment">
+              <mat-icon [color]="isCommentLikedByUser(comment) ? 'accent' : ''">thumb_up</mat-icon>
+              {{ comment.likes.length || 0 }}
+            </button>
+            <button mat-button (click)="startReply(comment.id)" matTooltip="Reply to this comment">
+              <mat-icon>reply</mat-icon> Reply
+            </button>
+            
+            <!-- Edit Button with tooltip (only for author) -->
+            <button 
+              mat-button 
+              color="accent" 
+              *ngIf="isAuthor(comment.authorId)" 
+              (click)="editComment(comment.id)" 
+              matTooltip="Edit this comment">
+              <mat-icon>edit</mat-icon> Edit
+            </button>
+            
+            <!-- Delete Button with tooltip (only for author) -->
+            <button 
+              mat-button 
+              color="warn" 
+              *ngIf="isAuthor(comment.authorId)" 
+              (click)="deleteComment(comment.id)" 
+              matTooltip="Delete this comment">
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+          </mat-card-actions>
+
+          <!-- Reply form -->
+          <div class="reply-form" *ngIf="replyingTo === comment.id">
+            <form [formGroup]="replyForm" (ngSubmit)="submitReply(comment.id)">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Your reply</mat-label>
+                <textarea matInput formControlName="content" rows="2" placeholder="Write your reply here..."></textarea>
+                <mat-error *ngIf="replyForm.get('content')?.hasError('required')">
+                  Reply is required
+                </mat-error>
+                <mat-error *ngIf="replyForm.get('content')?.hasError('minlength')">
+                  Reply must be at least 3 characters
+                </mat-error>
+              </mat-form-field>
+              <div class="form-actions">
+                <button mat-button type="button" (click)="cancelReply()" matTooltip="Cancel reply">Cancel</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="replyForm.invalid" matTooltip="Post your reply">
+                  Post Reply
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Replies -->
+          <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
+            <mat-card class="reply-card" *ngFor="let reply of comment.replies">
+              <mat-card-header>
+                <mat-card-subtitle>
+                  {{ reply.authorName }} · {{ reply.createdAt | date:'medium' }}
+                </mat-card-subtitle>
+                
+                <!-- Action menu for reply owner with tooltip -->
+                <div class="comment-actions" *ngIf="isAuthor(reply.authorId)">
+                  <button mat-icon-button [matMenuTriggerFor]="replyMenu" matTooltip="Reply Actions">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #replyMenu="matMenu">
+                    <button mat-menu-item (click)="editComment(reply.id)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Edit</span>
+                    </button>
+                    <button mat-menu-item (click)="deleteComment(reply.id)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content>
+                <!-- Regular reply content -->
+                <p *ngIf="editingCommentId !== reply.id">{{ reply.content }}</p>
+                
+                <!-- Edit reply form -->
+                <div class="edit-comment-form" *ngIf="editingCommentId === reply.id">
+                  <form [formGroup]="editCommentForm" (ngSubmit)="submitEditComment()">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Edit your reply</mat-label>
+                      <textarea matInput formControlName="content" rows="2"></textarea>
+                      <mat-error *ngIf="editCommentForm.get('content')?.hasError('required')">
+                        Reply is required
+                      </mat-error>
+                      <mat-error *ngIf="editCommentForm.get('content')?.hasError('minlength')">
+                        Reply must be at least 3 characters
+                      </mat-error>
+                    </mat-form-field>
+                    <div class="form-actions">
+                      <button mat-button type="button" (click)="cancelEditComment()" matTooltip="Cancel editing">Cancel</button>
+                      <button mat-raised-button color="primary" type="submit" [disabled]="editCommentForm.invalid" matTooltip="Save changes">
+                        Update Reply
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions>
+                <button mat-button (click)="isCommentLikedByUser(reply) ? unlikeComment(reply.id) : likeComment(reply.id)" matTooltip="Like this reply">
+                  <mat-icon [color]="isCommentLikedByUser(reply) ? 'accent' : ''">thumb_up</mat-icon>
+                  {{ reply.likes.length || 0 }}
+                </button>
+                
+                <!-- Edit Button with tooltip (only for author) -->
+                <button 
+                  mat-button 
+                  color="accent" 
+                  *ngIf="isAuthor(reply.authorId)" 
+                  (click)="editComment(reply.id)" 
+                  matTooltip="Edit this reply">
+                  <mat-icon>edit</mat-icon> Edit
+                </button>
+                
+                <!-- Delete Button with tooltip (only for author) -->
+                <button 
+                  mat-button 
+                  color="warn" 
+                  *ngIf="isAuthor(reply.authorId)" 
+                  (click)="deleteComment(reply.id)" 
+                  matTooltip="Delete this reply">
+                  <mat-icon>delete</mat-icon> Delete
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          </div>
+        </mat-card>
       </div>
     </div>
   </div>
-  
+
+  <div class="not-found" *ngIf="!isLoading && !post">
+    <h2>Post not found</h2>
+    <p>The post you're looking for doesn't exist or has been removed.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Go Back to Posts
+    </button>
+  </div>
+</div>

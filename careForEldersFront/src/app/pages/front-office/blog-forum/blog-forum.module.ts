@@ -1,12 +1,17 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { BlogForumRoutingModule } from './blog-forum-routing.module';
 import { PostListComponent } from './post-list/post-list.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { PostFormComponent } from './post-form/post-form.component';
 import { ConfirmDialogComponent } from "./confirm-dialog/confirm-dialog.component";
+
+// Services
+import { PostService } from './post.service';
+import { CommentService } from './comment.service';
 
 // Angular Material Imports
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +29,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+//import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -34,14 +40,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   imports: [
     CommonModule,
-    FormsModule,  // Add this if not already in AppModule
+    FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
     BlogForumRoutingModule,
     
     // Angular Material modules
     MatButtonModule,
     MatCardModule,
-    MatChipsModule,  // Only need to import once
+    MatChipsModule,
     MatDialogModule,
     MatDividerModule,
     MatFormFieldModule,
@@ -54,6 +61,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatSlideToggleModule,
     MatTooltipModule,
     MatSnackBarModule,
+    
+  ],
+  providers: [
+    PostService,
+    CommentService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

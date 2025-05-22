@@ -10,6 +10,7 @@ import { SubscriptionModule } from '../subscription/subscription.module';
 import {FormsModule} from "@angular/forms";
 import { ParamedicalCareModule } from '../paramedical-care/paramedical-care.module';
 import { RouterModule } from '@angular/router';
+import { BlogForumModule } from '../blog-forum/blog-forum.module';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { RouterModule } from '@angular/router';
     AppointmentAvailabilityModule,
     SubscriptionModule,
     ParamedicalCareModule,
+    BlogForumModule,
     RouterModule
 
   ]

@@ -16,28 +16,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "posts")
-public class Post {
+@Document(collection = "comments")
+public class Comment {
     
     @Id
     private String id;
     
-    private String title;
+    private String postId;
     private String content;
     private String authorId;
     private String authorName;
     
     @Builder.Default
-    private List<String> tags = new ArrayList<>();
-    
-    @Builder.Default
-    private List<LikePost> likes = new ArrayList<>();
-    
-    @Builder.Default
-    private int viewCount = 0;
-    
-    @Builder.Default
-    private long commentsCount = 0;
+    private List<LikeComment> likes = new ArrayList<>();
     
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -46,8 +37,11 @@ public class Post {
     private LocalDateTime updatedAt = LocalDateTime.now();
     
     @Builder.Default
-    private boolean published = true;
+    private boolean isDeleted = false;
+    
+    // For nested comments/replies
+    private String parentCommentId;
     
     @Builder.Default
-    private boolean isDeleted = false;
+    private List<Comment> replies = new ArrayList<>();
 }

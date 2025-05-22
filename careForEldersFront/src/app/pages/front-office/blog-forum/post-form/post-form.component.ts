@@ -1,11 +1,10 @@
-import { Component, OnInit } from "@angular/core"
-import { FormBuilder, FormGroup, Validators, type FormArray } from "@angular/forms"
-import { ActivatedRoute, Router } from "@angular/router"
-import { MatSnackBar } from "@angular/material/snack-bar"
-import { COMMA, ENTER } from "@angular/cdk/keycodes"
-// Remove or comment out this import since we're not using MatChipInputEvent anymore
-// import { MatChipInputEvent } from "@angular/material/chips"
-import { PostService } from "../post.service"
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, FormArray } from "@angular/forms";
+import { ActivatedRoute, Router } from "@angular/router";
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { COMMA, ENTER } from "@angular/cdk/keycodes";
+import { PostService } from "../post.service";
+import { PostRequest } from "../models/post.model";
 
 @Component({
   selector: "app-post-form",
@@ -13,13 +12,13 @@ import { PostService } from "../post.service"
   styleUrls: ["./post-form.component.scss"],
 })
 export class PostFormComponent implements OnInit {
-  postForm: FormGroup
-  isEditMode = false
-  postId: string | null = null
-  isLoading = false
-  isSubmitting = false
-  serverErrors: { [key: string]: string } = {}
-  readonly separatorKeysCodes = [ENTER, COMMA] as const
+  postForm: FormGroup;
+  isEditMode = false;
+  postId: string | null = null;
+  isLoading = false;
+  isSubmitting = false;
+  serverErrors: { [key: string]: string } = {};
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(
     private fb: FormBuilder,
@@ -33,167 +32,153 @@ export class PostFormComponent implements OnInit {
       content: ["", [Validators.required, Validators.minLength(10)]],
       tags: this.fb.array([]),
       published: [true],
-    })
+    });
   }
 
   ngOnInit(): void {
-    this.postId = this.route.snapshot.paramMap.get("id")
-    this.isEditMode = !!this.postId
+    this.postId = this.route.snapshot.paramMap.get("id");
+    this.isEditMode = !!this.postId;
 
     if (this.isEditMode && this.postId) {
-      this.loadPost(this.postId)
+      this.loadPost(this.postId);
     }
   }
 
   get tagsArray(): FormArray {
-    return this.postForm.get("tags") as FormArray
+    return this.postForm.get("tags") as FormArray;
   }
 
   loadPost(id: string): void {
-    this.isLoading = true
+    this.isLoading = true;
 
     this.postService.getPostById(id).subscribe({
       next: (post) => {
         // Clear existing tags
         while (this.tagsArray.length) {
-          this.tagsArray.removeAt(0)
+          this.tagsArray.removeAt(0);
         }
 
         // Add each tag to the form array
         post.tags.forEach((tag: string) => {
-          this.tagsArray.push(this.fb.control(tag))
-        })
+          this.tagsArray.push(this.fb.control(tag));
+        });
 
         this.postForm.patchValue({
           title: post.title,
           content: post.content,
           published: post.published,
-        })
+        });
 
-        this.isLoading = false
+        this.isLoading = false;
       },
       error: (error) => {
-        console.error("Error loading post", error)
+        console.error("Error loading post", error);
         this.snackBar.open("Failed to load post for editing", "Close", {
           duration: 3000,
-        })
-        this.isLoading = false
-        this.router.navigate(["/user/userProfile/blog"])
+        });
+        this.isLoading = false;
+        this.router.navigate(["/user/userProfile/blog"]);
       },
-    })
+    });
   }
 
-  // Keep this method for backward compatibility if needed
-  addTag(event: any): void {
-    const value = (event.value || "").trim()
-
-    if (value) {
-      this.tagsArray.push(this.fb.control(value))
-    }
-
-    if (event.chipInput) {
-      event.chipInput.clear()
-    }
-  }
-
-  // Add this new method for the custom implementation
   addTagFromInput(inputElement: HTMLInputElement): void {
-    const value = inputElement.value.trim()
+    const value = inputElement.value.trim();
     
     if (value) {
-      this.tagsArray.push(this.fb.control(value))
-      inputElement.value = ''
+      this.tagsArray.push(this.fb.control(value));
+      inputElement.value = '';
     }
   }
 
   removeTag(index: number): void {
-    this.tagsArray.removeAt(index)
+    this.tagsArray.removeAt(index);
   }
 
   onSubmit(): void {
     if (this.postForm.invalid) {
-      this.markFormGroupTouched(this.postForm)
-      return
+      this.markFormGroupTouched(this.postForm);
+      return;
     }
 
-    this.isSubmitting = true
-    this.serverErrors = {}
+    this.isSubmitting = true;
+    this.serverErrors = {};
 
-    const postRequest = {
+    const postRequest: PostRequest = {
       title: this.postForm.value.title,
       content: this.postForm.value.content,
       tags: this.tagsArray.value,
       published: this.postForm.value.published,
-    }
+    };
 
     if (this.isEditMode && this.postId) {
-      this.updatePost(this.postId, postRequest)
+      this.updatePost(this.postId, postRequest);
     } else {
-      this.createPost(postRequest)
+      this.createPost(postRequest);
     }
   }
 
-  createPost(postRequest: any): void {
+  createPost(postRequest: PostRequest): void {
     this.postService.createPost(postRequest).subscribe({
       next: (post) => {
         this.snackBar.open("Post created successfully", "Close", {
           duration: 3000,
-        })
-        this.isSubmitting = false
-        this.router.navigate(["/user/userProfile/blog"])
+        });
+        this.isSubmitting = false;
+        this.router.navigate(["/user/userProfile/blog"]);
       },
       error: (error) => {
-        this.handleError(error)
+        this.handleError(error);
       },
-    })
+    });
   }
 
-  updatePost(id: string, postRequest: any): void {
+  updatePost(id: string, postRequest: PostRequest): void {
     this.postService.updatePost(id, postRequest).subscribe({
       next: (post) => {
         this.snackBar.open("Post updated successfully", "Close", {
           duration: 3000,
-        })
-        this.isSubmitting = false
-        this.router.navigate(["/user/userProfile/blog"])
+        });
+        this.isSubmitting = false;
+        this.router.navigate(["/user/userProfile/blog"]);
       },
       error: (error) => {
-        this.handleError(error)
+        this.handleError(error);
       },
-    })
+    });
   }
 
   handleError(error: any): void {
-    console.error("Error submitting post", error)
-    this.isSubmitting = false
+    console.error("Error submitting post", error);
+    this.isSubmitting = false;
 
     if (error.error && error.error.errors) {
-      const validationErrors = error.error
+      const validationErrors = error.error;
       validationErrors.errors.forEach((err: any) => {
-        this.serverErrors[err.field] = err.message
-      })
+        this.serverErrors[err.field] = err.message;
+      });
     } else {
       this.snackBar.open("Failed to save post. Please try again.", "Close", {
         duration: 3000,
-      })
+      });
     }
   }
 
   markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach((control) => {
-      control.markAsTouched()
+      control.markAsTouched();
 
       if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control)
+        this.markFormGroupTouched(control);
       }
-    })
+    });
   }
 
   cancel(): void {
     if (this.isEditMode && this.postId) {
-      this.router.navigate(["/user/userProfile/blog", this.postId])
+      this.router.navigate(["/user/userProfile/blog", this.postId]);
     } else {
-      this.router.navigate(["/user/userProfile/blog"])
+      this.router.navigate(["/user/userProfile/blog"]);
     }
   }
 }

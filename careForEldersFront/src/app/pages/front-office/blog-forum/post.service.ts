@@ -1,60 +1,53 @@
 import { Injectable } from "@angular/core"
-import { HttpClient, HttpParams } from "@angular/common/http"
-import type { Observable } from "rxjs"
+import { HttpClient } from "@angular/common/http"
+import { Observable } from "rxjs"
+import { Post } from "./models/post.model"
 
 @Injectable({
   providedIn: "root",
 })
 export class PostService {
-  private apiUrl = "http://localhost:8084/api/posts"
+  private apiUrl = "http://localhost:8084/api" // Updated to match your API URL
 
   constructor(private http: HttpClient) {}
 
-  getAllPosts(page = 0, size = 10, sortBy = "createdAt", direction = "desc"): Observable<any> {
-    const params = new HttpParams()
-      .set("page", page.toString())
-      .set("size", size.toString())
-      .set("sortBy", sortBy)
-      .set("direction", direction)
-
-    return this.http.get<any>(this.apiUrl, { params })
+  getPosts(page: number = 0, size: number = 10): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/posts?page=${page}&size=${size}`)
   }
 
-  getPostById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`)
+  getPostById(id: string): Observable<Post> {
+    return this.http.get<Post>(`${this.apiUrl}/posts/${id}`)
   }
 
-  getPostsByAuthor(authorId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/author/${authorId}`)
+  createPost(postData: any): Observable<Post> {
+    return this.http.post<Post>(`${this.apiUrl}/posts`, postData)
   }
 
-  searchPosts(title?: string, content?: string, tag?: string): Observable<any[]> {
-    let params = new HttpParams()
-
-    if (title) {
-      params = params.set("title", title)
-    }
-
-    if (content) {
-      params = params.set("content", content)
-    }
-
-    if (tag) {
-      params = params.set("tag", tag)
-    }
-
-    return this.http.get<any[]>(`${this.apiUrl}/search`, { params })
-  }
-
-  createPost(postRequest: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, postRequest)
-  }
-
-  updatePost(id: string, postRequest: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, postRequest)
+  updatePost(id: string, postData: any): Observable<Post> {
+    return this.http.put<Post>(`${this.apiUrl}/posts/${id}`, postData)
   }
 
   deletePost(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`)
+    return this.http.delete<void>(`${this.apiUrl}/posts/${id}`)
+  }
+
+  likePost(id: string): Observable<Post> {
+    return this.http.post<Post>(`${this.apiUrl}/posts/${id}/like`, {})
+  }
+
+  unlikePost(id: string): Observable<Post> {
+    return this.http.delete<Post>(`${this.apiUrl}/posts/${id}/like`)
+  }
+
+  searchPostsByTitle(title: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.apiUrl}/posts/search?title=${encodeURIComponent(title)}`)
+  }
+
+  searchPostsByContent(content: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.apiUrl}/posts/search?content=${encodeURIComponent(content)}`)
+  }
+
+  searchPostsByTag(tag: string): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.apiUrl}/posts/search?tag=${encodeURIComponent(tag)}`)
   }
 }

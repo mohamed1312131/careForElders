@@ -2,6 +2,7 @@ package com.care4elders.blogforum.controller;
 
 import java.util.List;
 
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,17 +20,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import com.care4elders.blogforum.dto.PostRequest;
 import com.care4elders.blogforum.exception.PostNotFoundException;
 import com.care4elders.blogforum.exception.ValidationError;
 import com.care4elders.blogforum.exception.ValidationErrorResponse;
+
+import com.care4elders.blogforum.model.LikePost;
 import com.care4elders.blogforum.model.Post;
 import com.care4elders.blogforum.service.PostService;
 
+
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -38,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
     
     private final PostService postService;
+
     
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(
@@ -63,16 +67,15 @@ public class PostController {
             post = postService.incrementViewCount(id);
             return ResponseEntity.ok(post);
         } catch (PostNotFoundException e) {
-            //log.error("Post not found with id: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
     
-    /*@GetMapping("/doctor/{docId}")
-    public ResponseEntity<List<Post>> getPostsByDoctor(@PathVariable String authorId) {
-        List<Post> posts = postService.getPostsByAuthor(authorId);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Post>> getPostsByUser(@PathVariable String userId) {
+        List<Post> posts = postService.getPostsByUser(userId);
         return ResponseEntity.ok(posts);
-    }*/
+    }
     
     @GetMapping("/search")
     public ResponseEntity<List<Post>> searchPosts(
@@ -92,23 +95,24 @@ public class PostController {
     }
     
     @PostMapping
-public ResponseEntity<?> createPost(
-        @Valid @RequestBody PostRequest postRequest,
-        BindingResult bindingResult) {
-    
-    if (bindingResult.hasErrors()) {
-        return ResponseEntity
-                .badRequest()
-                .body(createValidationErrorResponse(bindingResult));
+    public ResponseEntity<?> createPost(
+            @Valid @RequestBody PostRequest postRequest,
+            BindingResult bindingResult) {
+        
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(createValidationErrorResponse(bindingResult));
+        }
+        
+        // TODO: Get actual user ID and name from authentication
+        String authorId = "doctor123";
+        String authorName = "Doctor";
+        
+        Post createdPost = postService.createPost(postRequest, authorId, authorName);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
-    
-    // TODO: Get actual user ID and name from authentication
-    String authorId = "doctor123";  // Changed from "user123"
-    String authorName = "Doctor";   // Changed from "John Doe"
-    
-    Post createdPost = postService.createPost(postRequest, authorId, authorName);
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
-}
+
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(
@@ -126,7 +130,6 @@ public ResponseEntity<?> createPost(
             Post updatedPost = postService.updatePost(id, postRequest);
             return ResponseEntity.ok(updatedPost);
         } catch (PostNotFoundException e) {
-            //log.error("Post not found with id: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
@@ -137,11 +140,56 @@ public ResponseEntity<?> createPost(
             postService.deletePost(id);
             return ResponseEntity.noContent().build();
         } catch (PostNotFoundException e) {
-           // log.error("Post not found with id: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
     
+  
+    
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> likePost(@PathVariable String id) {
+        // TODO: Get actual user ID from authentication
+        String userId = "user123";
+        
+        try {
+            LikePost like = postService.likePost(id, userId);
+            return ResponseEntity.ok(like);
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+
+    
+    @DeleteMapping("/{id}/like")
+    public ResponseEntity<Void> removeLike(@PathVariable String id) {
+        // TODO: Get actual user ID from authentication
+        String userId = "user123";
+        
+        try {
+            postService.removeLike(id, userId);
+            return ResponseEntity.noContent().build();
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    @GetMapping("/most-liked")
+    public ResponseEntity<Post> getMostLikedPost() {
+        Post post = postService.getMostLikedPost();
+        return ResponseEntity.ok(post);
+    }
+    
+    @GetMapping("/{id}/likes-count")
+    public ResponseEntity<Integer> getLikesCount(@PathVariable String id) {
+        try {
+            Post post = postService.getPostById(id);
+            int likesCount = postService.getLikesCount(post);
+            return ResponseEntity.ok(likesCount);
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
     private ValidationErrorResponse createValidationErrorResponse(BindingResult bindingResult) {
         ValidationErrorResponse errorResponse = new ValidationErrorResponse();
         
