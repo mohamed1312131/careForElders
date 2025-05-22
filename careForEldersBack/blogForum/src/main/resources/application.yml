@@ -6,31 +6,6 @@ spring:
     name: blogForum
   data:
     uri: mongodb://mongodb:27017/blogForum
-  # WebClient configuration
-  webflux:
-    client:
-      max-in-memory-size: 16777216  # 16MB
-  # Cache configuration
-  cache:
-    cache-names: sentimentCache
-    caffeine:
-      spec: maximumSize=1000,expireAfterWrite=1h
-  # Async task executor configuration
-  task:
-    execution:
-      pool:
-        core-size: 2
-        max-size: 5
-        queue-capacity: 100
-      thread-name-prefix: SentimentAnalysis-
-
-# Hugging Face API Configuration
-huggingface:
-  api:
-    url: https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english
-    token: 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
-
-
 # use this while running with locally
 eureka:
   client:
