@@ -36,6 +36,10 @@ export const FrontOfficeRoutes: Routes = [
     loadChildren: () => import('./appointment-availability/appointment-availability.module').then(m => m.AppointmentAvailabilityModule),
     data: { preload: true }
   },
+  /*{
+    path: "post",
+    loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
+  }, */
   {
     path: 'users',
     component: UsersComponent,
@@ -87,11 +91,8 @@ export const FrontOfficeRoutes: Routes = [
       import('./patient-bill/patient-bills.module').then((m) => m.PatientBillsModule),
     // Remove the component property here
   },
-
-  {
-    path: "blog-forum",
-    loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
-  }, */
+*/
+  
 
 
 ];
