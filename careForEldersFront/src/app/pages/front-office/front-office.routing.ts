@@ -78,7 +78,15 @@ export const FrontOfficeRoutes: Routes = [
 
     path:'nutritionplainadmin',
     component:AdminDashboardComponent,
-  }
+  },
+  {
+    path:'medicalrecordlist',
+    component:MedicalRecordListComponent,
+  },
+  {
+    path:'medicalrecord/:id',
+    component:MedicalRecordComponent ,
+  },
   /*{
     path: 'bill',
     loadChildren: () =>

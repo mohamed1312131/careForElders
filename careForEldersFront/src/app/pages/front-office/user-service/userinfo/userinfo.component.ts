@@ -14,7 +14,7 @@ export class UserinfoComponent implements OnInit {
   userForm!: FormGroup;
   userId: string = ''; // User ID from the route or logged-in user
   isLoading: boolean = false;
-  roles: string[] = ['NURSE', 'USER', 'ADMINISTRATOR', 'DOCTOR'];
+  roles: string[] = ['NURSE', 'USER'];
   originalUserData: any = {}; // Store the original user data for comparison
 
   constructor(
