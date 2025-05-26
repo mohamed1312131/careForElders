@@ -38,8 +38,13 @@ body {
 
   a {
     color: inherit;
+<<<<<<< Updated upstream
     text-decoration: none; /* Good practice for nav links */
     transition: background 0.3s, color 0.3s;
+=======
+    text-decoration: none;
+    //transition: background 0.3s, color 0.3s;
+>>>>>>> Stashed changes
   }
 
   ul {
@@ -189,7 +194,7 @@ main > header {
       top: -2px;
       background: #dfe0e2;
       color: #868d99;
-      transition: background 0.3s, color 0.3s;
+      //transition: background 0.3s, color 0.3s;
     }
   }
 }

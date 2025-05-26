@@ -30,7 +30,36 @@ export const FrontOfficeRoutes: Routes = [
     loadChildren: () => import('./appointment-availability/appointment-availability.module').then(m => m.AppointmentAvailabilityModule),
     data: { preload: true } 
   },
+<<<<<<< Updated upstream
   
+=======
+  {
+    path: 'abonnement',
+    loadChildren: () =>
+      import('./subscription/subscription.module').then((m) => m.SubscriptionModule),
+  },
+
+  {
+    path: 'users',
+    component: UsersComponent,
+  },
+  {
+    path: 'userinfo/:id',
+    component: UserinfoComponent,
+  },
+  {
+    path:'medical-record/:id',
+    component:MedicalRecordComponent,
+  },
+  {
+    path:'medicalRecord',
+    component:MedicalRecordComponent,},
+  {
+    path:'medicalRecordsList',
+    component:MedicalRecordListComponent,
+  },
+
+>>>>>>> Stashed changes
   {
     path:'medicalRecord',
     component:MedicalRecordComponent,

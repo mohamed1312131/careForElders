@@ -1,0 +1,94 @@
+<p>unauthorized works!</p>
+<div class="unauthorized-container">
+  <div class="unauthorized-card">
+    <div class="countdown-banner">
+      <p>Redirecting in {{ countdown }} seconds...</p>
+    </div>
+    <div class="header">
+      <i class="fas fa-lock"></i>
+      <h1>Access Restricted</h1>
+    </div>
+    
+    <div class="content">
+      <p>You don't have access to this feature with your current subscription plan.</p>
+      <p>Upgrade your plan to unlock premium features and get the full experience!</p>
+      
+      <div class="feature-highlights">
+        <div class="feature" *ngIf="requiredModule === 'chat'">
+          <i class="fas fa-comments"></i>
+          <span>Chat directly with doctors and get instant responses</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'patientBill'">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span>View and manage all your medical bills in one place</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'blogForum'">
+          <i class="fas fa-blog"></i>
+          <span>Participate in health discussions and read expert articles</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'event'">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Access exclusive health events and webinars</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'planAndExercise'">
+          <i class="fas fa-dumbbell"></i>
+          <span>Get personalized exercise plans from professionals</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'nutrition'">
+          <i class="fas fa-utensils"></i>
+          <span>Receive customized nutrition plans</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'medicalRecord'">
+          <i class="fas fa-file-medical"></i>
+          <span>Full access to your complete medical history</span>
+        </div>
+        <div class="feature" *ngIf="requiredModule === 'paramedicalCare'">
+          <i class="fas fa-user-md"></i>
+          <span>Premium paramedical care services</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button class="btn-upgrade" routerLink="/userProfile/Abonnement">
+        <i class="fas fa-arrow-up"></i> Upgrade Plan
+      </button>
+      <button class="btn-back" routerLink="/userProfile">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </button>
+    </div>
+    
+    <div class="plan-comparison">
+      <h3>Compare Plans</h3>
+      <div class="plans">
+        <div class="plan">
+          <h4>Basic</h4>
+          <ul>
+            <li>Book appointments</li>
+            <li>Basic doctor access</li>
+            <li>Notifications</li>
+          </ul>
+        </div>
+        <div class="plan recommended">
+          <h4>Silver</h4>
+          <ul>
+            <li>All Basic features</li>
+            <li>Chat with doctors</li>
+            <li>Nutrition plans</li>
+            <li>Health events</li>
+            <li>Patient bills</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <h4>Gold</h4>
+          <ul>
+            <li>All Silver features</li>
+            <li>Medical records</li>
+            <li>Paramedical care</li>
+            <li>Advanced analytics</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

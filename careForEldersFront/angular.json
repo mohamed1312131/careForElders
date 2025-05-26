@@ -37,7 +37,10 @@
               "src/styles.scss",
               "src/assets/scss/style.scss",
               "node_modules/ngx-toastr/toastr.css"
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
             ],
             "scripts": []
           },
