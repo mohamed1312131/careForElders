@@ -37,6 +37,12 @@ export const FrontOfficeRoutes: Routes = [
     data: { preload: true }
   },
   {
+    path: 'abonnement',
+    loadChildren: () =>
+      import('./subscription/subscription.module').then((m) => m.SubscriptionModule),
+  },
+
+  {
     path: 'users',
     component: UsersComponent,
   },

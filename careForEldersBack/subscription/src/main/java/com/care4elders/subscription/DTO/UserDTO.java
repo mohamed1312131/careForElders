@@ -13,7 +13,8 @@ public class UserDTO {
     private String email;
     private String role;  // "ADMIN", "DOCTOR", "PATIENT", etc.
     private boolean active;
-
+    private String currentSubscriptionId;  // ID of active UserSubscription (in subscription service)
+    private String currentPlanName;
     // Add other fields that your user service returns
     // (phone number, address, etc.) as needed
 }

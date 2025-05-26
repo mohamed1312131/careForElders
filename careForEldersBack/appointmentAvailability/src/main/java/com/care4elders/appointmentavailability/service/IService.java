@@ -13,10 +13,12 @@ public interface IService {
     Reservation updateReservation(String id, Reservation r);     // Update
     void deleteReservation(String id);
     List<Reservation> getReservationsByUserId(String userId);
-  //  List<UserDTO> GetAllUsers();
+    List<Reservation> getReservationsByDoctorId(String DoctorId);
+    //  List<UserDTO> GetAllUsers();
     UserDTO getUserById(String userId);
 
     List<UserDTO> getAllUsers();
     List<UserDTO> getAllDoctors();
     UserDTO getDoctorById(String doctorId);
+
 }

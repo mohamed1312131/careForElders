@@ -1,0 +1,41 @@
+<p>event-details-dialog works!</p>
+<h2 mat-dialog-title>
+  {{ data.meta?.type === 'reservation' ? 'Appointment Details' : 'Availability Slot Details' }}
+</h2>
+
+<mat-dialog-content>
+  <p><strong>Start:</strong> {{ data.start | date: 'short' }}</p>
+  <p><strong>End:</strong> {{ data.end | date: 'short' }}</p>
+
+  <div *ngIf="data.meta?.type === 'reservation'">
+    <p><strong>Status:</strong> {{ data.meta?.status }}</p>
+    <p><strong>Meeting Link:</strong> {{ data.meta?.meetingLink || 'N/A' }}</p>
+    <p><strong>Type:</strong> {{ data.meta?.data?.reservationType }}</p>
+  </div>
+
+  <div *ngIf="data.meta?.type === 'availability'">
+    <p><strong>Duration:</strong> {{ data.meta?.slotDuration }} min</p>
+    <p><strong>Slot ID:</strong> {{ data.meta?.data?.id }}</p>
+  </div>
+</mat-dialog-content>
+<button *ngIf="data.meta?.meetingLink" mat-button (click)="startCall(data.meta.meetingLink)">
+  Start Video Call
+</button>
+
+  <mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Close</button>
+  <button mat-flat-button color="primary" (click)="onUpdate()">Update</button>
+
+  <button
+    *ngIf="showGoToPayments"
+    mat-stroked-button
+    color="accent"
+    (click)="goToPayments()"
+  >
+    Go to Payments
+  </button>
+</mat-dialog-actions>
+
+
+
+

@@ -36,7 +36,15 @@
             "styles": [
               "src/styles.scss",
               "src/assets/scss/style.scss",
+<<<<<<< HEAD
               "node_modules/ngx-toastr/toastr.css",
+=======
+              "node_modules/ngx-toastr/toastr.css"
+<<<<<<< Updated upstream
+
+=======
+>>>>>>> Stashed changes
+>>>>>>> ghassen
             ],
             "scripts": []
           },
