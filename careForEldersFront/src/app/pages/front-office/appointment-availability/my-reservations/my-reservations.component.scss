@@ -1,0 +1,135 @@
+.container {
+  padding: 2rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+}
+
+/* Calendar container */
+.calendar-container {
+  min-height: 600px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.09);
+  padding: 24px 16px;
+  margin-bottom: 24px;
+}
+
+/* Modern button group styling */
+.btn-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .btn {
+    min-width: 76px;
+    font-weight: 500;
+    border-radius: 20px;
+    transition: background 0.17s, color 0.17s, box-shadow 0.17s;
+    box-shadow: none;
+
+    &.active, &:focus-visible {
+      background: #0d6efd;
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 6px rgba(13,110,253,0.13);
+    }
+    &:hover:not(.active) {
+      background: #e8f0fe;
+      color: #0d6efd;
+    }
+  }
+
+  .navigation-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .current-date {
+      margin-left: 8px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    button[mat-icon-button] {
+      background: transparent;
+      border: none;
+      color: #0d6efd;
+      transition: color 0.17s;
+      &:hover {
+        color: #054cb5;
+        background: #e8f0fe;
+      }
+    }
+    button[mat-stroked-button] {
+      border-radius: 18px;
+      border-color: #0d6efd;
+      color: #0d6efd;
+      font-weight: 500;
+      padding: 2px 20px;
+      min-width: auto;
+      background: #fff;
+      &:hover {
+        background: #0d6efd;
+        color: #fff;
+      }
+    }
+  }
+}
+
+/* Calendar event chip styling */
+.calendar-event {
+  cursor: pointer;
+  border-radius: 16px;
+  font-size: 13px;
+  padding: 2px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #f6f9fb;
+  color: #212529;
+  margin-bottom: 3px;
+  border: 1px solid #e3ebf6;
+  transition: background 0.16s, color 0.16s;
+  &:hover {
+    background: #e7f1ff;
+    color: #0d6efd;
+  }
+}
+
+/* Alert and spinner */
+.alert {
+  margin-top: 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 790px) {
+  .calendar-container {
+    padding: 12px 4px;
+  }
+  .btn-group,
+  .calendar-controls {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-container {
+    min-height: 400px;
+    padding: 8px 0;
+  }
+  .btn-group,
+  .calendar-controls {
+    gap: 6px !important;
+  }
+}
+
+/* Snackbar for success */
+.snackbar-success {
+  background-color: #28a745 !important;
+  color: #fff !important;
+}

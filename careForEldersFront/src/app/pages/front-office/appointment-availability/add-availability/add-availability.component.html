@@ -1,0 +1,35 @@
+<div class="container">
+  <h2>Add Availability</h2>
+  
+  <form (ngSubmit)="submitAvailability()">
+    <!-- Date Picker (Mini Calendar) -->
+    <div class="mb-3">
+      <label class="form-label">Choose a Day</label>
+      <mat-form-field appearance="fill" class="w-100">
+        <input matInput [matDatepicker]="picker" placeholder="Select a date"
+               [(ngModel)]="selectedDate" name="date" required>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Start Time</label>
+      <input type="time" class="form-control" [(ngModel)]="availability.heureDebut" name="heureDebut" required>
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">End Time</label>
+      <input type="time" class="form-control" [(ngModel)]="availability.heureFin" name="heureFin" required>
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Slot Duration (minutes)</label>
+      <select class="form-select" [(ngModel)]="availability.slotDuration" name="slotDuration" required>
+        <option *ngFor="let duration of slotDurations" [value]="duration">{{duration}}</option>
+      </select>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Add Availability</button>
+  </form>
+</div>

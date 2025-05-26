@@ -2,12 +2,13 @@ package com.care4elders.subscription.RestController;
 
 import com.care4elders.subscription.DTO.SubscriptionPlanDTO;
 import com.care4elders.subscription.DTO.UserSubscriptionDTO;
+import com.care4elders.subscription.DTO.UserSubscriptionResponseDTO;
 import com.care4elders.subscription.Service.SubscriptionService;
 import com.care4elders.subscription.entity.SubscriptionPlan;
 import com.care4elders.subscription.entity.UserSubscription;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequestMapping("/api/subscriptions")
 @RequiredArgsConstructor
 public class SubscriptionRestController {
+
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/plans")
@@ -24,6 +26,7 @@ public class SubscriptionRestController {
                                        @RequestBody SubscriptionPlanDTO planDTO) {
         return subscriptionService.createPlan(adminId, planDTO);
     }
+
     @GetMapping("/plans")
     public SubscriptionPlan getAllPlans() {
         return subscriptionService.getAllPlans();
@@ -49,9 +52,34 @@ public class SubscriptionRestController {
         return subscriptionService.assignPlanToUser(subscriptionDTO);
     }
 
+<<<<<<< Updated upstream
     @GetMapping("/user/{userId}")
     public List<UserSubscription> getUserSubscriptions(@PathVariable String userId) {
         return subscriptionService.getUserSubscriptions(userId);
     }
 }
 
+=======
+    @PostMapping("/assign-default/{userId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserSubscription assignDefaultPlan(@PathVariable String userId) {
+        return subscriptionService.assignDefaultPlan(userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<UserSubscriptionResponseDTO>> getSubscriptionsByUser(@PathVariable String userId) {
+        List<UserSubscriptionResponseDTO> userSubscriptions = subscriptionService.getSubscriptionsByUser(userId);
+        return new ResponseEntity<>(userSubscriptions, HttpStatus.OK);
+    }
+
+    @GetMapping("/current/{userId}")
+    public ResponseEntity<UserSubscriptionResponseDTO> getCurrentSubscription(@PathVariable String userId) {
+        UserSubscriptionResponseDTO response = subscriptionService.getCurrentSubscriptionForUser(userId);
+        if (response != null) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+}
+>>>>>>> Stashed changes

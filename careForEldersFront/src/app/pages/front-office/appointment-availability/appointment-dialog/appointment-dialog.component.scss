@@ -1,0 +1,86 @@
+.appointment-card {
+      border-radius: 12px;
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .doctor-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #673ab7;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .appointment-details {
+      padding: 16px 0;
+    }
+
+    .detail-row {
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      width: 100px;
+      color: #555;
+    }
+
+    .detail-value {
+      flex: 1;
+    }
+
+    .w-full {
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .cancel-button {
+      margin-right: 8px;
+      color: #f44336;
+    }
+
+    .confirm-button {
+      background-color: #673ab7;
+      color: white;
+    }
+
+    mat-divider {
+      margin: 16px 0;
+    }
+
+    mat-form-field {
+      margin-bottom: 8px;
+    }
+
+    mat-card-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    mat-card-subtitle {
+      color: rgba(0, 0, 0, 0.87);
+    }
+.snackbar-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
