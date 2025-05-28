@@ -34,9 +34,17 @@ export class LoginComponent {
 
     this.authApi.login({ email, password }).subscribe({
       next: (res: any) => {
+        console.log('✅ Login successful', res);
         localStorage.setItem('token', res.token);
         localStorage.setItem('user_id', res.user.id);
+        localStorage.setItem('role', res.user.roles); // Store role if needed later
+        console.log(res.user.roles)
+
+      if (res.user.roles === 'ADMINISTRATOR') {
+        this.router.navigate(['/admin/dashboard']);
+      } else {
         this.router.navigate(['/user/userProfile']);
+      }
       },
       error: (err: any) => {
         console.error('❌ Login failed', err);

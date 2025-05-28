@@ -31,20 +31,14 @@
     </properties>
     <dependencies>
 
-<<<<<<< HEAD
 
-=======
-<<<<<<< Updated upstream
-        <!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
-=======
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
 
->>>>>>> Stashed changes
->>>>>>> ghassen
+
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
