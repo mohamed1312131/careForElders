@@ -23,8 +23,8 @@
         <module name="nutrition" />
         <module name="medicalRecord" />
         <module name="blogForum" />
-        <module name="appointmentAvailability" />
         <module name="subscription" />
+        <module name="appointmentAvailability" />
         <module name="event" />
       </profile>
       <profile name="Annotation profile for chat" enabled="true">

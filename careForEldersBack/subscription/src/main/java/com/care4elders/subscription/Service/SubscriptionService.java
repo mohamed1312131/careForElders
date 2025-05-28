@@ -3,37 +3,38 @@ package com.care4elders.subscription.Service;
 import com.care4elders.subscription.DTO.SubscriptionPlanDTO;
 import com.care4elders.subscription.DTO.UserDTO;
 import com.care4elders.subscription.DTO.UserSubscriptionDTO;
+import com.care4elders.subscription.DTO.UserSubscriptionResponseDTO;
 import com.care4elders.subscription.entity.SubscriptionPlan;
 import com.care4elders.subscription.entity.UserSubscription;
 import com.care4elders.subscription.exception.EntityNotFoundException;
 import com.care4elders.subscription.exception.ServiceUnavailableException;
 import com.care4elders.subscription.repository.SubscriptionPlanRepo;
 import com.care4elders.subscription.repository.UserSubscriptionRepo;
-import jakarta.annotation.PostConstruct;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Builder
 @Service
 @RequiredArgsConstructor
-
 public class SubscriptionService {
+
     private final SubscriptionPlanRepo subscriptionPlanRepository;
     private final UserSubscriptionRepo userSubscriptionRepository;
     private final RestTemplate restTemplate;
 
-    // Subscription Plan CRUD Operations
+    // Admin operations
     public SubscriptionPlan createPlan(String adminId, SubscriptionPlanDTO planDTO) {
         validateAdmin(adminId);
         SubscriptionPlan plan = new SubscriptionPlan();
-        // Map DTO to entity
         plan.setName(planDTO.getName());
         plan.setPrice(planDTO.getPrice());
         plan.setDurationDays(planDTO.getDurationDays());
@@ -49,7 +50,6 @@ public class SubscriptionService {
         validateAdmin(adminId);
         SubscriptionPlan existingPlan = subscriptionPlanRepository.findById(planId)
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found"));
-        // Update fields
         existingPlan.setName(planDTO.getName());
         existingPlan.setPrice(planDTO.getPrice());
         existingPlan.setDurationDays(planDTO.getDurationDays());
@@ -62,13 +62,13 @@ public class SubscriptionService {
         subscriptionPlanRepository.deleteById(planId);
     }
 
-    // User Subscription Management
+    // Assign user to a plan
     public UserSubscription assignPlanToUser(UserSubscriptionDTO subscriptionDTO) {
         validateUser(subscriptionDTO.getUserId());
         SubscriptionPlan plan = subscriptionPlanRepository.findById(subscriptionDTO.getPlanId())
                 .orElseThrow(() -> new EntityNotFoundException("Plan not found"));
 
-        // Deactivate any existing active subscription
+        // Deactivate existing active subscription
         userSubscriptionRepository.findByUserIdAndIsActive(subscriptionDTO.getUserId(), true)
                 .ifPresent(existing -> {
                     existing.setActive(false);
@@ -81,23 +81,64 @@ public class SubscriptionService {
         newSubscription.setStartDate(LocalDateTime.now());
         newSubscription.setEndDate(LocalDateTime.now().plusDays(plan.getDurationDays()));
         newSubscription.setActive(true);
-
         return userSubscriptionRepository.save(newSubscription);
     }
 
-    public List<UserSubscription> getUserSubscriptions(String userId) {
+    public UserSubscription assignDefaultPlan(String userId) {
+        if (userSubscriptionRepository.existsByUserIdAndIsActive(userId, true)) {
+            throw new RuntimeException("User already has an active subscription");
+        }
 
-        return userSubscriptionRepository.findByUserId(userId);
+        SubscriptionPlan basicPlan = subscriptionPlanRepository.findByName("BASIC")
+                .orElseThrow(() -> new RuntimeException("Basic plan not found"));
+
+        UserSubscription subscription = new UserSubscription();
+        subscription.setUserId(userId);
+        subscription.setPlanId(basicPlan.getId());
+        subscription.setStartDate(LocalDateTime.now());
+        subscription.setEndDate(LocalDateTime.now().plusDays(basicPlan.getDurationDays()));
+        subscription.setActive(true);
+
+        return userSubscriptionRepository.save(subscription);
     }
 
+    public List<UserSubscriptionResponseDTO> getSubscriptionsByUser(String userId) {
+        return userSubscriptionRepository.findByUserId(userId).stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public UserSubscriptionResponseDTO getCurrentSubscriptionForUser(String userId) {
+        return userSubscriptionRepository.findByUserIdAndIsActive(userId, true)
+                .map(this::mapToResponseDTO)
+                .orElse(null);
+    }
+
+    private UserSubscriptionResponseDTO mapToResponseDTO(UserSubscription subscription) {
+        if (subscription == null) {
+            return null;
+        }
+
+        SubscriptionPlan plan = subscriptionPlanRepository.findById(subscription.getPlanId())
+                .orElseThrow(() -> new EntityNotFoundException("Plan not found with id: " + subscription.getPlanId()));
+
+        return UserSubscriptionResponseDTO.builder()
+                .userId(subscription.getUserId())
+                .planId(subscription.getPlanId())
+                .startDate(subscription.getStartDate())
+                .endDate(subscription.getEndDate())
+                .active(subscription.isActive())
+                .planName(plan.getName())
+                .price(plan.getPrice())
+                .durationDays(plan.getDurationDays())
+                .features(plan.getFeatures())
+                .build();
+    }
+
+    // Internal validators
     private void validateAdmin(String adminId) {
         try {
-            UserDTO admin = restTemplate.getForObject(
-                    "http://USER-SERVICE/users/{Id}",
-                    UserDTO.class,
-                    adminId
-            );
-
+            UserDTO admin = restTemplate.getForObject("http://USER-SERVICE/users/{Id}", UserDTO.class, adminId);
             if (admin == null || !"ADMINISTRATOR".equals(admin.getRole())) {
                 throw new EntityNotFoundException("Admin not found or invalid role");
             }
@@ -110,12 +151,7 @@ public class SubscriptionService {
 
     private void validateUser(String userId) {
         try {
-            UserDTO user = restTemplate.getForObject(
-                    "http://USER-SERVICE/users/{Id}",
-                    UserDTO.class,
-                    userId
-            );
-
+            UserDTO user = restTemplate.getForObject("http://USER-SERVICE/users/{Id}", UserDTO.class, userId);
             if (user == null) {
                 throw new EntityNotFoundException("User not found");
             }

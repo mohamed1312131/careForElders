@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core"
-import { BrowserModule } from "@angular/platform-browser"
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { HttpClientModule } from "@angular/common/http"
 
@@ -31,16 +30,13 @@ import { FrontOfficeModule } from "./pages/front-office/front-office.module"
 // ToastrModule for Toastr notifications
 import { ToastrModule } from 'ngx-toastr';
 import { UserinfoComponent } from './pages/front-office/user-service/userinfo/userinfo.component';
-import {UsersComponent} from "./pages/front-office/user-service/user/user.component";
+
 import {MedicalRecordComponent} from "./pages/front-office/medical-record/medical-record/medical-record.component";
 import {AddNoteDialogComponent} from "./pages/front-office/medical-record/add-note-dialog/add-note-dialog.component";
 import {TruncatePipe} from "./pages/front-office/medical-record/truncate.pipe";
 import {
   DocumentPreviewDialogComponent
 } from "./pages/front-office/medical-record/document-preview-dialog/document-preview-dialog.component";
-import {
-  MedicalRecordListComponent
-} from "./pages/front-office/medical-record/medical-records-list/medical-records-list.component";
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
@@ -63,6 +59,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {PlanListComponent} from "./pages/front-office/nutrition/plan-list/plan-list.component";
 import {PlanDetailsComponent} from "./pages/front-office/nutrition/plan-details/plan-details.component";
 import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dashboard/admin-dashboard.component";
+import { CommonModule } from "@angular/common"
 
 @NgModule({
   declarations: [
@@ -83,7 +80,7 @@ import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dash
     AdminDashboardComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule, // Required for animations
