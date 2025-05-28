@@ -11,28 +11,16 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./pages/front-office/front-office.module').then(m => m.FrontOfficeModule),
   },
+  {
+    path: 'authentication',
+    loadChildren: () =>
+    import('./pages/authentication/authentication.module').then((m) => m.AuthenticationModule),
+  },
 
   // Admin routes
   {
     path: 'admin',
-    component: BlankComponent,
-    children: [
-      {
-        path: '',
-        redirectTo: 'authentication/login',
-        pathMatch: 'full',
-      },
-      {
-        path: 'authentication',
-        loadChildren: () =>
-          import('./pages/authentication/authentication.module').then((m) => m.AuthenticationModule),
-      },
-    ],
-  },
-  {
-    path: 'admin',
     component: FullComponent,
-
     children: [
       {
         path: 'dashboard',
@@ -50,15 +38,8 @@ const routes: Routes = [
           import('./pages/extra/extra.module').then((m) => m.ExtraModule),
       },
       { path: 'medical-record', component: MedicalRecordComponent },
-
     ],
-  },
-
-  // Wildcard route for a 404 page
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  }
 ];
 
 @NgModule({

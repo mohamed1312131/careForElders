@@ -13,8 +13,6 @@ import {ConfirmDialogComponent} from "./front-office/user-service/user/confirm-d
 import {UserDialogComponent} from "./front-office/user-service/user/user-dialog/user-dialog.component";
 import { MatChipsModule } from '@angular/material/chips';
 import {MatDialogModule} from "@angular/material/dialog";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {ToastrModule} from "ngx-toastr";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
@@ -50,7 +48,6 @@ import {MatIconModule} from "@angular/material/icon";
     ReactiveFormsModule,
     MatChipsModule,
     MatDialogModule,
-    BrowserAnimationsModule,
     MatSidenavModule,
     MatToolbarModule,
     MatIconModule,

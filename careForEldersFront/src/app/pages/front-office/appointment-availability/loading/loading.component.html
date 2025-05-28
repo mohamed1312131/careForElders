@@ -1,0 +1,45 @@
+<p>loading works!</p>
+<div class="loading-overlay">
+  <main>
+    <!-- SVG icons -->
+    <svg width="0" height="0" aria-hidden="true">
+      <symbol id="check-circle" viewBox="0 0 16 16">
+        <circle fill="currentcolor" cx="8" cy="8" r="8" />
+        <polyline fill="none" stroke="var(--bg)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" points="4 8,7 11,12 5" />
+      </symbol>
+      <symbol id="empty-circle" viewBox="0 0 16 16">
+        <defs>
+          <rect id="empty-circle-rect" x="-1" width="2" height="2" />
+        </defs>
+        <g fill="currentcolor" transform="translate(8,8)">
+          <ng-container *ngFor="let r of rectAngles">
+            <use [attr.href]="'#empty-circle-rect'" [attr.transform]="'rotate(' + r + ') translate(0,6)'" />
+          </ng-container>
+        </g>
+      </symbol>
+      <symbol id="half-circle" viewBox="0 0 16 16">
+        <clipPath id="half-circle-clip">
+          <rect x="8" y="0" width="8" height="16" />
+        </clipPath>
+        <circle fill="none" stroke="currentcolor" stroke-width="2" cx="8" cy="8" r="7" />
+        <circle fill="currentcolor" cx="8" cy="8" r="5" clip-path="url(#half-circle-clip)" />
+      </symbol>
+    </svg>
+    <div [ngClass]="{'loading': true, 'loading--done': allStepsDone}">
+      <div class="loading__steps">
+        <ng-container *ngFor="let s of stepObjects; let i = index">
+          <app-loading-step-block
+            [state]="s.state"
+            [title]="s.title"
+            [distance]="getDistance(i)"
+            [fade]="getFade(i)"
+            [start]="s.start"
+            [finish]="s.finish"
+            [filesPrepared]="s.filesPrepared"
+            [filesPreparedMax]="s.filesPreparedMax">
+          </app-loading-step-block>
+        </ng-container>
+      </div>
+    </div>
+  </main>
+</div>
