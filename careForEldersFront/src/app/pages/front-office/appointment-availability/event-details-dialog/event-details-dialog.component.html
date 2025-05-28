@@ -1,4 +1,3 @@
-<p>event-details-dialog works!</p>
 <h2 mat-dialog-title>
   {{ data.meta?.type === 'reservation' ? 'Appointment Details' : 'Availability Slot Details' }}
 </h2>
@@ -16,16 +15,39 @@
   <div *ngIf="data.meta?.type === 'availability'">
     <p><strong>Duration:</strong> {{ data.meta?.slotDuration }} min</p>
     <p><strong>Slot ID:</strong> {{ data.meta?.data?.id }}</p>
+  
+    <!-- Show Booked button if isBooked is true -->
+    <button mat-raised-button color="warn" disabled *ngIf="data.meta?.isBooked">
+      Booked
+    </button>
+    <!-- Show Book button if not booked -->
+    <button mat-flat-button color="primary"
+            *ngIf="!data.meta?.isBooked"
+            (click)="bookSlot(data.meta.data)">
+      Book
+    </button>
   </div>
 </mat-dialog-content>
-<button *ngIf="data.meta?.meetingLink" mat-button (click)="startCall(data.meta.meetingLink)">
+
+<!-- Only show Start Video Call if not in the past and meetingLink exists -->
+<button
+  *ngIf="data.meta?.meetingLink && !data.meta?.isPast"
+  mat-button
+  (click)="startCall(data.meta.meetingLink)">
   Start Video Call
 </button>
 
-  <mat-dialog-actions align="end">
+<mat-dialog-actions align="end">
   <button mat-button (click)="close()">Close</button>
-  <button mat-flat-button color="primary" (click)="onUpdate()">Update</button>
-
+  <!-- Update button: only for reservation and not past -->
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onUpdate()"
+    *ngIf="data.meta?.type === 'reservation' && !data.meta?.isPast"
+  >
+    Update
+  </button>
   <button
     *ngIf="showGoToPayments"
     mat-stroked-button
@@ -35,7 +57,3 @@
     Go to Payments
   </button>
 </mat-dialog-actions>
-
-
-
-

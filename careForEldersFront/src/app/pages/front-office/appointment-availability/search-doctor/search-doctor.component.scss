@@ -1,21 +1,88 @@
-.card-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-  }
-  
-  .user-card {
-    background-color: #f4f4f4;
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    width: 250px;
+.doctor-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h2 {
     text-align: center;
-    transition: transform 0.2s;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+    font-weight: 500;
   }
-  
-  .user-card:hover {
-    transform: translateY(-5px);
+
+  .doctor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
   }
-  
+
+  .doctor-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  .doctor-avatar {
+    height: 180px;
+    background-color: #f0f8ff;  // light blue background
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  .doctor-info {
+    padding: 1.5rem;
+    text-align: center;
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      color: #2c3e50;
+    }
+
+    .role {
+      color: #3498db;
+      font-weight: 500;
+      margin: 0 0 1rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .email {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .notice {
+      font-style: italic;
+      color: #95a5a6;
+      font-size: 0.8rem;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}

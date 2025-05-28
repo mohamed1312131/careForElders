@@ -12,11 +12,13 @@ import { JitsiDialogComponent } from '../jitsi-dialog/jitsi-dialog.component';
 export class EventDetailsDialogComponent {
    @Input() appointment: any;
   showGoToPayments: boolean = false;
+  reservationMeta : any;
 
   constructor(
     public dialogRef: MatDialogRef<EventDetailsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: CalendarEvent & { fromMySchedule?: boolean },
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {
     
     this.showGoToPayments = !!data.fromMySchedule;
@@ -28,7 +30,12 @@ export class EventDetailsDialogComponent {
 
   onUpdate(): void {
     console.log('Update clicked for:', this.data.meta);
-    // Add update logic
+    // Save the reservation meta to localStorage
+    localStorage.setItem('reservationToUpdate', JSON.stringify(this.reservationMeta));
+    // Redirect to the calendar view of the doctor, tell calendar to go into "update" mode
+    this.router.navigate(['/user/userProfile/doctor/', this.reservationMeta.data.doctorId], {
+      queryParams: { update: 'true' }
+    });
   }
 
   goToPayments(): void {
@@ -45,5 +52,10 @@ startCall(meetingLink: string) {
     data: { roomName: meetingId }
   });
 }
+bookSlot(slot: any): void {
+    console.log('Booking slot:', slot);
+    // You can add more logic here (API call, feedback, etc.)
+  }
+
 
 }

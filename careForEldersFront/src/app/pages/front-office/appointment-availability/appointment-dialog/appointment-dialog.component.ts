@@ -82,93 +82,101 @@ import { formatDate } from '@angular/common';
   `,
   styles: [`
     .appointment-card {
-      border-radius: 12px;
-      padding: 20px;
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      font-family: 'Roboto', sans-serif;
-    }
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 520px;
+  margin: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+}
 
-    .doctor-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #673ab7;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-    }
+.doctor-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #673ab7, #512da8);
+  color: #fff;
+  font-weight: 600;
+  font-size: 18px;
+}
 
-    .appointment-details {
-      padding: 16px 0;
-    }
+.appointment-details {
+  padding-top: 20px;
+}
 
-    .detail-row {
-      display: flex;
-      margin-bottom: 12px;
-    }
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 15px;
+}
 
-    .detail-label {
-      font-weight: 500;
-      width: 100px;
-      color: #555;
-    }
+.detail-label {
+  font-weight: 500;
+  color: #444;
+}
 
-    .detail-value {
-      flex: 1;
-      padding: 8px 0;
-    }
+.detail-value {
+  color: #222;
+}
 
-    .w-full {
-      width: 100%;
-      margin-top: 16px;
-    }
+.w-full {
+  width: 100%;
+  margin-top: 16px;
+}
 
-    .presentiel-button {
-      background-color: #673ab7;
-      color: white;
-      margin-right: 8px;
-    }
+.presentiel-button {
+  background-color: #673ab7;
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 6px 16px;
+}
 
-    .enligne-button {
-      background-color: #ff4081;
-      color: white;
-    }
+.enligne-button {
+  background-color: #ff4081;
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 6px 16px;
+}
 
-    mat-divider {
-      margin: 16px 0;
-    }
+mat-divider {
+  margin: 20px 0;
+}
 
-    mat-form-field {
-      margin-bottom: 8px;
-    }
+mat-form-field {
+  margin-bottom: 14px;
+}
 
-    mat-card-title {
-      font-size: 1.25rem;
-      font-weight: 500;
-    }
+mat-card-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+}
 
-    mat-card-subtitle {
-      color: rgba(0, 0, 0, 0.87);
-    }
+mat-card-subtitle {
+  font-size: 0.95rem;
+  color: #555;
+}
 
-    .error-snackbar {
-      background-color: #f44336;
-      color: white;
-    }
-    .loading-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.6);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.error-snackbar {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
   `]
 })
 

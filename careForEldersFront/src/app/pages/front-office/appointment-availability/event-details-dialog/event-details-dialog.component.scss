@@ -1,78 +1,90 @@
+:host {
+  display: block;
+  min-width: 340px;
+  max-width: 420px;
+}
+
+h2[mat-dialog-title] {
+  margin: 0 0 16px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #3f51b5;
+  text-align: center;
+}
+
 mat-dialog-content {
+  font-size: 1rem;
+  color: #333;
+  padding-bottom: 16px;
   p {
-    margin: 0 0 8px;
+    margin: 0 0 8px 0;
+    strong {
+      color: #2e3a59;
+      font-weight: 500;
+      min-width: 90px;
+      display: inline-block;
+    }
+  }
+
+  div {
+    margin-top: 8px;
+  }
+
+  button[mat-raised-button], button[mat-flat-button] {
+    margin-top: 14px;
+    width: 100%;
+    font-weight: 500;
+    font-size: 1.1rem;
   }
 }
-.appointment-card {
-      border-radius: 12px;
-      padding: 20px;
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-      font-family: 'Roboto', sans-serif;
-    }
 
-    .doctor-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #673ab7;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-    }
+button[mat-button] {
+  color: #3f51b5;
+  font-weight: 500;
+  &:hover {
+    background: #e3e8fd;
+  }
+}
 
-    .appointment-details {
-      padding: 16px 0;
-    }
+button[mat-flat-button][color="primary"] {
+  background: #1976d2;
+  color: #fff;
+  &:hover {
+    background: #1565c0;
+  }
+}
 
-    .detail-row {
-      display: flex;
-      margin-bottom: 12px;
-    }
+button[mat-raised-button][color="warn"] {
+  background: #ef5350;
+  color: #fff;
+}
 
-    .detail-label {
-      font-weight: 500;
-      width: 100px;
-      color: #555;
-    }
+button[mat-stroked-button][color="accent"] {
+  border-color: #ff9800;
+  color: #ff9800;
+  &:hover {
+    background: #fff3e0;
+  }
+}
 
-    .detail-value {
-      flex: 1;
-    }
+mat-dialog-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  button {
+    min-width: 110px;
+  }
+}
 
-    .w-full {
-      width: 100%;
-      margin-top: 16px;
-    }
-
-    .cancel-button {
-      margin-right: 8px;
-      color: #f44336;
-    }
-
-    .confirm-button {
-      background-color: #673ab7;
-      color: white;
-    }
-
-    mat-divider {
-      margin: 16px 0;
-    }
-
-    mat-form-field {
-      margin-bottom: 8px;
-    }
-
-    mat-card-title {
-      font-size: 1.25rem;
-      font-weight: 500;
-    }
-
-    mat-card-subtitle {
-      color: rgba(0, 0, 0, 0.87);
-    }
-  
+@media (max-width: 500px) {
+  :host {
+    min-width: 95vw;
+    max-width: 98vw;
+  }
+  mat-dialog-content, mat-dialog-actions {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
