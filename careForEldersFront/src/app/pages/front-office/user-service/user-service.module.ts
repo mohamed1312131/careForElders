@@ -18,7 +18,7 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     UserServiceRoutingModule,
-    ChatModule,
+
     AppointmentAvailabilityModule,
     SubscriptionModule,
     ParamedicalCareModule,
