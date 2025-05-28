@@ -1,7 +1,9 @@
 package com.care4elders.blogforum.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,18 +20,20 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-
+import com.care4elders.blogforum.dto.FileUploadResult;
+import com.care4elders.blogforum.dto.PostImageRequest;
 import com.care4elders.blogforum.dto.PostRequest;
 import com.care4elders.blogforum.exception.PostNotFoundException;
 import com.care4elders.blogforum.exception.ValidationError;
 import com.care4elders.blogforum.exception.ValidationErrorResponse;
-
 import com.care4elders.blogforum.model.LikePost;
 import com.care4elders.blogforum.model.Post;
+import com.care4elders.blogforum.service.FileUploadService;
 import com.care4elders.blogforum.service.PostService;
-
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -41,8 +45,8 @@ import lombok.AllArgsConstructor;
 public class PostController {
     
     private final PostService postService;
+    private final FileUploadService fileUploadService;
 
-    
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
@@ -113,6 +117,99 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
 
+    /**
+     * Upload single image for post
+     */
+    @PostMapping("/upload-image")
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            FileUploadResult result = fileUploadService.uploadImage(file);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Upload multiple images for post
+     */
+    @PostMapping("/upload-images")
+    public ResponseEntity<?> uploadMultipleImages(@RequestParam("files") MultipartFile[] files) {
+        try {
+            List<FileUploadResult> results = new ArrayList<>();
+            for (MultipartFile file : files) {
+                FileUploadResult result = fileUploadService.uploadImage(file);
+                results.add(result);
+            }
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Create post with image support
+     */
+    @PostMapping("/with-images")
+    public ResponseEntity<?> createPostWithImages(
+            @RequestPart("post") @Valid PostRequest postRequest,
+            @RequestPart(value = "featuredImage", required = false) MultipartFile featuredImage,
+            @RequestPart(value = "additionalImages", required = false) MultipartFile[] additionalImages,
+            BindingResult bindingResult) {
+        
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(createValidationErrorResponse(bindingResult));
+        }
+        
+        try {
+            // Handle featured image upload
+            if (featuredImage != null && !featuredImage.isEmpty()) {
+                FileUploadResult featuredResult = fileUploadService.uploadImage(featuredImage);
+                postRequest.setFeaturedImageUrl(featuredResult.getFileUrl());
+                postRequest.setFeaturedImageName(featuredResult.getFileName());
+                postRequest.setFeaturedImageType(featuredResult.getFileType());
+                postRequest.setFeaturedImageSize(featuredResult.getFileSize());
+            }
+            
+            // Handle additional images upload
+            if (additionalImages != null && additionalImages.length > 0) {
+                List<PostImageRequest> imageRequests = new ArrayList<>();
+                for (int i = 0; i < additionalImages.length; i++) {
+                    MultipartFile file = additionalImages[i];
+                    if (!file.isEmpty()) {
+                        FileUploadResult result = fileUploadService.uploadImage(file);
+                        PostImageRequest imageRequest = PostImageRequest.builder()
+                                .url(result.getFileUrl())
+                                .fileName(result.getFileName())
+                                .fileType(result.getFileType())
+                                .fileSize(result.getFileSize())
+                                .order(i)
+                                .build();
+                        imageRequests.add(imageRequest);
+                    }
+                }
+                postRequest.setAdditionalImages(imageRequests);
+            }
+            
+            // TODO: Get actual user ID and name from authentication
+            String authorId = "doctor123";
+            String authorName = "Doctor";
+            
+            Post createdPost = postService.createPost(postRequest, authorId, authorName);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
+            
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to create post: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
     
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(
@@ -144,8 +241,6 @@ public class PostController {
         }
     }
     
-  
-    
     @PostMapping("/{id}/like")
     public ResponseEntity<?> likePost(@PathVariable String id) {
         // TODO: Get actual user ID from authentication
@@ -158,8 +253,6 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
     }
-    
-
     
     @DeleteMapping("/{id}/like")
     public ResponseEntity<Void> removeLike(@PathVariable String id) {
@@ -190,6 +283,27 @@ public class PostController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    /**
+     * Delete image from post
+     */
+    @DeleteMapping("/{postId}/images/{imageId}")
+    public ResponseEntity<?> deleteImageFromPost(
+            @PathVariable String postId,
+            @PathVariable String imageId) {
+        
+        try {
+            postService.removeImageFromPost(postId, imageId);
+            return ResponseEntity.noContent().build();
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Failed to delete image: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+    
     private ValidationErrorResponse createValidationErrorResponse(BindingResult bindingResult) {
         ValidationErrorResponse errorResponse = new ValidationErrorResponse();
         

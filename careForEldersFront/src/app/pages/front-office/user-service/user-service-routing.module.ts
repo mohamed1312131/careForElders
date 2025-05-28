@@ -146,7 +146,7 @@ const routes: Routes = [
         ]
       },
 
-            { path: "blog", component: PostListComponent },
+            { path: "post", component: PostListComponent },
             { path: "post/create", component: PostFormComponent },
             { path: "post/edit/:id", component: PostFormComponent },
             { path: "post/:id", component: PostDetailComponent },

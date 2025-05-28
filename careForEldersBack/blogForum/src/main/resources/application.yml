@@ -14,8 +14,15 @@ eureka:
   instance:
     prefer-ip-address: true
 
-# user this while running docker-composee
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://service-registry:8761/eureka/
+# Custom upload settings
+app:
+  upload:
+    dir: uploads
+    max-file-size: 5242880  # 5MB in bytes
+  # Google Cloud Speech-to-Text Settings
+google:
+  cloud:
+    speech:
+      language-code: en-US  # Default language
+      encoding: LINEAR16   # Default audio encoding
+      sample-rate-hertz: 16000

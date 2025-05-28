@@ -34,4 +34,7 @@ public interface PostService {
     
     // Comment-related methods
     void updateCommentsCount(String postId, long commentsCount);
+    
+    // New image-related methods
+    void removeImageFromPost(String postId, String imageId) throws PostNotFoundException;
 }
