@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {PhotoService} from "../../../services/photo.service"
+import { AbonnementService } from '../../front-office/subscription/service-abonnement/abonnement.service';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
@@ -15,8 +16,14 @@ export class RegisterComponent {
   verifying = false;
   verified = false;
   errorMessage: string = '';
+  user: any;
   private successMessage: string='';
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router ,private PhotoService:PhotoService) {
+  constructor(
+    private abonnementsrvice:AbonnementService ,
+    private fb: FormBuilder, 
+    private http: HttpClient,
+     private router: Router ,
+     private PhotoService:PhotoService) {
     this.registerForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -45,17 +52,27 @@ export class RegisterComponent {
     this.loading = true;
 
     this.http.post('http://localhost:8081/users', this.registerForm.value).subscribe({
-      next: () => {
+      next: (x) => {
         this.showVerification = true;
         this.loading = false;
-        console.log('Registration successful!', this.registerForm.value);
-      },
-      error: (err) => {
-        console.error(err);
-        this.loading = false;
-        this.errorMessage = err?.error || 'Something went wrong';
-      }
-    });
+        this.user = x;
+        console.log(this.user)
+         this.abonnementsrvice.assignDefaultPlan(this.user.id).subscribe({
+        next: (res) => {
+          console.log('✅ Default subscription assigned:', res);
+        },
+        error: (err) => {
+          console.error('❌ Error assigning default subscription:', err);
+        }
+      });
+
+    },
+    error: (err) => {
+      console.error(err);
+      this.loading = false;
+      this.errorMessage = err?.error || 'Something went wrong';
+    }
+  });
   }
 
   verifyToken() {
