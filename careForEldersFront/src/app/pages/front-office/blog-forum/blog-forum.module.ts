@@ -29,14 +29,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-//import { MatTooltipModule } from '@angular/material/tooltip';
+import { SpeechToTextComponent } from './speech-to-text/speech-to-text.component';
+import { SpeechToTextService } from './speech-to-text.service';
+
 
 @NgModule({
   declarations: [
     PostListComponent, 
     PostDetailComponent, 
     PostFormComponent, 
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    SpeechToTextComponent
   ],
   imports: [
     CommonModule,
@@ -65,7 +68,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   providers: [
     PostService,
-    CommentService
+    CommentService,
+    SpeechToTextService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

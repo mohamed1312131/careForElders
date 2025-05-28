@@ -4,6 +4,7 @@ import { MatSnackBar } from "@angular/material/snack-bar"
 import { MatDialog } from "@angular/material/dialog"
 import { PageEvent } from "@angular/material/paginator"
 import { PostService } from "../post.service"
+import { CommentService } from "../comment.service"
 import { Post } from "../models/post.model"
 import { ConfirmDialogComponent } from "../confirm-dialog/confirm-dialog.component"
 
@@ -21,9 +22,24 @@ export class PostListComponent implements OnInit {
   searchTerm = ""
   searchType = "title"
   currentUserId = "user123" // This should come from your auth service
+  
+  // Expose Math object to template
+  Math = Math
+  
+  // Filter and sort options
+  sortBy = "createdAt"
+  sortDirection = "desc"
+  filterOptions = [
+    { value: "all", label: "All Posts" },
+    { value: "recent", label: "Recent Posts" },
+    { value: "popular", label: "Most Liked" },
+    { value: "discussed", label: "Most Discussed" }
+  ]
+  selectedFilter = "all"
 
   constructor(
     private postService: PostService,
+    private commentService: CommentService,
     private snackBar: MatSnackBar,
     private router: Router,
     private route: ActivatedRoute,
@@ -34,12 +50,32 @@ export class PostListComponent implements OnInit {
     this.loadPosts()
   }
 
+  // Helper method for pagination display
+  getPaginationText(): string {
+    const start = this.currentPage * this.pageSize + 1
+    const end = Math.min((this.currentPage + 1) * this.pageSize, this.totalPosts)
+    return `Showing ${start} - ${end} of ${this.totalPosts} posts`
+  }
+
+  // Alternative helper methods for template
+  getStartIndex(): number {
+    return this.currentPage * this.pageSize + 1
+  }
+
+  getEndIndex(): number {
+    return Math.min((this.currentPage + 1) * this.pageSize, this.totalPosts)
+  }
+
   loadPosts(): void {
     this.isLoading = true
     this.postService.getPosts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.posts = response.content
         this.totalPosts = response.totalElements
+        
+        // Load accurate comment counts for each post
+        this.loadCommentCounts()
+        
         this.isLoading = false
       },
       error: (error) => {
@@ -52,6 +88,43 @@ export class PostListComponent implements OnInit {
     })
   }
 
+  loadCommentCounts(): void {
+    // Load comment counts for all posts
+    this.posts.forEach(post => {
+      this.commentService.getCommentsByPostId(post.id).subscribe({
+        next: (comments) => {
+          post.commentsCount = comments.length
+        },
+        error: (error) => {
+          console.error(`Error loading comments for post ${post.id}`, error)
+          post.commentsCount = 0
+        }
+      })
+    })
+  }
+
+  onFilterChange(): void {
+    switch (this.selectedFilter) {
+      case "recent":
+        this.sortBy = "createdAt"
+        this.sortDirection = "desc"
+        break
+      case "popular":
+        this.sortBy = "likes"
+        this.sortDirection = "desc"
+        break
+      case "discussed":
+        this.sortBy = "commentsCount"
+        this.sortDirection = "desc"
+        break
+      default:
+        this.sortBy = "createdAt"
+        this.sortDirection = "desc"
+    }
+    this.currentPage = 0
+    this.loadPosts()
+  }
+
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex
     this.pageSize = event.pageSize
@@ -59,18 +132,15 @@ export class PostListComponent implements OnInit {
   }
 
   viewPost(postId: string): void {
-    // Navigate to the post detail page
-    this.router.navigate([postId], { relativeTo: this.route })
+    this.router.navigate(["/user/userProfile/post/", postId], { relativeTo: this.route })
   }
 
   createPost(): void {
-    // Navigate to the create post page
     this.router.navigate(["/user/userProfile/post/create"], { relativeTo: this.route })
   }
 
   editPost(postId: string, event: Event): void {
     event.stopPropagation()
-    // Navigate to the edit post page
     this.router.navigate(["/user/userProfile/post/edit", postId], { relativeTo: this.route })
   }
 
@@ -110,7 +180,6 @@ export class PostListComponent implements OnInit {
   likePost(post: Post, event: Event): void {
     event.stopPropagation()
 
-    // Check if user already liked the post
     const alreadyLiked = post.likes.some((like) => like.userId === this.currentUserId)
 
     if (alreadyLiked) {
@@ -186,6 +255,7 @@ export class PostListComponent implements OnInit {
     searchObservable.subscribe({
       next: (posts) => {
         this.posts = posts
+        this.loadCommentCounts() // Load comment counts for search results
         this.isLoading = false
       },
       error: (error) => {
@@ -201,5 +271,27 @@ export class PostListComponent implements OnInit {
   clearSearch(): void {
     this.searchTerm = ""
     this.loadPosts()
+  }
+
+  getTimeAgo(date: Date): string {
+    const now = new Date()
+    const postDate = new Date(date)
+    const diffInMs = now.getTime() - postDate.getTime()
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+    const diffInDays = Math.floor(diffInHours / 24)
+
+    if (diffInHours < 1) {
+      return "Just now"
+    } else if (diffInHours < 24) {
+      return `${diffInHours}h ago`
+    } else if (diffInDays < 7) {
+      return `${diffInDays}d ago`
+    } else {
+      return postDate.toLocaleDateString()
+    }
+  }
+
+  getPostEngagement(post: Post): number {
+    return (post.likes?.length || 0) + (post.commentsCount || 0) + (post.viewCount || 0)
   }
 }

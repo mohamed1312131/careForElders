@@ -1,4 +1,6 @@
 export interface Like {
+    id?: string;
     userId: string;
-    createdAt: string;
+    username?: string;
+    createdAt?: Date;
   }

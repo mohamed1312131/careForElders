@@ -1,77 +1,196 @@
-<div class="post-form-container">
-  <h1>{{ isEditMode ? 'Edit Post' : 'Create New Post' }}</h1>
-
-  <div class="loading-spinner" *ngIf="isLoading">
-    <mat-spinner diameter="40"></mat-spinner>
+<div class="post-create-container">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p *ngIf="isUploadingImages">Uploading images...</p>
+    <p *ngIf="!isUploadingImages">{{ isEditMode ? 'Updating post...' : 'Creating post...' }}</p>
   </div>
 
-  <form [formGroup]="postForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
-    <mat-card>
-      <mat-card-content>
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Title</mat-label>
-          <input matInput formControlName="title" placeholder="Enter post title">
-          <mat-error *ngIf="postForm.get('title')?.hasError('required')">
-            Title is required
-          </mat-error>
-          <mat-error *ngIf="postForm.get('title')?.hasError('maxlength')">
-            Title cannot exceed 100 characters
-          </mat-error>
-          <mat-error *ngIf="serverErrors['title']">
-            {{ serverErrors['title'] }}
-          </mat-error>
-        </mat-form-field>
+  <!-- Header -->
+  <div class="header">
+    <button mat-icon-button class="back-button" (click)="cancel()" matTooltip="Go back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isEditMode ? 'Edit Post' : 'Create New Post' }}</h1>
+  </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Content</mat-label>
-          <textarea matInput formControlName="content" rows="10" placeholder="Write your post content here..."></textarea>
-          <mat-error *ngIf="postForm.get('content')?.hasError('required')">
-            Content is required
-          </mat-error>
-          <mat-error *ngIf="postForm.get('content')?.hasError('minlength')">
-            Content must be at least 10 characters
-          </mat-error>
-          <mat-error *ngIf="serverErrors['content']">
-            {{ serverErrors['content'] }}
-          </mat-error>
-        </mat-form-field>
+  <!-- Main Form -->
+  <form [formGroup]="postForm" (ngSubmit)="onSubmit()" class="post-form">
+    
+    <!-- Title Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Post Title</mat-label>
+      <input matInput formControlName="title" placeholder="Enter an engaging title for your post">
+      <mat-icon matSuffix>title</mat-icon>
+      <mat-error *ngIf="title?.hasError('required')">Title is required</mat-error>
+      <mat-error *ngIf="title?.hasError('minlength')">Title must be at least 5 characters</mat-error>
+      <mat-error *ngIf="title?.hasError('maxlength')">Title cannot exceed 100 characters</mat-error>
+    </mat-form-field>
 
-        <div class="tags-section">
-          <mat-label>Tags</mat-label>
-          
-          <div class="tag-input-container">
-            <mat-form-field appearance="outline" class="tag-input">
-              <mat-label>Add tag</mat-label>
-              <input matInput #tagInput placeholder="Enter a tag and press Enter">
-            </mat-form-field>
-            <button mat-mini-fab color="primary" type="button" (click)="addTagFromInput(tagInput)">
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-          
-          <mat-chip-list>
-            <mat-chip
-              *ngFor="let tag of tagsArray.controls; let i = index"
-              [removable]="true"
-              (removed)="removeTag(i)"
-            >
-              {{ tag.value }}
-              <mat-icon matChipRemove>cancel</mat-icon>
-            </mat-chip>
-          </mat-chip-list>
+    <!-- Content Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Post Content</mat-label>
+      <textarea 
+        matInput 
+        formControlName="content" 
+        placeholder="Share your thoughts, experiences, or knowledge..."
+        rows="12"
+      ></textarea>
+      <mat-icon matSuffix>article</mat-icon>
+      <mat-error *ngIf="content?.hasError('required')">Content is required</mat-error>
+      <mat-error *ngIf="content?.hasError('minlength')">Content must be at least 20 characters</mat-error>
+    </mat-form-field>
+
+    <!-- Image Upload Section -->
+    <div class="image-upload-section">
+      <h3>
+        <mat-icon>image</mat-icon>
+        Images
+      </h3>
+
+      <!-- Featured Image Upload -->
+      <div class="featured-image-upload">
+        <h4>Featured Image</h4>
+        
+        <div 
+          class="image-upload-area"
+          *ngIf="!featuredImagePreview"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event, 'featured')"
+          (click)="featuredImageInput.click()"
+        >
+          <mat-icon class="upload-icon">cloud_upload</mat-icon>
+          <p>Drag and drop an image here, or click to select</p>
+          <small>Supports: JPEG, PNG, GIF, WebP (Max: 5MB)</small>
         </div>
 
-        <mat-slide-toggle formControlName="published" color="primary">
-          Publish immediately
-        </mat-slide-toggle>
-      </mat-card-content>
+        <div class="image-preview" *ngIf="featuredImagePreview">
+          <img [src]="featuredImagePreview" alt="Featured image preview">
+          <div class="image-overlay">
+            <button mat-mini-fab color="primary" (click)="featuredImageInput.click()" matTooltip="Change image">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-mini-fab color="warn" (click)="removeFeaturedImage()" matTooltip="Remove image">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
 
-      <mat-card-actions align="end">
-        <button mat-button type="button" (click)="cancel()">Cancel</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="postForm.invalid || isSubmitting">
-          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update' : 'Create') }}
+        <input 
+          #featuredImageInput
+          type="file" 
+          accept="image/*" 
+          (change)="onFeaturedImageSelected($event)"
+          style="display: none"
+        >
+
+        <!-- Image Metadata -->
+        <div class="image-metadata" *ngIf="featuredImagePreview">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Alt Text</mat-label>
+            <input matInput formControlName="imageAltText" placeholder="Describe the image for accessibility">
+            <mat-icon matSuffix>accessibility</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Caption</mat-label>
+            <input matInput formControlName="imageCaption" placeholder="Add a caption for the image">
+            <mat-icon matSuffix>text_fields</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Additional Images Upload -->
+      <div class="additional-images-section">
+        <h4>Additional Images (Optional)</h4>
+        <p class="section-description">Add up to {{ maxAdditionalImages }} additional images to your post</p>
+        
+        <button 
+          mat-stroked-button 
+          type="button" 
+          (click)="additionalImagesInput.click()"
+          [disabled]="additionalImages.length >= maxAdditionalImages"
+        >
+          <mat-icon>add_photo_alternate</mat-icon>
+          Add Images ({{ additionalImages.length }}/{{ maxAdditionalImages }})
         </button>
-      </mat-card-actions>
-    </mat-card>
+
+        <input 
+          #additionalImagesInput
+          type="file" 
+          accept="image/*" 
+          multiple
+          (change)="onAdditionalImagesSelected($event)"
+          style="display: none"
+        >
+
+        <div class="additional-images-grid" *ngIf="additionalImagePreviews.length > 0">
+          <div 
+            class="additional-image-item" 
+            *ngFor="let preview of additionalImagePreviews; let i = index"
+          >
+            <img [src]="preview" [alt]="'Additional image ' + (i + 1)">
+            <button 
+              mat-mini-fab 
+              color="warn" 
+              class="remove-image-btn"
+              (click)="removeAdditionalImage(i)"
+              matTooltip="Remove image"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tags Field -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tags</mat-label>
+      <mat-chip-grid #chipGrid formArrayName="tags">
+        <mat-chip-row 
+          *ngFor="let tag of tags.controls; let i = index" 
+          [value]="tag.value"
+          (removed)="removeTag(i)"
+        >
+          {{ tag.value }}
+          <button matChipRemove>
+            <mat-icon>cancel</mat-icon>
+          </button>
+        </mat-chip-row>
+        <input 
+          placeholder="Add tags to help others find your post..."
+          [matChipInputFor]="chipGrid"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          (matChipInputTokenEnd)="addTag($event)"
+        />
+      </mat-chip-grid>
+      <mat-icon matSuffix>local_offer</mat-icon>
+      <mat-hint>Press Enter or comma to add tags. Use relevant keywords.</mat-hint>
+    </mat-form-field>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button 
+        mat-button 
+        type="button" 
+        (click)="cancel()"
+        [disabled]="isLoading"
+      >
+        <mat-icon>cancel</mat-icon>
+        Cancel
+      </button>
+      
+      <button 
+        mat-raised-button 
+        color="primary" 
+        type="submit" 
+        [disabled]="postForm.invalid || isLoading"
+      >
+        <mat-icon>{{ isEditMode ? 'save' : 'publish' }}</mat-icon>
+        {{ isEditMode ? 'Update Post' : 'Publish Post' }}
+      </button>
+    </div>
   </form>
 </div>

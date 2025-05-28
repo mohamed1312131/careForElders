@@ -50,4 +50,16 @@ public class Post {
     
     @Builder.Default
     private boolean isDeleted = false;
+    // New image-related fields
+    private String featuredImageUrl;
+    private String featuredImageName;
+    private String featuredImageType;
+    private Long featuredImageSize;
+    
+    @Builder.Default
+    private List<PostImage> additionalImages = new ArrayList<>();
+    
+    // Image metadata
+    private String imageAltText;
+    private String imageCaption;
 }

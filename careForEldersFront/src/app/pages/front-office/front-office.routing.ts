@@ -8,6 +8,7 @@ import {PlanDetailsComponent} from "./nutrition/plan-details/plan-details.compon
 import {AdminDashboardComponent} from "./nutrition/admin-dashboard/admin-dashboard.component";
 import {UsersComponent} from "./user-service/user/user.component";
 import {MedicalRecordListComponent} from "./medical-record/medical-records-list/medical-records-list.component";
+import { PostListComponent } from './blog-forum/post-list/post-list.component';
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -36,10 +37,9 @@ export const FrontOfficeRoutes: Routes = [
     loadChildren: () => import('./appointment-availability/appointment-availability.module').then(m => m.AppointmentAvailabilityModule),
     data: { preload: true }
   },
-  /*{
+  {
     path: "post",
-    loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
-  }, */
+    component:PostListComponent,  }, 
   {
     path: 'users',
     component: UsersComponent,
