@@ -1,119 +1,131 @@
-// speech-recognition.service.ts
-import { Injectable } from '@angular/core';
-import { Subject, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+// src/app/services/speech-recognition.service.ts
+import { Injectable } from "@angular/core"
+import { Observable, Subject } from "rxjs"
 
-@Injectable({ providedIn: 'root' })
+declare global {
+  interface Window {
+    SpeechRecognition: any
+    webkitSpeechRecognition: any
+  }
+}
+
+export interface SpeechRecognitionEvent {
+  resultIndex: number
+  results: SpeechRecognitionResultList
+}
+
+export interface SpeechRecognitionResultList {
+  length: number
+  item(index: number): SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
+}
+
+export interface SpeechRecognitionResult {
+  length: number
+  item(index: number): SpeechRecognitionAlternative
+  [index: number]: SpeechRecognitionAlternative
+  isFinal: boolean
+}
+
+export interface SpeechRecognitionAlternative {
+  transcript: string
+  confidence: number
+}
+
+@Injectable({
+  providedIn: "root",
+})
 export class SpeechRecognitionService {
-  private recognition: any;
-  private speechSubject = new Subject<string>();
-  private finalTranscript = '';
-  private audioChunks: Blob[] = [];
-  private mediaRecorder: MediaRecorder | null = null;
-  private stream: MediaStream | null = null;
+  private recognition: any
+  private isListening = false
+  private transcriptionSubject = new Subject<string>()
 
-  constructor(private http: HttpClient) {}
+  constructor() {
+    this.initializeRecognition()
+  }
 
-  public async startListening(): Promise<void> {
-    this.finalTranscript = '';
-    this.audioChunks = [];
-    
-    try {
-      // Initialize Web Speech API
-      this.initSpeechRecognition();
-      
-      // Initialize audio recording
-      await this.initAudioRecording();
-      
-      this.recognition.start();
-    } catch (error) {
-      console.error('Error initializing speech recognition:', error);
-      throw error;
+  private initializeRecognition() {
+    if (this.isSupported()) {
+      // Use proper type casting to avoid TypeScript errors
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      this.recognition = new SpeechRecognition()
+      this.setupRecognition()
     }
   }
 
-  public stopListening(): void {
-    if (this.recognition) {
-      this.recognition.stop();
-    }
-    if (this.mediaRecorder) {
-      this.mediaRecorder.stop();
-    }
-    this.closeAudioStream();
-  }
+  private setupRecognition() {
+    if (!this.recognition) return
 
-  public getTranscript(): Observable<string> {
-    return this.speechSubject.asObservable();
-  }
+    this.recognition.continuous = true
+    this.recognition.interimResults = true
+    this.recognition.lang = "en-US"
+    this.recognition.maxAlternatives = 1
 
-  private initSpeechRecognition(): void {
-    // @ts-ignore
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SpeechRecognition();
-    this.recognition.continuous = true;
-    this.recognition.interimResults = true;
+    this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let finalTranscript = ""
 
-    this.recognition.onresult = (event: any) => {
-      let interimTranscript = '';
-      
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          this.finalTranscript += transcript + ' ';
-        } else {
-          interimTranscript += transcript;
+        const result = event.results[i]
+        if (result.isFinal) {
+          finalTranscript += result[0].transcript
         }
       }
-      
-      // Emit combined results
-      this.speechSubject.next(this.finalTranscript + interimTranscript);
-    };
+
+      if (finalTranscript.trim()) {
+        this.transcriptionSubject.next(finalTranscript.trim())
+      }
+    }
+
+    this.recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error)
+      this.isListening = false
+
+      // Handle specific errors
+      if (event.error === "not-allowed") {
+        alert("Microphone access denied. Please allow microphone access and try again.")
+      } else if (event.error === "no-speech") {
+        console.log("No speech detected. Try speaking again.")
+      }
+    }
 
     this.recognition.onend = () => {
-      this.processFinalAudio();
-    };
+      this.isListening = false
+    }
+
+    this.recognition.onstart = () => {
+      this.isListening = true
+    }
   }
 
-  private async initAudioRecording(): Promise<void> {
-    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    this.mediaRecorder = new MediaRecorder(this.stream);
-    
-    this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
-      if (event.data.size > 0) {
-        this.audioChunks.push(event.data);
+  startListening(): Observable<string> {
+    if (this.recognition && !this.isListening) {
+      try {
+        this.recognition.start()
+      } catch (error) {
+        console.error("Error starting speech recognition:", error)
       }
-    };
-    
-    this.mediaRecorder.start(1000); // Collect data every 1 second
+    }
+    return this.transcriptionSubject.asObservable()
   }
 
-  private async processFinalAudio(): Promise<void> {
-    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
-      this.mediaRecorder.stop();
-      return;
-    }
-
-    try {
-      const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.wav');
-      formData.append('language', 'en-US'); // Can be dynamic based on user selection
-
-      // Send to Spring Boot backend
-      const response = await this.http.post<any>('/api/speech-to-text', formData).toPromise();
-      this.speechSubject.next(response.transcript);
-    } catch (error) {
-      console.error('Error processing audio:', error);
-      this.speechSubject.error('Error processing speech');
-    } finally {
-      this.closeAudioStream();
+  stopListening(): void {
+    if (this.recognition && this.isListening) {
+      this.recognition.stop()
     }
   }
 
-  private closeAudioStream(): void {
-    if (this.stream) {
-      this.stream.getTracks().forEach(track => track.stop());
-      this.stream = null;
+  isSupported(): boolean {
+    return !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition)
+  }
+
+  getIsListening(): boolean {
+    return this.isListening
+  }
+
+  // Method to change language
+  setLanguage(language: string): void {
+    if (this.recognition) {
+      this.recognition.lang = language
     }
   }
 }

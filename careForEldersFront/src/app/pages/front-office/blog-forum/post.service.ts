@@ -10,7 +10,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 export class PostService {
   private apiUrl = "http://localhost:8084/api/posts" // Updated to match your API URL
   constructor(private http: HttpClient) {}
-//  private apiUrl = "http://localhost:8084/api/speech-to-text"  
+// private apiUrl = "http://localhost:8084/api/speech-to-text"  
   getPosts(page: number = 0, size: number = 10): Observable<PostResponse> {
     const params = new HttpParams()
       .set('page', page.toString())
