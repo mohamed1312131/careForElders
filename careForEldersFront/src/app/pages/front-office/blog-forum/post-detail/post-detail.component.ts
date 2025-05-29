@@ -1,14 +1,13 @@
-import { Component,  OnInit, ViewChild,  OnDestroy } from "@angular/core"
+import { Component,  OnInit,  OnDestroy } from "@angular/core"
 import  { ActivatedRoute, Router } from "@angular/router"
 import  { MatSnackBar } from "@angular/material/snack-bar"
 import  { MatDialog } from "@angular/material/dialog"
 import { Subscription } from "rxjs"
 import  { PostService } from "../post.service"
 import  { CommentService } from "../comment.service"
-import  { SpeechToTextService, RecordingState } from "../speech-to-text.service"
-import { Post } from "../models/post.model"
+import  { Post } from "../models/post.model"
 import  { Comment, CommentRequest } from "../models/comment.model"
-import  { SpeechToTextComponent } from "../speech-to-text/speech-to-text.component"
+import { SpeechRecognitionService } from "../speech-recognition/speech-recognition.service"
 
 @Component({
   selector: "app-post-detail",
@@ -16,8 +15,6 @@ import  { SpeechToTextComponent } from "../speech-to-text/speech-to-text.compone
   styleUrls: ["./post-detail.component.scss"],
 })
 export class PostDetailComponent implements OnInit, OnDestroy {
-  @ViewChild("speechToTextComponent") speechToTextComponent!: SpeechToTextComponent
-
   post: Post | null = null
   comments: Comment[] = []
   filteredComments: Comment[] = []
@@ -29,20 +26,11 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   // Comment form
   newCommentContent = ""
   isSubmittingComment = false
-
-  // Speech-to-text functionality
-  showSpeechToText = false
-  speechToTextLanguage = "en-US"
-  isRecordingForComment = false
-  isRecordingForReply = false
-  recordingState: RecordingState = {
-    isRecording: false,
-    isProcessing: false,
-    duration: 0,
-    error: null,
-    maxDurationReached: false,
-  }
-
+  // Speech recognition states
+  isRecordingComment = false;
+  isRecordingReply = false;
+  
+  private speechRecognitionSub?: Subscription;
   // Reply functionality
   replyingToCommentId: string | null = null
   replyContent = ""
@@ -101,7 +89,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private postService: PostService,
     private commentService: CommentService,
-    private speechToTextService: SpeechToTextService,
+    private speechRecognitionService: SpeechRecognitionService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
   ) {}
@@ -114,171 +102,60 @@ export class PostDetailComponent implements OnInit, OnDestroy {
         this.loadComments()
       }
     })
-
-    // Subscribe to speech-to-text recording state
-    this.subscription.add(
-      this.speechToTextService.recordingState$.subscribe((state) => {
-        this.recordingState = state
-      }),
-    )
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
-    if (this.speechToTextComponent) {
-      this.speechToTextComponent.cancelRecording()
+    this.stopSpeechRecognition();
+  }
+
+    // Speech recognition methods
+    startRecordingForComment(): void {
+      this.isRecordingComment = true;
+      this.isRecordingReply = false;
+      this.startSpeechRecognition("comment");
     }
-  }
-
-  // Speech-to-text methods
-  toggleSpeechToText(): void {
-    this.showSpeechToText = !this.showSpeechToText
-    if (!this.showSpeechToText && this.speechToTextComponent) {
-      this.speechToTextComponent.cancelRecording()
-      this.isRecordingForComment = false
-      this.isRecordingForReply = false
+  
+    startRecordingForReply(): void {
+      this.isRecordingComment = false;
+      this.isRecordingReply = true;
+      this.startSpeechRecognition("reply");
     }
-  }
-
-  startRecordingForComment(): void {
-    this.isRecordingForComment = true
-    this.isRecordingForReply = false
-    this.showSpeechToText = true
-
-    // Focus on comment textarea
-    setTimeout(() => {
-      const textarea = document.getElementById("comment-textarea") as HTMLTextAreaElement
-      if (textarea) {
-        textarea.focus()
-      }
-    }, 100)
-  }
-
-  startRecordingForReply(): void {
-    this.isRecordingForComment = false
-    this.isRecordingForReply = true
-    this.showSpeechToText = true
-
-    // Focus on reply textarea
-    setTimeout(() => {
-      const textarea = document.getElementById("reply-textarea") as HTMLTextAreaElement
-      if (textarea) {
-        textarea.focus()
-      }
-    }, 100)
-  }
-
-  onTranscriptReceived(transcript: string): void {
-    if (this.isRecordingForComment) {
-      // Append to comment content
-      if (this.newCommentContent.trim()) {
-        this.newCommentContent += " " + transcript
-      } else {
-        this.newCommentContent = transcript
-      }
-      this.isRecordingForComment = false
-
-      // Auto-resize textarea
-      setTimeout(() => {
-        const textarea = document.getElementById("comment-textarea") as HTMLTextAreaElement
-        if (textarea) {
-          this.autoResizeTextarea({ target: textarea })
+  
+    private startSpeechRecognition(context: "comment" | "reply"): void {
+      this.stopSpeechRecognition();
+      
+      this.speechRecognitionSub = this.speechRecognitionService.startListening().subscribe({
+        next: (transcript) => {
+          if (context === "comment") {
+            this.newCommentContent = transcript;
+          } else {
+            this.replyContent = transcript;
+          }
+        },
+        error: (err) => {
+          this.snackBar.open(`Speech recognition error: ${err}`, "Close", {
+            duration: 4000,
+            panelClass: ["error-snackbar"],
+          });
+          this.stopSpeechRecognition();
         }
-      }, 100)
-    } else if (this.isRecordingForReply && this.replyingToCommentId) {
-      // Append to reply content
-      if (this.replyContent.trim()) {
-        this.replyContent += " " + transcript
-      } else {
-        this.replyContent = transcript
+      });
+    }
+  
+    stopSpeechRecognition(): void {
+      if (this.speechRecognitionSub) {
+        this.speechRecognitionSub.unsubscribe();
+        this.speechRecognitionSub = undefined;
       }
-      this.isRecordingForReply = false
-
-      // Auto-resize textarea
-      setTimeout(() => {
-        const textarea = document.getElementById("reply-textarea") as HTMLTextAreaElement
-        if (textarea) {
-          this.autoResizeTextarea({ target: textarea })
-        }
-      }, 100)
+      this.speechRecognitionService.stopListening();
+      this.isRecordingComment = false;
+      this.isRecordingReply = false;
     }
-
-    // Auto-hide speech-to-text panel after successful transcription
-    setTimeout(() => {
-      this.showSpeechToText = false
-    }, 1000)
-  }
-
-  onRecordingStateChanged(state: RecordingState): void {
-    this.recordingState = state
-
-    // Show helpful messages
-    if (state.isRecording) {
-      const context = this.isRecordingForComment ? "comment" : "reply"
-      this.snackBar.open(`Recording ${context}... Speak clearly`, "Close", {
-        duration: 2000,
-        panelClass: ["info-snackbar"],
-      })
+  
+    get isSpeechRecognitionSupported(): boolean {
+      return this.speechRecognitionService.isSupported();
     }
-  }
-
-  onTranscriptionCompleted(event: { transcript: string; success: boolean }): void {
-    if (event.success) {
-      const context = this.isRecordingForComment ? "comment" : "reply"
-      this.snackBar.open(`${context} transcribed successfully!`, "Close", {
-        duration: 3000,
-        panelClass: ["success-snackbar"],
-      })
-    }
-  }
-
-  insertTranscriptAtCursor(transcript: string, textareaId: string): void {
-    const textarea = document.getElementById(textareaId) as HTMLTextAreaElement
-    if (textarea) {
-      const start = textarea.selectionStart
-      const end = textarea.selectionEnd
-      const currentValue = textarea.value
-
-      const newValue = currentValue.substring(0, start) + transcript + currentValue.substring(end)
-
-      // Update the model based on which textarea this is
-      if (textareaId === "comment-textarea") {
-        this.newCommentContent = newValue
-      } else if (textareaId === "reply-textarea") {
-        this.replyContent = newValue
-      }
-
-      // Set cursor position after inserted text
-      const newCursorPosition = start + transcript.length
-      setTimeout(() => {
-        textarea.value = newValue
-        textarea.setSelectionRange(newCursorPosition, newCursorPosition)
-        textarea.focus()
-        this.autoResizeTextarea({ target: textarea })
-      }, 0)
-    }
-  }
-
-  get isSpeechToTextSupported(): boolean {
-    return this.speechToTextService.isRecordingSupported()
-  }
-
-  get speechToTextButtonTooltip(): string {
-    if (!this.isSpeechToTextSupported) {
-      return "Speech-to-text not supported in this browser"
-    }
-    if (this.recordingState.isRecording) {
-      return "Recording in progress..."
-    }
-    if (this.recordingState.isProcessing) {
-      return "Processing speech..."
-    }
-    return "Click to add text using voice"
-  }
-
-  // All existing methods from the original component...
-  // (Include all the existing methods from your post-detail.component.ts)
-
   // Post CRUD Operations
   editPost(): void {
     if (!this.post) {
@@ -401,9 +278,6 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     this.cancelEditComment()
     this.cancelEditReply()
     this.cancelReply()
-    this.showSpeechToText = false
-    this.isRecordingForComment = false
-    this.isRecordingForReply = false
   }
 
   submitEditComment(): void {
@@ -946,7 +820,6 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   cancelReply(): void {
     this.replyingToCommentId = null
     this.replyContent = ""
-    this.isRecordingForReply = false
   }
 
   submitReply(): void {

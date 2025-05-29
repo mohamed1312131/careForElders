@@ -29,8 +29,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { SpeechToTextComponent } from './speech-to-text/speech-to-text.component';
-import { SpeechToTextService } from './speech-to-text.service';
+
+import { SpeechRecognitionComponent } from './speech-recognition/speech-recognition.component';
+import { SpeechRecognitionService } from './speech-recognition/speech-recognition.service';
+
 
 
 @NgModule({
@@ -39,7 +41,7 @@ import { SpeechToTextService } from './speech-to-text.service';
     PostDetailComponent, 
     PostFormComponent, 
     ConfirmDialogComponent,
-    SpeechToTextComponent
+    SpeechRecognitionComponent
   ],
   imports: [
     CommonModule,
@@ -69,7 +71,7 @@ import { SpeechToTextService } from './speech-to-text.service';
   providers: [
     PostService,
     CommentService,
-    SpeechToTextService
+    SpeechRecognitionService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

@@ -19,10 +19,4 @@ app:
   upload:
     dir: uploads
     max-file-size: 5242880  # 5MB in bytes
-  # Google Cloud Speech-to-Text Settings
-google:
-  cloud:
-    speech:
-      language-code: en-US  # Default language
-      encoding: LINEAR16   # Default audio encoding
-      sample-rate-hertz: 16000
+
