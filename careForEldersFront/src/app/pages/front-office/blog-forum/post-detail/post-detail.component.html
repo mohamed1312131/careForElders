@@ -86,7 +86,7 @@
                 {{ isPostLikedByUser() ? 'favorite' : 'favorite_border' }}
               </mat-icon>
             </button>
-            <span>{{ post.likes.length || 0 }}</span>
+            <span>{{ post.likes?.length || 0 }}</span>
           </div>
 
           <div class="comment-count">
@@ -176,36 +176,36 @@
         </div>
       </div>
 
-        <!-- Enhanced comment form with speech recognition -->
-        <div class="comment-form">
-          <div class="comment-input-container">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Add a comment</mat-label>
-              <textarea 
-                id="comment-textarea"
-                matInput 
-                [(ngModel)]="newCommentContent" 
-                (input)="autoResizeTextarea($event)"
-                rows="3" 
-                placeholder="Share your thoughts..."
-                maxlength="5000">
-              </textarea>
-              <mat-hint align="end">{{ newCommentContent.length }}/5000</mat-hint>
-            </mat-form-field>
-            
-            <!-- Speech recognition button for comments -->
-            <div class="speech-controls">
-              <button 
-                mat-icon-button 
-                (click)="startRecordingForComment()"
-                [disabled]="isSubmittingComment || !isSpeechRecognitionSupported"
-                [matTooltip]="isRecordingComment ? 'Stop recording' : 'Start voice input'"
-                [color]="isRecordingComment ? 'warn' : 'primary'">
-                <mat-icon>{{ isRecordingComment ? 'mic_off' : 'mic' }}</mat-icon>
-              </button>
+      <!-- Enhanced comment form with speech recognition -->
+      <div class="comment-form">
+        <div class="comment-input-container">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Add a comment</mat-label>
+            <textarea 
+              id="comment-textarea"
+              matInput 
+              [(ngModel)]="newCommentContent" 
+              (input)="autoResizeTextarea($event)"
+              rows="3" 
+              placeholder="Share your thoughts..."
+              maxlength="5000">
+            </textarea>
+            <mat-hint align="end">{{ newCommentContent.length }}/5000</mat-hint>
+          </mat-form-field>
           
-             <!-- Recording indicator -->
-             <div class="recording-indicator" *ngIf="isRecordingComment">
+          <!-- Speech recognition button for comments -->
+          <div class="speech-controls">
+            <button 
+              mat-icon-button 
+              (click)="startRecordingForComment()"
+              [disabled]="isSubmittingComment || !isSpeechRecognitionSupported"
+              [matTooltip]="isRecordingComment ? 'Stop recording' : 'Start voice input'"
+              [color]="isRecordingComment ? 'warn' : 'primary'">
+              <mat-icon>{{ isRecordingComment ? 'mic_off' : 'mic' }}</mat-icon>
+            </button>
+            
+            <!-- Recording indicator -->
+            <div class="recording-indicator" *ngIf="isRecordingComment">
               <div class="pulse-dot"></div>
               <span class="recording-text">Recording...</span>
             </div>
@@ -222,7 +222,6 @@
             <span *ngIf="!isSubmittingComment">Post Comment</span>
             <span *ngIf="isSubmittingComment">Posting...</span>
           </button>
-
           
           <!-- Speech recognition support indicator -->
           <div class="speech-support-info" *ngIf="!isSpeechRecognitionSupported">
@@ -231,11 +230,12 @@
           </div>
         </div>
       </div>
-<!-- Comments loading indicator -->
-<div class="loading-comments" *ngIf="isLoadingComments">
-  <mat-spinner diameter="30"></mat-spinner>
-  <span>Loading comments...</span>
-</div>
+
+      <!-- Comments loading indicator -->
+      <div class="loading-comments" *ngIf="isLoadingComments">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Loading comments...</span>
+      </div>
 
       <!-- Enhanced Comments list -->
       <div class="comments-list" *ngIf="!isLoadingComments && filteredComments.length > 0; else noComments">
@@ -353,7 +353,7 @@
                   {{ isCommentLikedByUser(comment) ? 'favorite' : 'favorite_border' }}
                 </mat-icon>
               </button>
-              <span>{{ comment.likes.length || 0 }}</span>
+              <span>{{ comment.likes?.length || 0 }}</span>
             </div>
 
             <button mat-button (click)="startReply(comment.id)">
@@ -373,58 +373,59 @@
             </div>
           </div>
 
-<!-- Enhanced Reply form with speech recognition -->
-<div class="reply-form" *ngIf="replyingToCommentId === comment.id">
-  <div class="reply-input-container">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Write a reply</mat-label>
-      <textarea 
-        id="reply-textarea"
-        matInput 
-        [(ngModel)]="replyContent" 
-        (input)="autoResizeTextarea($event)"
-        rows="2" 
-        placeholder="Write your reply..."
-        maxlength="5000">
-      </textarea>
-      <mat-hint align="end">{{ replyContent.length }}/5000</mat-hint>
-    </mat-form-field>
-    
-    <!-- Speech recognition button for replies -->
-    <div class="speech-controls">
-      <button 
-        mat-icon-button 
-        (click)="startRecordingForReply()"
-        [disabled]="isSubmittingReply || !isSpeechRecognitionSupported"
-        [matTooltip]="isRecordingReply ? 'Stop recording' : 'Start voice input'"
-        [color]="isRecordingReply ? 'warn' : 'primary'">
-        <mat-icon>{{ isRecordingReply ? 'mic_off' : 'mic' }}</mat-icon>
-      </button>
-      
-      <!-- Recording indicator for replies -->
-      <div class="recording-indicator" *ngIf="isRecordingReply">
-        <div class="pulse-dot"></div>
-        <span class="recording-text">Recording...</span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="reply-actions">
-    <button mat-button (click)="cancelReply()">
-      <mat-icon>cancel</mat-icon>
-      Cancel
-    </button>
-    <button 
-      mat-raised-button 
-      color="primary" 
-      (click)="submitReply()" 
-      [disabled]="!replyContent.trim() || isSubmittingReply || isRecordingReply">
-      <mat-icon>send</mat-icon>
-      <span *ngIf="!isSubmittingReply">Post Reply</span>
-      <span *ngIf="isSubmittingReply">Posting...</span>
-    </button>
-  </div>
-  
+          <!-- Enhanced Reply form with speech recognition -->
+          <div class="reply-form" *ngIf="replyingToCommentId === comment.id">
+            <div class="reply-input-wrapper">
+              <mat-form-field appearance="outline" class="reply-textarea-field">
+                <mat-label>Write a reply</mat-label>
+                <textarea 
+                  id="reply-textarea"
+                  matInput 
+                  [(ngModel)]="replyContent" 
+                  (input)="autoResizeTextarea($event)"
+                  rows="2" 
+                  placeholder="Write your reply..."
+                  maxlength="5000">
+                </textarea>
+                <mat-hint align="end">{{ replyContent.length }}/5000</mat-hint>
+                
+                <!-- Speech recognition button positioned inside the form field -->
+                <button 
+                  mat-icon-button 
+                  matSuffix
+                  type="button"
+                  (click)="startRecordingForReply()"
+                  [disabled]="isSubmittingReply || !isSpeechRecognitionSupported"
+                  [matTooltip]="isRecordingReply ? 'Stop recording' : 'Start voice input'"
+                  [color]="isRecordingReply ? 'warn' : 'primary'"
+                  class="reply-speech-button">
+                  <mat-icon>{{ isRecordingReply ? 'mic_off' : 'mic' }}</mat-icon>
+                </button>
+              </mat-form-field>
+              
+              <!-- Recording indicator for replies -->
+              <div class="reply-recording-indicator" *ngIf="isRecordingReply">
+                <div class="pulse-dot"></div>
+                <span class="recording-text">Recording...</span>
+              </div>
+            </div>
+            
+            <div class="reply-actions">
+              <button mat-button (click)="cancelReply()" type="button">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+              <button 
+                mat-raised-button 
+                color="primary" 
+                (click)="submitReply()" 
+                type="button"
+                [disabled]="!replyContent.trim() || isSubmittingReply || isRecordingReply">
+                <mat-icon>send</mat-icon>
+                <span *ngIf="!isSubmittingReply">Post Reply</span>
+                <span *ngIf="isSubmittingReply">Posting...</span>
+              </button>
+            </div>
           </div>
 
           <!-- Enhanced Replies -->
@@ -538,7 +539,7 @@
                       {{ isCommentLikedByUser(reply) ? 'favorite' : 'favorite_border' }}
                     </mat-icon>
                   </button>
-                  <span>{{ reply.likes.length || 0 }}</span>
+                  <span>{{ reply.likes?.length || 0 }}</span>
                 </div>
 
                 <div class="edit-delete" *ngIf="canEditComment(reply)">
