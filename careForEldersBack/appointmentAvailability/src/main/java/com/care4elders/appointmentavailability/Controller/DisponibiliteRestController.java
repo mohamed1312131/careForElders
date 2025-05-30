@@ -1,11 +1,16 @@
 package com.care4elders.appointmentavailability.Controller;
 
+import com.care4elders.appointmentavailability.dto.DisponibiliteDTO;
+import com.care4elders.appointmentavailability.dto.SlotDTO;
 import com.care4elders.appointmentavailability.entity.Disponibilite;
 import com.care4elders.appointmentavailability.service.DispoService;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 @RequestMapping("/api/disponibilites")
 @RestController
@@ -13,42 +18,48 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class DisponibiliteRestController {
 
-    private DispoService dispoService;
+    private DispoService disponibiliteService;
+
+   // private final DisponibiliteService disponibiliteService;
 
     @PostMapping
-    public ResponseEntity<Disponibilite> create(@RequestBody Disponibilite dispo) {
-        Disponibilite saved = dispoService.createDisponibilite(dispo);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<Disponibilite> create(@RequestBody DisponibiliteDTO dto) {
+        return new ResponseEntity<>(
+                disponibiliteService.createDisponibilite(dto),
+                HttpStatus.CREATED
+        );
     }
-    @GetMapping
-    public List<Disponibilite> getAllDisponibilites() {
-        return dispoService.getAllDisponibilites();
-    }
-
 
     @GetMapping("/doctor/{doctorId}")
-    public ResponseEntity<List<Disponibilite>> getByDoctor(@PathVariable String doctorId) {
-        return ResponseEntity.ok(dispoService.getDisponibilitesByDoctor(doctorId));
+    public List<Disponibilite> getByDoctor(@PathVariable String doctorId) {
+        return disponibiliteService.getByDoctorId(doctorId);
     }
 
-
-    /*
-    @GetMapping("/medecin/{id}")
-    public ResponseEntity<List<Disponibilite>> getByMedecin(@PathVariable Long id) {
-        return ResponseEntity.ok(dispoService.getDisponibilitesByMedecin(id));
+    @GetMapping("/{id}")
+    public Disponibilite getById(@PathVariable String id) {
+        return disponibiliteService.getById(id);
     }
 
-  @PutMapping("/{id}")
-    public ResponseEntity<Disponibilite> update(@PathVariable Long id, @RequestBody Disponibilite dispo) {
-        return ResponseEntity.ok(dispoService.updateDisponibilite(id, dispo));
+    @PutMapping("/{id}")
+    public Disponibilite update(
+            @PathVariable String id,
+            @RequestBody DisponibiliteDTO dto
+    ) {
+        return disponibiliteService.updateDisponibilite(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        dispoService.deleteDisponibilite(id);
-        return ResponseEntity.noContent().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String id) {
+        disponibiliteService.deleteDisponibilite(id);
     }
-*/
 
+    @GetMapping("/doctor/{doctorId}/range")
+    public List<Disponibilite> getByDateRange(
+            @PathVariable String doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end
+    ) {
+        return disponibiliteService.getByDoctorAndDateRange(doctorId, start, end);
+    }
 }
-

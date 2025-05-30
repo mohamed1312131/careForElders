@@ -15,10 +15,15 @@ export class AbonnementService {
     return this.http.get<any[]>(`${this.apiUrl}/plans`);
   }
 
+  assignDefaultPlan(userId: string): Observable<any> {
+  return this.http.post(`${this.apiUrl}/assign-default/${userId}`, {});
+  }
+
   subscribeUser(userId: string, planId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/user-subscriptions`, { userId, planId });
   }
+
   getCurrentSubscription(userId: string): Observable<any> {
-  return this.http.get(`${this.apiUrl}/user/${userId}`);
-}
+  return this.http.get(`${this.apiUrl}/current/${userId}`);
+  }
 }

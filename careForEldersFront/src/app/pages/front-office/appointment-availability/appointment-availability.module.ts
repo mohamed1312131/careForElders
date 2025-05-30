@@ -20,16 +20,23 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCardModule } from '@angular/material/card';
+import { EventDetailsDialogComponent } from './event-details-dialog/event-details-dialog.component';
+import { JitsiDialogComponent } from './jitsi-dialog/jitsi-dialog.component';
+import { LoadingComponent } from './loading/loading.component';
+import { LoadingStepBlockComponent } from './loading-step-block/loading-step-block.component';
 
 
 @NgModule({
   declarations: [TestingComponent,
     SearchDoctorComponent,
     DoctorDetailsComponent,
-    DoctorDetailsComponent,
     MyReservationsComponent,
   MyScheduleComponent,
-  AppointmentDialogComponent],
+  AppointmentDialogComponent,
+EventDetailsDialogComponent,
+JitsiDialogComponent,
+LoadingComponent,
+LoadingStepBlockComponent],
   
   imports: [
     CommonModule,

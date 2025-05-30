@@ -1,137 +1,218 @@
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { CalendarEvent, CalendarView } from 'angular-calendar';
+import { DisponibiliteService } from '../service/disponibilite-service/disponibilite.service';
+import { Router } from '@angular/router';
+import { AppointementService } from '../service/appointement-service/appointement.service';
+import { EventDetailsDialogComponent } from '../event-details-dialog/event-details-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+
+// Interfaces
+interface AvailabilitySlot {
+  id: string;
+  date: string;
+  heureDebut: string;
+  heureFin: string;
+  slotDuration: number;
+  [key: string]: any;
+}
+
+interface Reservation {
+  id: string;
+  date: string;
+  heure: string;
+  endTime: string;
+  statut: string;
+  userId: string;
+  doctorId: string;
+  reservationType: string;
+  meetingLink: string | null;
+  location: string | null;
+}
 
 @Component({
   selector: 'app-my-schedule',
   templateUrl: './my-schedule.component.html',
-  styleUrl: './my-schedule.component.scss'
+  styleUrls: ['./my-schedule.component.scss']
 })
 export class MyScheduleComponent implements OnInit {
   view: CalendarView = CalendarView.Week;
   CalendarView = CalendarView;
   viewDate: Date = new Date();
   events: CalendarEvent[] = [];
-  doctor: any;
   loading = false;
-  doctorId: string | null = null;
+  userId: string | null = null;
 
-  constructor(private router: Router, private snackBar: MatSnackBar) {}
+  constructor(
+    private disponibiliteService: DisponibiliteService,
+    private appointementService: AppointementService,
+    private router: Router,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
-    this.logLocalStorageContents();
-    this.doctorId = this.getDoctorIdFromLocalStorage();
-    this.loadScheduleFromLocalStorage();
-  }
-
-  private logLocalStorageContents(): void {
-    console.log('LocalStorage contents:');
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key) {
-        console.log(`Key: ${key}, Value:`, localStorage.getItem(key));
-      }
+    this.getUserInfo();
+    if (this.userId) {
+      this.loadScheduleData();
     }
   }
 
-  private getDoctorIdFromLocalStorage(): string | null {
-    try {
-      const professionalString = localStorage.getItem('currentProfessional');
-      if (!professionalString) {
-        console.warn('No professional data found in localStorage');
-        return null;
-      }
-      
-      const professional = JSON.parse(professionalString);
-      const doctorId = professional?.id || null;
-      
-      console.log('Retrieved Doctor ID:', doctorId);
-      return doctorId;
-      
-    } catch (error) {
-      console.error('Error parsing professional data from localStorage:', error);
-      return null;
+  getUserInfo(): void {
+    this.userId = localStorage.getItem('user_id');
+    console.log('User ID:', this.userId);
+    if (!this.userId) {
+      console.warn('User ID not found in local storage.');
     }
   }
 
-  loadScheduleFromLocalStorage(): void {
+  loadScheduleData(): void {
+    if (!this.userId) return;
+
     this.loading = true;
-    
-    setTimeout(() => {
-      try {
-        const userData = localStorage.getItem('currentProfessional');
-        if (!userData) {
-          console.warn('No professional data found in local storage');
-          return;
-        }
 
-        const currentProfessional = JSON.parse(userData);
-        const scheduleSlots = currentProfessional.schedule || [];
-        const appointments = currentProfessional.appointments || [];
+    this.disponibiliteService.getByDoctor(this.userId).subscribe({
+      next: (slots: AvailabilitySlot[]) => {
+        this.appointementService.getReservationsByDoctorId(this.userId!).subscribe({
+          next: (reservations: Reservation[]) => {
+            const reservationEvents = reservations.map(res => this.mapReservationToEvent(res));
 
-        // Convert schedule slots to events
-        this.events = [
-          ...scheduleSlots.map((slot: any) => ({
-            start: new Date(slot.date + 'T' + slot.startTime),
-            end: new Date(slot.date + 'T' + slot.endTime),
-            title: 'Available',
-            color: { primary: '#5cb85c', secondary: '#D1E7DD' },
-            meta: { type: 'availability', data: slot }
-          })),
-          ...appointments.map((appointment: any) => ({
-            start: new Date(appointment.date + 'T' + appointment.startTime),
-            end: new Date(appointment.date + 'T' + appointment.endTime),
-            title: `Appointment with ${appointment.patientName}`,
-            color: this.getAppointmentColor(appointment.status),
-            meta: { type: 'appointment', data: appointment }
-          }))
-        ];
+            const availabilityEvents: CalendarEvent[] = [];
+            slots.forEach(slot => {
+              const slotEvents = this.createTimeSlots(slot);
+              slotEvents.forEach(availability => {
+                const isOverlapping = reservationEvents.some(res =>
+  res.end &&
+  availability.end &&
+  availability.start < res.end &&
+  res.start < availability.end
+                );
+                if (!isOverlapping) {
+                  availabilityEvents.push(availability);
+                }
+              });
+            });
 
-      } catch (error) {
-        console.error('Error loading schedule:', error);
-      } finally {
+            // Final calendar events: reservations first, then available slots
+            this.events = [...reservationEvents, ...availabilityEvents];
+            console.log('Final Calendar Events:', this.events);
+          },
+          error: err => {
+            console.error('Error loading reservations:', err);
+          },
+          complete: () => {
+            this.loading = false;
+          }
+        });
+      },
+      error: err => {
+        console.error('Error loading availability slots:', err);
         this.loading = false;
       }
-    }, 500);
+    });
   }
 
-  private getAppointmentColor(status: string): any {
-    const colors: Record<string, any> = {
-      confirmed: { primary: '#0275d8', secondary: '#D9EDF7' },
-      completed: { primary: '#5cb85c', secondary: '#DFF0D8' },
-      cancelled: { primary: '#d9534f', secondary: '#F2DEDE' },
-      noshow: { primary: '#f0ad4e', secondary: '#FCF8E3' }
+  
+// Add these methods to your MyScheduleComponent class
+
+navigatePrevious(): void {
+  if (this.view === CalendarView.Day) {
+    this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() - 1));
+  } else if (this.view === CalendarView.Week) {
+    this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() - 7));
+  } else if (this.view === CalendarView.Month) {
+    this.viewDate = new Date(this.viewDate.setMonth(this.viewDate.getMonth() - 1));
+  }
+  this.loadScheduleData(); // Optional: reload data if needed
+}
+
+navigateNext(): void {
+  if (this.view === CalendarView.Day) {
+    this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() + 1));
+  } else if (this.view === CalendarView.Week) {
+    this.viewDate = new Date(this.viewDate.setDate(this.viewDate.getDate() + 7));
+  } else if (this.view === CalendarView.Month) {
+    this.viewDate = new Date(this.viewDate.setMonth(this.viewDate.getMonth() + 1));
+  }
+  this.loadScheduleData(); // Optional: reload data if needed
+}
+
+navigateToday(): void {
+  this.viewDate = new Date();
+  this.loadScheduleData(); // Optional: reload data if needed
+}
+
+
+  private mapReservationToEvent(reservation: Reservation): CalendarEvent {
+    const start = new Date(`${reservation.date}T${reservation.heure}`);
+    const end = new Date(`${reservation.date}T${reservation.endTime}`);
+
+    return {
+      start: start,
+      end: end,
+      title: `Appointment - ${reservation.reservationType}`,
+      color: {
+        primary: '#d9534f',
+        secondary: '#F8D7DA'
+      },
+      meta: {
+        type: 'reservation',
+        data: reservation,
+        status: reservation.statut,
+        meetingLink: reservation.meetingLink
+      }
     };
-    return colors[status.toLowerCase()] || { primary: '#777', secondary: '#EEE' };
+  }
+
+  private createTimeSlots(slot: AvailabilitySlot): CalendarEvent[] {
+    const slots: CalendarEvent[] = [];
+    const start = new Date(`${slot.date}T${slot.heureDebut}`);
+    const end = new Date(`${slot.date}T${slot.heureFin}`);
+    const duration = slot.slotDuration;
+
+    let currentStart = new Date(start);
+
+    while (currentStart < end) {
+      const currentEnd = new Date(currentStart);
+      currentEnd.setMinutes(currentEnd.getMinutes() + duration);
+
+      if (currentEnd > end) break;
+
+      slots.push({
+        start: new Date(currentStart),
+        end: new Date(currentEnd),
+        title: `Available (${duration} min)`,
+        color: { primary: '#5cb85c', secondary: '#D1E7DD' },
+        meta: {
+          type: 'availability',
+          data: slot,
+          slotDuration: duration
+        }
+      });
+
+      currentStart = new Date(currentEnd);
+    }
+
+    return slots;
   }
 
   setView(view: CalendarView): void {
     this.view = view;
   }
 
-  eventClicked(event: CalendarEvent): void {
-    if (event.meta.type === 'appointment') {
-      console.log('Appointment clicked:', event.meta.data);
-      // Show appointment details
-    } else {
-      console.log('Availability slot clicked:', event.meta.data);
-      // Show availability details or edit form
-    }
+  eventClicked({ event }: { event: CalendarEvent }): void {
+  this.dialog.open(EventDetailsDialogComponent, {
+    width: '400px',
+    data: {
+    ...event,              // this sends the calendar event data
+    fromMySchedule: true   // this tells the dialog it's opened from MySchedule
+  }
+  });
   }
 
   onAddAvailability(): void {
-    console.log('Current Doctor ID when clicking Add Availability:', this.doctorId);
-    
-    if (!this.doctorId) {
-      this.snackBar.open('Doctor ID is missing. Please log in again.', 'Close', {
-        duration: 3000,
-        panelClass: ['error-snackbar']
-      });
+    if (!this.userId) {
+      console.error('Cannot add availability - User ID is missing');
       return;
     }
-
-    // Navigate to the "Add Availability" page using the stored doctor ID
-    this.router.navigate([`user/userProfile/doctor/${this.doctorId}/AddAvailability`]);
+    this.router.navigate([`user/userProfile/doctor/${this.userId}/AddAvailability`]);
   }
 }
