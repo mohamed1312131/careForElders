@@ -147,7 +147,7 @@
           >
             <mat-icon>{{ isPostLikedByUser(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
-          <span class="stat-count">{{ post.likes.length || null }}</span>
+          <span class="stat-count">{{ post.likes?.length || null }}</span>
           <span class="stat-label">Likes</span>
         </div>
 

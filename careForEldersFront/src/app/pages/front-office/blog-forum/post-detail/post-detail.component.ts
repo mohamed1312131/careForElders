@@ -1,12 +1,12 @@
-import { Component,  OnInit,  OnDestroy } from "@angular/core"
-import  { ActivatedRoute, Router } from "@angular/router"
-import  { MatSnackBar } from "@angular/material/snack-bar"
-import  { MatDialog } from "@angular/material/dialog"
+import { Component, OnInit, OnDestroy } from "@angular/core"
+import { ActivatedRoute, Router } from "@angular/router"
+import { MatSnackBar } from "@angular/material/snack-bar"
+import { MatDialog } from "@angular/material/dialog"
 import { Subscription } from "rxjs"
-import  { PostService } from "../post.service"
-import  { CommentService } from "../comment.service"
-import  { Post } from "../models/post.model"
-import  { Comment, CommentRequest } from "../models/comment.model"
+import { PostService } from "../post.service"
+import { CommentService } from "../comment.service"
+import { Post } from "../models/post.model"
+import { Comment, CommentRequest } from "../models/comment.model"
 import { SpeechRecognitionService } from "../speech-recognition/speech-recognition.service"
 
 @Component({
@@ -22,6 +22,10 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   isLoadingComments = false
   postId = ""
   currentUserId = "user123" // This should come from your auth service
+
+  // Backend configuration
+  private readonly BACKEND_URL = "http://localhost:8084"
+  private readonly API_BASE = "/api"
 
   // Comment form
   newCommentContent = ""
@@ -49,6 +53,11 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   // Post operations
   isDeletingPost = false
   isLikingPost = false
+
+  // Image debugging properties
+  imageLoading = false
+  imageError = false
+  imageErrorMessage = ""
 
   // Filtering properties
   selectedSentimentFilter = "ALL"
@@ -109,53 +118,98 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     this.stopSpeechRecognition();
   }
 
-    // Speech recognition methods
-    startRecordingForComment(): void {
-      this.isRecordingComment = true;
-      this.isRecordingReply = false;
-      this.startSpeechRecognition("comment");
-    }
-  
-    startRecordingForReply(): void {
-      this.isRecordingComment = false;
-      this.isRecordingReply = true;
-      this.startSpeechRecognition("reply");
-    }
-  
-    private startSpeechRecognition(context: "comment" | "reply"): void {
-      this.stopSpeechRecognition();
-      
-      this.speechRecognitionSub = this.speechRecognitionService.startListening().subscribe({
-        next: (transcript) => {
-          if (context === "comment") {
-            this.newCommentContent = transcript;
-          } else {
-            this.replyContent = transcript;
-          }
-        },
-        error: (err) => {
-          this.snackBar.open(`Speech recognition error: ${err}`, "Close", {
-            duration: 4000,
-            panelClass: ["error-snackbar"],
-          });
-          this.stopSpeechRecognition();
+  // Speech recognition methods
+  startRecordingForComment(): void {
+    this.isRecordingComment = true;
+    this.isRecordingReply = false;
+    this.startSpeechRecognition("comment");
+  }
+
+  startRecordingForReply(): void {
+    this.isRecordingComment = false;
+    this.isRecordingReply = true;
+    this.startSpeechRecognition("reply");
+  }
+
+  private startSpeechRecognition(context: "comment" | "reply"): void {
+    this.stopSpeechRecognition();
+    
+    this.speechRecognitionSub = this.speechRecognitionService.startListening().subscribe({
+      next: (transcript) => {
+        if (context === "comment") {
+          this.newCommentContent = transcript;
+        } else {
+          this.replyContent = transcript;
         }
-      });
-    }
-  
-    stopSpeechRecognition(): void {
-      if (this.speechRecognitionSub) {
-        this.speechRecognitionSub.unsubscribe();
-        this.speechRecognitionSub = undefined;
+      },
+      error: (err) => {
+        this.snackBar.open(`Speech recognition error: ${err}`, "Close", {
+          duration: 4000,
+          panelClass: ["error-snackbar"],
+        });
+        this.stopSpeechRecognition();
       }
-      this.speechRecognitionService.stopListening();
-      this.isRecordingComment = false;
-      this.isRecordingReply = false;
+    });
+  }
+
+  stopSpeechRecognition(): void {
+    if (this.speechRecognitionSub) {
+      this.speechRecognitionSub.unsubscribe();
+      this.speechRecognitionSub = undefined;
     }
-  
-    get isSpeechRecognitionSupported(): boolean {
-      return this.speechRecognitionService.isSupported();
+    this.speechRecognitionService.stopListening();
+    this.isRecordingComment = false;
+    this.isRecordingReply = false;
+  }
+
+  get isSpeechRecognitionSupported(): boolean {
+    return this.speechRecognitionService.isSupported();
+  }
+
+  // Image event handlers for debugging
+  onImageLoad(event: any): void {
+    console.log("Image loaded successfully:", event.target.src)
+    this.imageLoading = false
+    this.imageError = false
+  }
+
+  onImageError(event: any): void {
+    console.error("Image failed to load:", event.target.src)
+    this.imageLoading = false
+    this.imageError = true
+    this.imageErrorMessage = `Failed to load: ${event.target.src}`
+  }
+
+  onImageLoadStart(event: any): void {
+    console.log("Image loading started:", event.target.src)
+    this.imageLoading = true
+    this.imageError = false
+  }
+
+  // Helper method to construct full image URL
+  private constructImageUrl(imagePath: string): string {
+    if (!imagePath) return ""
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith("http")) {
+      return imagePath
     }
+
+    // Construct the full URL based on your backend structure
+    // Based on your Swagger UI, images are likely served from the uploads directory
+    if (imagePath.startsWith("/uploads/")) {
+      return `${this.BACKEND_URL}${imagePath}`
+    } else if (imagePath.startsWith("uploads/")) {
+      return `${this.BACKEND_URL}/${imagePath}`
+    } else if (!imagePath.startsWith("/")) {
+      // If it's just a filename, assume it's in the uploads directory
+      return `${this.BACKEND_URL}/uploads/${imagePath}`
+    } else {
+      // For any other relative path
+      return `${this.BACKEND_URL}${imagePath}`
+    }
+  }
+
   // Post CRUD Operations
   editPost(): void {
     if (!this.post) {
@@ -743,12 +797,35 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     }
   }
 
-  // CRUD operations
+  // CRUD operations with updated URL structure
   loadPost(): void {
     this.isLoading = true
     this.postService.getPostById(this.postId).subscribe({
       next: (post) => {
         this.post = post
+
+        // DEBUG: Log the post data to console
+        console.log("Post data received:", post)
+        console.log("Original featured image URL:", post.featuredImageUrl)
+
+        // Process the featured image URL using the new helper method
+        if (post.featuredImageUrl) {
+          post.featuredImageUrl = this.constructImageUrl(post.featuredImageUrl)
+        }
+
+        // Process additional images if they exist
+        if (post.additionalImages && Array.isArray(post.additionalImages)) {
+          post.additionalImages = post.additionalImages.map((image: any) => {
+            if (image.url) {
+              image.url = this.constructImageUrl(image.url)
+            }
+            return image
+          })
+        }
+
+        console.log("Processed featured image URL:", post.featuredImageUrl)
+        console.log("Processed additional images:", post.additionalImages)
+
         this.isLoading = false
       },
       error: (error) => {

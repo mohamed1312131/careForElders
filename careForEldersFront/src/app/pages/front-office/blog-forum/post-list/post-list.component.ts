@@ -23,6 +23,10 @@ export class PostListComponent implements OnInit {
   searchType = "title"
   currentUserId = "user123" // This should come from your auth service
   
+  // Backend configuration - matching your Swagger UI
+  private readonly BACKEND_URL = "http://localhost:8084"
+  private readonly API_BASE = "/api"
+  
   // Expose Math object to template
   Math = Math
   
@@ -50,6 +54,57 @@ export class PostListComponent implements OnInit {
     this.loadPosts()
   }
 
+  // Helper method to construct full image URL
+  private constructImageUrl(imagePath: string): string {
+    if (!imagePath) return ""
+    
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith("http")) {
+      return imagePath
+    }
+
+    // Construct the full URL based on your backend structure
+    // Based on your Swagger UI, images are likely served from the uploads directory
+    if (imagePath.startsWith("/uploads/")) {
+      return `${this.BACKEND_URL}${imagePath}`
+    } else if (imagePath.startsWith("uploads/")) {
+      return `${this.BACKEND_URL}/${imagePath}`
+    } else if (!imagePath.startsWith("/")) {
+      // If it's just a filename, assume it's in the uploads directory
+      return `${this.BACKEND_URL}/uploads/${imagePath}`
+    } else {
+      // For any other relative path
+      return `${this.BACKEND_URL}${imagePath}`
+    }
+  }
+
+  // Helper method to process post images
+  private processPostImages(post: Post): Post {
+    // Process featured image URL
+    if (post.featuredImageUrl) {
+      const originalUrl = post.featuredImageUrl
+      post.featuredImageUrl = this.constructImageUrl(post.featuredImageUrl)
+      
+      // Debug logging
+      console.log(`Post ${post.id} - Original image URL: ${originalUrl}`)
+      console.log(`Post ${post.id} - Processed image URL: ${post.featuredImageUrl}`)
+    }
+
+    // Process additional images if they exist
+    if (post.additionalImages && Array.isArray(post.additionalImages)) {
+      post.additionalImages = post.additionalImages.map((image: any) => {
+        if (image.url) {
+          const originalUrl = image.url
+          image.url = this.constructImageUrl(image.url)
+          console.log(`Additional image - Original: ${originalUrl}, Processed: ${image.url}`)
+        }
+        return image
+      })
+    }
+
+    return post
+  }
+
   // Helper method for pagination display
   getPaginationText(): string {
     const start = this.currentPage * this.pageSize + 1
@@ -70,7 +125,8 @@ export class PostListComponent implements OnInit {
     this.isLoading = true
     this.postService.getPosts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
-        this.posts = response.content
+        // Process image URLs for all posts
+        this.posts = response.content.map(post => this.processPostImages(post))
         this.totalPosts = response.totalElements
         
         // Load accurate comment counts for each post
@@ -212,9 +268,11 @@ export class PostListComponent implements OnInit {
   refreshPost(postId: string): void {
     this.postService.getPostById(postId).subscribe({
       next: (updatedPost) => {
+        // Process image URLs for the updated post
+        const processedPost = this.processPostImages(updatedPost)
         const index = this.posts.findIndex((p) => p.id === postId)
         if (index !== -1) {
-          this.posts[index] = updatedPost
+          this.posts[index] = processedPost
         }
       },
     })
@@ -254,7 +312,8 @@ export class PostListComponent implements OnInit {
 
     searchObservable.subscribe({
       next: (posts) => {
-        this.posts = posts
+        // Process image URLs for search results
+        this.posts = posts.map(post => this.processPostImages(post))
         this.loadCommentCounts() // Load comment counts for search results
         this.isLoading = false
       },
@@ -293,5 +352,36 @@ export class PostListComponent implements OnInit {
 
   getPostEngagement(post: Post): number {
     return (post.likes?.length || 0) + (post.commentsCount || 0) + (post.viewCount || 0)
+  }
+
+  // Image error handling methods for template
+  onImageLoad(event: any, postId: string): void {
+    console.log(`Image loaded successfully for post ${postId}:`, event.target.src)
+  }
+
+  onImageError(event: any, postId: string): void {
+    console.error(`Image failed to load for post ${postId}:`, event.target.src)
+    
+    // Set a placeholder image or hide the image
+    event.target.src = '/placeholder.svg?height=280&width=400&text=Image+Not+Found'
+    
+    // Optionally show a user-friendly message
+    this.snackBar.open(`Failed to load image for post`, "Close", {
+      duration: 2000,
+    })
+  }
+
+  onImageLoadStart(event: any, postId: string): void {
+    console.log(`Image loading started for post ${postId}:`, event.target.src)
+  }
+
+  // Helper method to get fallback image URL
+  getFallbackImageUrl(): string {
+    return '/placeholder.svg?height=280&width=400&text=No+Image'
+  }
+
+  // Helper method to check if post has valid image
+  hasValidImage(post: Post): boolean {
+    return !!(post.featuredImageUrl && post.featuredImageUrl.trim())
   }
 }

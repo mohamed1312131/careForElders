@@ -1,7 +1,27 @@
 .post-detail-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+// Enhanced header
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  .back-button {
+    margin-right: 16px;
+  }
+  
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+    color: #2c3e50;
+    line-height: 1.3;
+  }
 }
 
 .loading-spinner {
@@ -11,36 +31,28 @@
   height: 200px;
 }
 
-.post-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-  
-  h1 {
-    margin: 0 0 0 8px;
-    font-size: 24px;
-    font-weight: 500;
-  }
-}
-
 .post-content {
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 32px;
 }
 
+// Enhanced post metadata
 .post-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 16px;
-  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+  color: #7f8c8d;
   font-size: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #ecf0f1;
   
   .author {
     font-weight: 500;
+    color: #34495e;
   }
   
   .views {
@@ -60,26 +72,135 @@
   }
 }
 
-.post-body {
-  margin-bottom: 24px;
-  line-height: 1.6;
-  white-space: pre-line;
+// Update the post-featured-image section to improve image display
+.post-featured-image {
+  margin: 1.5rem 0;
+  
+  .image-container {
+    text-align: center;
+    
+    .featured-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+      display: block;
+      margin: 0 auto;
+      max-height: 500px;
+      object-fit: contain;
+      
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+    
+    .image-caption {
+      margin-top: 0.5rem;
+      
+      p {
+        font-style: italic;
+        color: #666;
+        margin: 0;
+        text-align: center;
+      }
+    }
+  }
 }
 
+// Post body content
+.post-body {
+  margin-bottom: 32px;
+  line-height: 1.7;
+  color: #34495e;
+  font-size: 16px;
+  
+  p {
+    margin: 0 0 16px;
+    white-space: pre-line;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Additional images section
+.post-additional-images {
+  margin: 32px 0;
+  
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: 500;
+    
+    mat-icon {
+      color: #3498db;
+    }
+  }
+  
+  .additional-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    
+    .additional-image-item {
+      position: relative;
+      
+      .additional-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        
+        &:hover {
+          transform: scale(1.03);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+      }
+      
+      .image-caption {
+        margin-top: 8px;
+        text-align: center;
+        
+        small {
+          color: #7f8c8d;
+          font-style: italic;
+        }
+      }
+    }
+  }
+}
+
+// Post footer
 .post-footer {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding-top: 16px;
+  border-top: 1px solid #ecf0f1;
+  padding-top: 24px;
+  margin-top: 32px;
 }
 
 .post-tags {
   margin-bottom: 16px;
+  
+  mat-chip {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-size: 12px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
 }
 
 .post-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
   
   .like-section {
     display: flex;
@@ -87,6 +208,7 @@
     
     span {
       margin-left: 4px;
+      font-weight: 500;
     }
   }
   
@@ -96,6 +218,7 @@
     
     mat-icon {
       margin-right: 4px;
+      color: #3498db;
     }
   }
   
@@ -105,11 +228,13 @@
   }
 }
 
+// Comments section
 .comments-section {
   h2 {
-    font-size: 20px;
-    font-weight: 500;
-    margin-bottom: 16px;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #2c3e50;
   }
 }
 
@@ -744,83 +869,6 @@
   }
 }
 
-// Featured and additional images styles
-.post-featured-image {
-  margin: 1.5rem 0;
-  
-  .image-container {
-    text-align: center;
-    
-    .featured-image {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease;
-      
-      &:hover {
-        transform: scale(1.02);
-      }
-    }
-    
-    .image-caption {
-      margin-top: 0.5rem;
-      
-      p {
-        font-style: italic;
-        color: #666;
-        margin: 0;
-      }
-    }
-  }
-}
-
-.post-additional-images {
-  margin: 2rem 0;
-  
-  h3 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    color: #333;
-  }
-  
-  .additional-images-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    
-    .additional-image-item {
-      position: relative;
-      
-      .additional-image {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        
-        &:hover {
-          transform: scale(1.05);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-      }
-      
-      .image-caption {
-        margin-top: 0.25rem;
-        text-align: center;
-        
-        small {
-          color: #666;
-          font-style: italic;
-        }
-      }
-    }
-  }
-}
-
 // Enhanced pulse animation for recording indicator
 @keyframes pulse {
   0% {
@@ -910,7 +958,24 @@ button mat-icon {
 // Responsive design
 @media (max-width: 768px) {
   .post-detail-container {
-    padding: 12px;
+    padding: 16px;
+  }
+  
+  .post-header h1 {
+    font-size: 24px;
+  }
+  
+  .post-content {
+    padding: 20px;
+  }
+  
+  .post-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .post-featured-image .image-container .featured-image {
+    max-height: 300px;
   }
   
   .filter-controls {
@@ -920,12 +985,6 @@ button mat-icon {
     .search-field, .filter-field {
       min-width: unset;
     }
-  }
-  
-  .post-meta, .comment-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
   }
   
   .post-actions {
@@ -985,5 +1044,33 @@ button mat-icon {
     .additional-image-item .additional-image {
       height: 150px;
     }
+  }
+}
+
+// Add responsive adjustments for the featured image
+@media (max-width: 768px) {
+  .post-featured-image .image-container .featured-image {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-header h1 {
+    font-size: 20px;
+  }
+  
+  .post-content {
+    padding: 16px;
+  }
+  
+  .post-featured-image .image-container .featured-image {
+    max-height: 200px;
+  }
+}
+
+// Add responsive adjustments for the featured image
+@media (max-width: 480px) {
+  .post-featured-image .image-container .featured-image {
+    max-height: 200px;
   }
 }
