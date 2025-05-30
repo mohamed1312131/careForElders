@@ -41,6 +41,12 @@ export const FrontOfficeRoutes: Routes = [
     path: "post",
     component:PostListComponent,  }, 
   {
+    path: 'abonnement',
+    loadChildren: () =>
+      import('./subscription/subscription.module').then((m) => m.SubscriptionModule),
+  },
+
+  {
     path: 'users',
     component: UsersComponent,
   },

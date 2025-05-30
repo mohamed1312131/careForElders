@@ -70,4 +70,21 @@
     mat-card-subtitle {
       color: rgba(0, 0, 0, 0.87);
     }
+<<<<<<< HEAD
   
+=======
+.snackbar-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+>>>>>>> ghassen

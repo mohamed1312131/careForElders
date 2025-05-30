@@ -14,8 +14,6 @@ import com.care4elders.chat.service.MemoryService;
 
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/chats")
 @CrossOrigin(origins = "http://localhost:4200")
