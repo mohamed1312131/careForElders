@@ -6,14 +6,16 @@
 
   <!-- Post content -->
   <div *ngIf="post && !isLoading">
+    <!-- Back button and title -->
     <div class="post-header">
-      <button mat-icon-button (click)="goBack()">
+      <button mat-icon-button (click)="goBack()" class="back-button">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <h1>{{ post.title }}</h1>
     </div>
 
     <div class="post-content">
+      <!-- Post metadata -->
       <div class="post-meta">
         <span class="author">Posted by {{ post.authorName }}</span>
         <span class="date">{{ post.createdAt | date:'medium' }}</span>
@@ -25,7 +27,7 @@
         </span>
       </div>
 
-      <!-- Featured Image Section -->
+      <!-- Featured Image Section - Improved -->
       <div class="post-featured-image" *ngIf="post.featuredImageUrl">
         <div class="image-container">
           <img 
@@ -40,6 +42,7 @@
         </div>
       </div>
 
+      <!-- Post body content -->
       <div class="post-body">
         <p>{{ post.content }}</p>
       </div>
@@ -69,6 +72,7 @@
         </div>
       </div>
 
+      <!-- Post footer with tags and actions -->
       <div class="post-footer">
         <div class="post-tags" *ngIf="post.tags && post.tags.length > 0">
           <mat-chip-list>
@@ -93,7 +97,7 @@
             <mat-icon>comment</mat-icon> {{ comments.length }}
           </div>
 
-          <div class="edit-delete" *ngIf="canEditPost()">
+          <div class="edit-delete" >
             <button mat-icon-button (click)="editPost()" aria-label="Edit post">
               <mat-icon>edit</mat-icon>
             </button>
