@@ -23,7 +23,7 @@ export class PostListComponent implements OnInit {
   searchType = "title"
   currentUserId = "user123" // This should come from your auth service
   
-  // Backend configuration - matching your Swagger UI
+ 
   private readonly BACKEND_URL = "http://localhost:8084"
   private readonly API_BASE = "/api"
   
