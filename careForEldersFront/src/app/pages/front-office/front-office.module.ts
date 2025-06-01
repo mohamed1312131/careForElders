@@ -18,7 +18,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     RouterModule.forChild(FrontOfficeRoutes),
     PatientBillsModule,
     BlogForumModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    
   ],
   providers: [
     provideNativeDateAdapter()  // Add this line to provide the DateAdapter

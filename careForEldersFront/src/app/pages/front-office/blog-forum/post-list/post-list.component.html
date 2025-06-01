@@ -1,131 +1,202 @@
 <div class="post-list-container">
+  <!-- Enhanced Header -->
   <div class="header">
     <div class="header-content">
-      <h1>Medical Blog Posts</h1>
-      <p class="subtitle">Expert health insights from our doctors</p>
+      <h1>
+        <mat-icon class="header-icon">forum</mat-icon>
+        Community Forum
+      </h1>
+      <p class="header-subtitle">Share knowledge, ask questions, and connect with the community</p>
     </div>
-    <button mat-raised-button color="primary" routerLink="/user/userProfile/post/create" class="create-button">
-      <mat-icon>add</mat-icon> Create New Post
+    <button mat-raised-button color="primary" class="create-button" (click)="createPost()">
+      <mat-icon>add</mat-icon>
+      Create Post
     </button>
   </div>
 
-  <div class="filters-container">
-    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-      <div class="search-filters">
-        <mat-form-field appearance="outline">
-          <mat-label>Search by</mat-label>
-          <mat-select formControlName="searchType">
-            <mat-option value="title">Title</mat-option>
-            <mat-option value="content">Content</mat-option>
-            <mat-option value="tag">Tag</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="search-input">
-          <mat-label>Search</mat-label>
-          <input matInput formControlName="searchTerm" placeholder="Enter search term">
-          <button *ngIf="searchForm.get('searchTerm')?.value" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </mat-form-field>
-
-        <button mat-raised-button color="primary" type="submit" class="search-button">
-          <mat-icon>search</mat-icon> Search
+  <!-- Enhanced Search and Filter Section -->
+  <div class="search-filter-section">
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search posts</mat-label>
+        <input matInput [(ngModel)]="searchTerm" placeholder="What are you looking for?">
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="searchTerm" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
         </button>
-      </div>
+      </mat-form-field>
 
-      <div class="sort-filters">
-        <mat-form-field appearance="outline">
-          <mat-label>Sort by</mat-label>
-          <mat-select formControlName="sortBy" (selectionChange)="onSortChange()">
-            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
-              {{ option.viewValue }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field appearance="outline" class="search-type">
+        <mat-label>Search by</mat-label>
+        <mat-select [(ngModel)]="searchType">
+          <mat-option value="title">
+            <mat-icon>title</mat-icon>
+            Title
+          </mat-option>
+          <mat-option value="content">
+            <mat-icon>article</mat-icon>
+            Content
+          </mat-option>
+          <mat-option value="tag">
+            <mat-icon>local_offer</mat-icon>
+            Tag
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Order</mat-label>
-          <mat-select formControlName="direction" (selectionChange)="onSortChange()">
-            <mat-option *ngFor="let direction of sortDirections" [value]="direction.value">
-              {{ direction.viewValue }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    </form>
-  </div>
+      <button mat-raised-button color="primary" (click)="search()" class="search-button">
+        <mat-icon>search</mat-icon>
+        Search
+      </button>
+    </div>
 
-  <div class="loading-spinner" *ngIf="isLoading">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
-
-  <div class="posts-grid" *ngIf="!isLoading">
-    <mat-card *ngFor="let post of posts" class="post-card">
-      <!-- Removed *ngIf="isAuthor(post)" to show menu for all posts -->
-      <div class="post-actions">
-        <button mat-icon-button [matMenuTriggerFor]="actionMenu" aria-label="Post actions" matTooltip="Post actions">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #actionMenu="matMenu">
-          <button mat-menu-item [routerLink]="['/user/userProfile/post/edit', post.id]">
-            <mat-icon>edit</mat-icon>
-            <span>Edit</span>
-          </button>
-          <button mat-menu-item (click)="deletePost(post.id)">
-            <mat-icon>delete</mat-icon>
-            <span>Delete</span>
-          </button>
-        </mat-menu>
-      </div>
-      
-      <div class="card-content-wrapper">
-        <mat-card-header>
-          <div class="header-image" *ngIf="post.authorName === 'Doctor'">
-            <mat-icon class="doctor-icon">local_hospital</mat-icon>
-          </div>
-          <mat-card-title>{{ post.title }}</mat-card-title>
-          <mat-card-subtitle>
-            <div class="post-meta">
-              <span class="author"><mat-icon>person</mat-icon> {{ post.authorName }}</span>
-              <span class="date"><mat-icon>event</mat-icon> {{ post.createdAt | date:'mediumDate' }}</span>
-            </div>
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content>
-          <p class="post-content">{{ post.content | slice:0:150 }}{{ post.content.length > 150 ? '...' : '' }}</p>
-          <div class="post-tags">
-            <div class="tag-container">
-              <span class="tag-item" *ngFor="let tag of post.tags">{{ tag }}</span>
-            </div>
-          </div>
-          <div class="post-stats">
-            <span class="views"><mat-icon>visibility</mat-icon> {{ post.viewCount }} views</span>
-            <span class="time"><mat-icon>access_time</mat-icon> {{ post.createdAt | date:'shortTime' }}</span>
-          </div>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button [routerLink]="['/user/userProfile/post', post.id]" class="read-more-btn">
-            READ MORE
-          </button>
-        </mat-card-actions>
-      </div>
-    </mat-card>
-
-    <div class="no-posts" *ngIf="posts.length === 0">
-      <mat-icon>sentiment_dissatisfied</mat-icon>
-      <p>No posts found. Try adjusting your search criteria.</p>
-      <button mat-raised-button color="primary" (click)="loadPosts()">Reset Filters</button>
+    <!-- Filter Options -->
+    <div class="filter-container">
+      <mat-form-field appearance="outline" class="filter-select">
+        <mat-label>Filter & Sort</mat-label>
+        <mat-select [(ngModel)]="selectedFilter" (selectionChange)="onFilterChange()">
+          <mat-option *ngFor="let option of filterOptions" [value]="option.value">
+            {{ option.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
   </div>
 
-  <mat-paginator
-    [length]="totalPosts"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="pageSizeOptions"
-    [pageIndex]="currentPage"
-    (page)="onPageChange($event)"
-    *ngIf="totalPosts > 0"
-    class="custom-paginator">
-  </mat-paginator>
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading posts...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && posts.length === 0">
+    <mat-icon class="empty-icon">forum</mat-icon>
+    <h2>No posts found</h2>
+    <p>Be the first to start a conversation in our community!</p>
+    <button mat-raised-button color="primary" (click)="createPost()">
+      <mat-icon>add</mat-icon>
+      Create First Post
+    </button>
+  </div>
+
+  <!-- Enhanced Posts Grid -->
+  <div class="posts-grid" *ngIf="!isLoading && posts.length > 0">
+    <div class="post-card" *ngFor="let post of posts" (click)="viewPost(post.id)">
+      <!-- Post Header -->
+      <div class="post-header">
+        <div class="author-info">
+          <div class="author-avatar">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <div class="author-details">
+            <span class="author-name">{{ post.authorName }}</span>
+            <span class="post-time">{{ getTimeAgo(post.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="post-menu" *ngIf="isAuthor(post.authorId)">
+          <button mat-icon-button [matMenuTriggerFor]="postMenu" (click)="$event.stopPropagation()">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #postMenu="matMenu">
+            <button mat-menu-item (click)="editPost(post.id, $event)">
+              <mat-icon>edit</mat-icon>
+              Edit Post
+            </button>
+            <button mat-menu-item (click)="deletePost(post.id, $event)" class="delete-option">
+              <mat-icon>delete</mat-icon>
+              Delete Post
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+
+      <!-- Featured Image -->
+      <div class="post-image" *ngIf="post.featuredImageUrl">
+        <img [src]="post.featuredImageUrl" [alt]="post.imageAltText || post.title" loading="lazy">
+      </div>
+
+      <!-- Post Content -->
+      <div class="post-content">
+        <h3 class="post-title">{{ post.title }}</h3>
+        <p class="post-excerpt">
+          {{ post.content | slice:0:200 }}{{ post.content.length > 200 ? '...' : '' }}
+        </p>
+        
+        <!-- Tags -->
+        <div class="post-tags" *ngIf="post.tags && post.tags.length > 0">
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let tag of post.tags | slice:0:3" class="tag-chip">
+              {{ tag }}
+            </mat-chip-option>
+            <mat-chip-option *ngIf="post.tags.length > 3" class="more-tags">
+              +{{ post.tags.length - 3 }} more
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+      </div>
+
+      <!-- Enhanced Post Stats -->
+      <div class="post-stats">
+        <div class="stat-item like-stat" [class.liked]="isPostLikedByUser(post)">
+          <button 
+            mat-icon-button 
+            [color]="isPostLikedByUser(post) ? 'accent' : ''" 
+            (click)="likePost(post, $event)" 
+            matTooltip="Like this post"
+          >
+            <mat-icon>{{ isPostLikedByUser(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+          <span class="stat-count">{{ post.likes.length || null }}</span>
+          <span class="stat-label">Likes</span>
+        </div>
+
+        <div class="stat-item comment-stat">
+          <button mat-icon-button matTooltip="View comments">
+            <mat-icon>chat_bubble_outline</mat-icon>
+          </button>
+          <span class="stat-count">{{ post.commentsCount || 0 }}</span>
+          <span class="stat-label">Comments</span>
+        </div>
+
+        <div class="stat-item view-stat">
+          <mat-icon class="stat-icon">visibility</mat-icon>
+          <span class="stat-count">{{ post.viewCount || 0 }}</span>
+          <span class="stat-label">Views</span>
+        </div>
+
+        <div class="spacer"></div>
+
+        <!-- Engagement Score -->
+        <div class="engagement-score" matTooltip="Engagement Score">
+          <mat-icon class="engagement-icon">trending_up</mat-icon>
+          <span>{{ getPostEngagement(post) }}</span>
+        </div>
+      </div>
+
+      <!-- Read More Button -->
+      <div class="post-actions">
+        <button mat-button color="primary" class="read-more-btn">
+          <mat-icon>arrow_forward</mat-icon>
+          Read More
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Pagination -->
+  <div class="pagination-container" *ngIf="totalPosts > 0">
+    <mat-paginator 
+      [length]="totalPosts"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      [pageIndex]="currentPage"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+    
+    <div class="pagination-info">
+      {{ getPaginationText() }}
+    </div>
+  </div>
 </div>
