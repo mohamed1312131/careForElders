@@ -1,0 +1,23 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: medicalRecord
+  data:
+    uri: mongodb://mongodb:27017/medicalRecord
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka/
+
+openai:
+  api:
+    key : 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
+  
+  
+huggingface:
+  api:
+    key: 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
+  model: philschmid/bart-large-cnn-samsum
