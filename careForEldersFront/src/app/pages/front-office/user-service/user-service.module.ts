@@ -8,21 +8,24 @@ import { SubscriptionModule } from '../subscription/subscription.module';
 import { ParamedicalCareModule } from '../paramedical-care/paramedical-care.module';
 import { RouterModule } from '@angular/router';
 import { BlogForumModule } from '../blog-forum/blog-forum.module';
+import { FormsModule } from '@angular/forms';
+import { ChatModule } from '../chat/chat.module';
 
 
 @NgModule({
 
-  declarations: [UsersComponent,UserLayoutComponent],
-  imports: [
-    CommonModule,
-    UserServiceRoutingModule,
-    AppointmentAvailabilityModule,
-    SubscriptionModule,
-    ParamedicalCareModule,
-    BlogForumModule,
-    RouterModule
+ declarations: [UsersComponent,UserLayoutComponent],
+    imports: [
+        CommonModule,
+        UserServiceRoutingModule,
+        ChatModule,
+        AppointmentAvailabilityModule,
+        SubscriptionModule,
+        ParamedicalCareModule,
+        RouterModule,
+        FormsModule
 
-  ]
+    ]
 })
 export class UserModule { }
 
