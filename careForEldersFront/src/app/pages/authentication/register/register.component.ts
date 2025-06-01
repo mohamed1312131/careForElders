@@ -16,9 +16,14 @@ export class RegisterComponent {
   verifying = false;
   verified = false;
   errorMessage: string = '';
+  user: any;
   private successMessage: string='';
-  user : any;
-  constructor(private abonnementsrvice :AbonnementService, private fb: FormBuilder, private http: HttpClient, private router: Router ,private PhotoService:PhotoService) {
+  constructor(
+    private abonnementsrvice:AbonnementService ,
+    private fb: FormBuilder, 
+    private http: HttpClient,
+     private router: Router ,
+     private PhotoService:PhotoService) {
     this.registerForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
@@ -47,10 +52,10 @@ export class RegisterComponent {
     this.loading = true;
 
     this.http.post('http://localhost:8081/users', this.registerForm.value).subscribe({
-      next: (X) => { console.log('X',X)
+      next: (x) => {
         this.showVerification = true;
         this.loading = false;
-        this.user = X;
+        this.user = x;
         console.log(this.user)
          this.abonnementsrvice.assignDefaultPlan(this.user.id).subscribe({
         next: (res) => {

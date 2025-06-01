@@ -21,6 +21,7 @@ import {ConfirmDialogComponent} from "./confirm-dialog/confirm-dialog.component"
   pageSize = 5;
   pageSizes = [5, 10, 25, 50];
   totalPages = 1;
+  selectedRole: string = '';
 
   constructor(private userService: UserService, private toastr: ToastrService,  private dialog: MatDialog) {}
 
@@ -101,13 +102,29 @@ import {ConfirmDialogComponent} from "./confirm-dialog/confirm-dialog.component"
   }
   onSearch(): void {
     const term = this.searchTerm.toLowerCase();
-    this.filteredUsers = this.users.filter(user =>
-      user.firstName.toLowerCase().includes(term) ||
-      user.lastName.toLowerCase().includes(term) ||
-      user.email.toLowerCase().includes(term)
-    );
+
+    this.filteredUsers = this.users.filter(user => {
+      const matchesSearch =
+        user.firstName.toLowerCase().includes(term) ||
+        user.lastName.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term);
+
+      const matchesRole = this.selectedRole ? user.role === this.selectedRole : true;
+
+      return matchesSearch && matchesRole;
+    });
+
     this.currentPage = 1;
     this.updatePage();
+  }
+
+  countInactiveUsers(): number {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    return this.users.filter(user =>
+      user.lastLogin && new Date(user.lastLogin) < sixMonthsAgo
+    ).length;
   }
 
   updatePage(): void {

@@ -17,6 +17,56 @@
         <input matInput (keyup)="applyFilter($event)" placeholder="Search bills by patient name, bill number, or status..." #input>
       </mat-form-field>
     </div>
+
+    <!-- Service Type Filter Section -->
+    <div class="filter-section" *ngIf="!isLoading">
+      <div class="filter-header">
+        <mat-icon>filter_list</mat-icon>
+        <span>Filter by Service Type:</span>
+      </div>
+      <div class="service-type-filters">
+        <button 
+          mat-stroked-button 
+          (click)="clearFilters()"
+          class="filter-button all-types">
+          <mat-icon>clear_all</mat-icon>
+          All Types
+        </button>
+        
+        <button 
+          mat-stroked-button 
+          (click)="filterByServiceType('DOCTOR_CARE')"
+          [style.border-color]="getServiceTypeColor('DOCTOR_CARE')"
+          class="filter-button doctor-care">
+          <mat-icon [style.color]="getServiceTypeColor('DOCTOR_CARE')">
+            {{ getServiceTypeIcon('DOCTOR_CARE') }}
+          </mat-icon>
+          Doctor Care
+        </button>
+        
+        <button 
+          mat-stroked-button 
+          (click)="filterByServiceType('PARA_MEDICAL_SERVICES')"
+          [style.border-color]="getServiceTypeColor('PARA_MEDICAL_SERVICES')"
+          class="filter-button para-medical">
+          <mat-icon [style.color]="getServiceTypeColor('PARA_MEDICAL_SERVICES')">
+            {{ getServiceTypeIcon('PARA_MEDICAL_SERVICES') }}
+          </mat-icon>
+          Para Medical
+        </button>
+        
+        <button 
+          mat-stroked-button 
+          (click)="filterByServiceType('SUBSCRIPTION')"
+          [style.border-color]="getServiceTypeColor('SUBSCRIPTION')"
+          class="filter-button subscription">
+          <mat-icon [style.color]="getServiceTypeColor('SUBSCRIPTION')">
+            {{ getServiceTypeIcon('SUBSCRIPTION') }}
+          </mat-icon>
+          Subscription
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="patient-bill-content mat-elevation-z2">
@@ -32,6 +82,26 @@
         <ng-container matColumnDef="patientName">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Patient Name </th>
           <td mat-cell *matCellDef="let bill"> {{getDisplayValue(bill.patientName)}} </td>
+        </ng-container>
+
+        <!-- Service Type Column -->
+        <ng-container matColumnDef="serviceType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Service Type </th>
+          <td mat-cell *matCellDef="let bill">
+            <div class="service-type-cell">
+              <mat-icon 
+                [style.color]="getServiceTypeColor(bill.serviceType)"
+                class="service-type-icon"
+                matTooltip="{{ getServiceTypeDisplay(bill.serviceType) }}">
+                {{ getServiceTypeIcon(bill.serviceType) }}
+              </mat-icon>
+              <span 
+                class="service-type-text"
+                [style.color]="getServiceTypeColor(bill.serviceType)">
+                {{ getServiceTypeDisplay(bill.serviceType) }}
+              </span>
+            </div>
+          </td>
         </ng-container>
 
         <!-- Bill Date Column -->

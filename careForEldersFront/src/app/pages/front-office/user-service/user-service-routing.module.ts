@@ -30,6 +30,7 @@ import { AdminDashboardComponent } from "../nutrition/admin-dashboard/admin-dash
 import { UnauthorizedComponent } from '../subscription/unauthorized/unauthorized.component';
 import { SubscriptionGuard } from '../subscription/subscriptionguard';
 import { MedicalRecordComponent } from '../medical-record/medical-record/medical-record.component';
+import { MedicalRecordListComponent } from '../medical-record/medical-records-list/medical-records-list.component';
 
 const routes: Routes = [
   {
@@ -61,31 +62,31 @@ const routes: Routes = [
       { 
         path: 'bill', 
         component: PatientBillListComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'create', 
         component: PatientBillFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'edit/:id', 
         component: PatientBillFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'view/:id', 
         component: PatientBillFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'payment/:id', 
         component: PatientBillPaymentComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
@@ -97,35 +98,37 @@ const routes: Routes = [
 
       // Blog/Forum
       { 
-        path: "blog", 
+        path: "post", 
         component: PostListComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
       { 
         path: "post/create", 
         component: PostFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
       { 
         path: "post/edit/:id", 
         component: PostFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
       { 
         path: "post/:id", 
         component: PostDetailComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
 
       // Nutrition & Plans
       {
         path: 'plan',
+ 
         //canActivate: [SubscriptionGuard],
         data: { modules: 'planAndExercise' },
+
         children: [
           { path: 'add-program', component: DoctorAddProgramComponent },
           { path: 'list', component: DoctorPlanListComponent },
@@ -145,14 +148,19 @@ const routes: Routes = [
           { path: 'nutritionplainadmin', component: AdminDashboardComponent }
         ]
       },
-
+      {path:'medicalRecord',
+        children: [
+          {
+            path:'medicalrecordlist',
+            component:MedicalRecordListComponent,
+          },
+          {
+            path:'medicalrecord/:id',
+            component:MedicalRecordComponent ,
+          },
+        ]},
       // Gold Plan Features
-      { 
-        path: 'medical-records', 
-        component: MedicalRecordComponent, 
-        canActivate: [SubscriptionGuard], 
-        data: { modules: 'Access to medical records' } 
-      },
+      
       { 
         path: 'userServices', 
         component: UserServicesComponent, 

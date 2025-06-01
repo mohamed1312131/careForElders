@@ -23,7 +23,10 @@ interface Medication {
   name: string;
   dosage: string;
 }
-
+interface BloodType {
+  value: string;
+  viewValue: string;
+}
 @Component({
   selector: 'app-medical-record',
   templateUrl: './medical-record.component.html',
@@ -35,6 +38,7 @@ export class MedicalRecordComponent implements OnInit {
   userId: string = '';
   isLoading = false;
   isUploading = false;
+  doctors: any[] = [];
   // For pagination
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   uploadProgress: number | null = null;
@@ -66,7 +70,21 @@ export class MedicalRecordComponent implements OnInit {
 
   newAllergy = '';
   newCondition = '';
-  newMedication = '';
+  newMedication: Medication = { name: '', dosage: '' } ;
+  notesSummary: string | null = null;
+  summaryGeneratedAt: Date | null = null;
+  isGeneratingSummary = false;
+  currentUploadFile: string = '';
+  bloodTypes: BloodType[] = [
+    {value: 'A+', viewValue: 'A+'},
+    {value: 'A-', viewValue: 'A-'},
+    {value: 'B+', viewValue: 'B+'},
+    {value: 'B-', viewValue: 'B-'},
+    {value: 'AB+', viewValue: 'AB+'},
+    {value: 'AB-', viewValue: 'AB-'},
+    {value: 'O+', viewValue: 'O+'},
+    {value: 'O-', viewValue: 'O-'}
+  ];
   constructor(
     private dialog: MatDialog,
     private toastr: ToastrService,
@@ -82,12 +100,10 @@ export class MedicalRecordComponent implements OnInit {
     this.loadMedicalNotes();
     this.loadAppointments();
     this.loadAttachments();
-    const savedAvatar = localStorage.getItem('profileImage');
-    if (savedAvatar) {
-      this.patient.avatarBase64 = savedAvatar; // Load from localStorage
-    }
+    this.loadDoctors();
+
   }
-  private loadUserData(): void {
+  loadUserData(): void {
     const userStr = localStorage.getItem('user');
     if (!userStr) {
       this.toastr.error('No user found in localStorage');
@@ -97,24 +113,30 @@ export class MedicalRecordComponent implements OnInit {
     try {
       const user = JSON.parse(userStr);
       this.userId = user.id;
-      console.log("dzadza",user);  // Log the response to see the structure
-
-      // Load profile image from localStorage if available
-      const savedAvatar = localStorage.getItem('profileImage');
-      if (savedAvatar) {
-        this.patient.avatar = savedAvatar;
-        console.log("azddddddddddddddddd",this.patient.avatar);
-      }
 
       this.medicalService.getMedicalRecord(this.userId).subscribe({
         next: (record) => {
           if (record) {
             this.setPatientData(user, record);
           } else {
-            this.createNewMedicalRecord(user);
+            // No record found, create a new one
+            const newRecord = { userId: this.userId, bloodType: '', allergies: '', currentMedications: '', chronicConditions: '', primaryCarePhysician: '', lastPhysicalExam: null };
+            this.medicalService.createMedicalRecord(newRecord).subscribe({
+              next: (createdRecord) => {
+                this.setPatientData(user, createdRecord);
+                this.toastr.success('Medical record initialized');
+              },
+              error: (err) => {
+                console.error('Failed to create medical record', err);
+                this.toastr.error('Could not initialize medical record');
+              }
+            });
           }
         },
-        error: (err) => this.handleMedicalRecordError(err)
+        error: (err) => {
+          console.error('Error fetching medical record:', err);
+          this.toastr.error('Failed to load medical record');
+        }
       });
     } catch (e) {
       console.error('Failed to parse user from localStorage', e);
@@ -122,42 +144,26 @@ export class MedicalRecordComponent implements OnInit {
     }
   }
 
-  private createNewMedicalRecord(user: any): void {
-    const newRecord = {
-      userId: this.userId,
-      bloodType: '',
-      allergies: [],
-      currentMedications: [],
-      chronicConditions: [],
-      primaryCarePhysician: '',
-      lastPhysicalExam: null
-    };
-
-    this.medicalService.createMedicalRecord(newRecord).subscribe({
-      next: (createdRecord) => {
-        this.setPatientData(user, createdRecord);
-        this.toastr.success('Medical record initialized');
-      },
-      error: (err) => {
-        console.error('Failed to create medical record', err);
-        this.toastr.error('Could not initialize medical record');
-      }
-    });
-  }
-
   private setPatientData(user: any, record: any): void {
+    // Convert medication strings back to objects (if needed)
+    const medications = Array.isArray(record.currentMedications)
+      ? record.currentMedications.map((med: string) => {
+        const [name, dosage] = med.split(' - ');
+        return { name, dosage };
+      })
+      : [];
+
     this.patient = {
       ...record,
       name: `${user.firstName} ${user.lastName}`,
-      avatar: user.profileImage
-        ? this.sanitizer.bypassSecurityTrustUrl(`data:image/png;base64,${user.profileImage}`)
-        : 'https://i.pravatar.cc/100?img=12',      info: record?.chronicConditions || 'General health info',
+      avatar: user.avatar || 'https://i.pravatar.cc/100?img=12',
+      info: record?.chronicConditions || 'General health info',
     };
 
     this.medicalRecord = {
       bloodType: record.bloodType || '',
       allergies: Array.isArray(record.allergies) ? record.allergies : [record.allergies].filter(Boolean),
-      currentMedications: Array.isArray(record.currentMedications) ? record.currentMedications : [record.currentMedications].filter(Boolean),
+      currentMedications: medications, // Now stored as objects in the UI
       chronicConditions: Array.isArray(record.chronicConditions) ? record.chronicConditions : [record.chronicConditions].filter(Boolean),
       primaryCarePhysician: record.primaryCarePhysician || '',
       lastPhysicalExam: record.lastPhysicalExam || null
@@ -175,15 +181,21 @@ export class MedicalRecordComponent implements OnInit {
       return;
     }
 
+    // Convert medication objects to strings (e.g., "Paracetamol - 500mg")
+    const medicationsAsStrings = this.medicalRecord.currentMedications.map(
+      (med: Medication) => `${med.name} - ${med.dosage}`
+    );
+
     const updatedRecord = {
       ...this.medicalRecord,
+      currentMedications: medicationsAsStrings, // Send as strings
       userId: this.userId
     };
 
     this.medicalService.updateMedicalRecord(this.patient.id, updatedRecord).subscribe({
       next: (updated) => {
         this.toastr.success('Medical record updated');
-        this.setPatientData({ id: this.userId, ...this.patient }, updated);  // Update UI with latest
+        this.loadUserData(); // Reload data to sync with backend
       },
       error: (err) => {
         console.error(err);
@@ -191,7 +203,6 @@ export class MedicalRecordComponent implements OnInit {
       }
     });
   }
-
 
   addAllergy(): void {
     if (this.newAllergy.trim()) {
@@ -216,12 +227,14 @@ export class MedicalRecordComponent implements OnInit {
   }
 
   addMedication(): void {
-    if (this.newMedication.trim()) {
-      this.medicalRecord.currentMedications.push(this.newMedication.trim());
-      this.newMedication = '';
+    if (this.newMedication.name.trim()) {
+      this.medicalRecord.currentMedications.push({
+        name: this.newMedication.name.trim(),
+        dosage: this.newMedication.dosage.trim()
+      });
+      this.newMedication = { name: '', dosage: '' }; // Reset the form
     }
   }
-
   removeMedication(index: number): void {
     this.medicalRecord.currentMedications.splice(index, 1);
   }
@@ -289,14 +302,15 @@ export class MedicalRecordComponent implements OnInit {
       next: (notes) => {
         this.records = notes;
         this.isLoading = false;
+        // Auto-generate summary when notes load
+        this.generateSummary();
       },
       error: (err) => {
         this.toastr.error('Failed to load medical records');
         this.isLoading = false;
         console.error(err);
       }
-    });
-  }
+    })}
 
   loadAppointments(): void {
     if (!this.userId) return;
@@ -521,14 +535,137 @@ export class MedicalRecordComponent implements OnInit {
     return 'assets/file-icon-large.png';
   }
 
-  private handleMedicalRecordError(err: any): void {
-    console.error('Error fetching medical record:', err);
-    this.toastr.error('Failed to load medical record');
-  }
-  getSafeAvatar(): SafeUrl {
-    if (this.patient.avatar?.startsWith('data:')) {
-      return this.sanitizer.bypassSecurityTrustUrl(this.patient.avatar);
+  generateSummary(): void {
+    if (this.records.length === 0) {
+      this.toastr.warning('No notes available to summarize');
+      return;
     }
-    return this.patient.avatar;
+
+    this.isGeneratingSummary = true;
+
+    // Combine all notes into one text
+    const allNotes = this.records.map(n => n.content).join('\n\n');
+
+    this.medicalService.generateNotesSummary(allNotes).subscribe({
+      next: (summary: string | null) => {
+        this.notesSummary = summary;
+        this.summaryGeneratedAt = new Date();
+        this.isGeneratingSummary = false;
+      },
+      error: (err: any) => {
+        console.error('Failed to generate summary', err);
+        this.toastr.error('Failed to generate summary');
+        this.isGeneratingSummary = false;
+      }
+    });
+  }
+
+  saveSummaryToNotes(): void {
+    if (!this.notesSummary) return;
+
+    const summaryNote = {
+      userId: this.userId,
+      authorId: 'ai-system',
+      authorName: 'AI Assistant',
+      content: `AI GENERATED SUMMARY:\n${this.notesSummary}`,
+      createdAt: new Date()
+    };
+
+    this.medicalService.addMedicalNote(summaryNote).subscribe({
+      next: () => {
+        this.toastr.success('Summary saved to notes');
+        this.loadMedicalNotes();
+      },
+      error: (err: any) => {
+        this.toastr.error('Failed to save summary');
+        console.error(err);
+      }
+    });
+  }
+  downloadDocument(doc: MedicalDocument): void {
+    const url = this.getDocumentUrl(doc);
+    const a = document.createElement('a');
+    a.href = url as string;
+    a.download = doc.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  editNote(noteId: string): void {
+    // Implement your edit note logic here
+    console.log('Editing note:', noteId);
+  }
+
+
+  // Add to your component class
+  printRecord(): void {
+    // Store original styles
+    const originalStyles = document.querySelectorAll('style, link[rel="stylesheet"]');
+
+    // Disable all styles for printing
+    originalStyles.forEach(style => {
+      style.setAttribute('media', 'none');
+    });
+
+    // Create print window
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.toastr.error('Popup blocker may be preventing the print window from opening');
+      return;
+    }
+
+    // Get the content to print
+    const content = document.querySelector('.medical-record-container')?.outerHTML;
+
+    // Write the content to the print window
+    printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Medical Record - ${this.patient.name}</title>
+      <style>
+        body { font-family: Arial, sans-serif; color: #333; }
+        .patient-header { background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%); color: white; padding: 20px; border-radius: 10px; }
+        .medical-section { page-break-inside: avoid; margin-bottom: 20px; border: 1px solid #eee; padding: 15px; border-radius: 8px; }
+        .mat-tab-group, .mat-tab-header { display: none !important; }
+        .tab-content { display: block !important; }
+        @page { size: auto; margin: 10mm; }
+        @media print {
+          body { zoom: 90%; }
+          button { display: none !important; }
+          .no-print { display: none !important; }
+        }
+      </style>
+    </head>
+    <body>
+      <h1 style="text-align: center; margin-bottom: 20px;">Medical Record</h1>
+      ${content}
+      <script>
+        window.onload = function() {
+          setTimeout(function() {
+            window.print();
+            window.close();
+          }, 300);
+        }
+      </script>
+    </body>
+    </html>
+  `);
+
+    // Close the document for writing
+    printWindow.document.close();
+
+    // Restore original styles after a delay
+    setTimeout(() => {
+      originalStyles.forEach(style => {
+        style.removeAttribute('media');
+      });
+    }, 1000);
+  }
+  loadDoctors(): void {
+    this.medicalService.getDoctors().subscribe({
+      next: (res) => this.doctors = res,
+      error: (err) => console.error('Failed to load doctors', err)
+    });
   }
 }
