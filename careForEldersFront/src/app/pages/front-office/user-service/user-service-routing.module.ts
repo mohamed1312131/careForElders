@@ -124,8 +124,7 @@ const routes: Routes = [
       // Nutrition & Plans
       {
         path: 'plan',
-        canActivate: [SubscriptionGuard],
-        data: { modules: 'planAndExercise' },
+      
         children: [
           { path: 'add-program', component: DoctorAddProgramComponent },
           { path: 'list', component: DoctorPlanListComponent },

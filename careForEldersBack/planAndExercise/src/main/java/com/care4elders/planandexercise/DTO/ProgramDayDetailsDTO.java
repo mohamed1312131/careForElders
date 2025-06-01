@@ -12,6 +12,7 @@ import java.util.List;
 @Data
 @Builder
 public class ProgramDayDetailsDTO {
+    private String id;
     private int dayNumber;
     private boolean restDay;
     private int totalDurationMinutes;
