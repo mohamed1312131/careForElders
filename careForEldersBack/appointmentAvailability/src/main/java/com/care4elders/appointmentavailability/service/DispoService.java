@@ -1,47 +1,43 @@
 package com.care4elders.appointmentavailability.service;
 
 import com.care4elders.appointmentavailability.dto.DisponibiliteDTO;
-import com.care4elders.appointmentavailability.dto.SlotDTO;
 import com.care4elders.appointmentavailability.entity.Disponibilite;
-import com.care4elders.appointmentavailability.entity.Reservation;
 import com.care4elders.appointmentavailability.repository.IDisponibiliteRepository;
 import com.care4elders.appointmentavailability.dto.UserDTO;
-
 import com.care4elders.appointmentavailability.repository.IReservationRepository;
+
 import jakarta.ws.rs.NotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
-
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
-
 public class DispoService {
 
     private final IDisponibiliteRepository repository;
     private final DoctorValidationService doctorValidationService;
 
     public Disponibilite createDisponibilite(DisponibiliteDTO dto) {
-        // Validate doctor exists
+        // ✅ Log input for debugging
+        log.info("Creating availability: doctorId={}, date={}, start={}, end={}",
+                dto.getDoctorId(), dto.getDate(), dto.getHeureDebut(), dto.getHeureFin());
+
+        // ✅ Validate doctor existence
         doctorValidationService.validateDoctor(dto.getDoctorId());
+
+        // ✅ Ensure date is not null
+        if (dto.getDate() == null) {
+            throw new IllegalArgumentException("Date must not be null");
+        }
 
         Disponibilite disponibilite = new Disponibilite();
         disponibilite.setDoctorId(dto.getDoctorId());
-        disponibilite.setDate(dto.getDate());
+        disponibilite.setDate(dto.getDate()); // Should be correctly parsed from frontend as 'YYYY-MM-DD'
         disponibilite.setHeureDebut(dto.getHeureDebut());
         disponibilite.setHeureFin(dto.getHeureFin());
         disponibilite.setSlotDuration(dto.getSlotDuration() != null ? dto.getSlotDuration() : 30);
@@ -68,6 +64,7 @@ public class DispoService {
         if (dto.getHeureDebut() != null) existing.setHeureDebut(dto.getHeureDebut());
         if (dto.getHeureFin() != null) existing.setHeureFin(dto.getHeureFin());
         if (dto.getSlotDuration() != null) existing.setSlotDuration(dto.getSlotDuration());
+        if (dto.getDate() != null) existing.setDate(dto.getDate());
 
         if (!existing.isValid()) {
             throw new IllegalArgumentException("Invalid availability time range");

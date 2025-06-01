@@ -6,180 +6,9 @@ import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-appointment-dialog',
-  template: `
-    <mat-card class="appointment-card">
-      <mat-card-header>
-        <div mat-card-avatar class="doctor-avatar">
-          {{ getDoctorInitials(data.doctorInfo.name) }}
-        </div>
-        <mat-card-title>Book Appointment</mat-card-title>
-        <mat-card-subtitle>
-          With Dr. {{ data.doctorInfo.name }}
-          <span *ngIf="data.doctorInfo.specialty">({{ data.doctorInfo.specialty }})</span>
-        </mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-divider></mat-divider>
-
-      <mat-card-content>
-        <div class="appointment-details">
-          <div class="detail-row">
-            <span class="detail-label">Date:</span>
-            <span class="detail-value">{{ formattedDate }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Time:</span>
-            <span class="detail-value">{{ formattedTime }}</span>
-          </div>
-          <div class="detail-row">
-            <span class="detail-label">Duration:</span>
-            <span class="detail-value">{{ data.availability.slotDuration }} minutes</span>
-          </div>
-          <div class="detail-row" *ngIf="patientName">
-            <span class="detail-label">Patient:</span>
-            <span class="detail-value">{{ patientName }}</span>
-          </div>
-          <mat-form-field appearance="outline" class="w-full" *ngIf="!patientName">
-            <mat-label>Patient Name</mat-label>
-            <input matInput [(ngModel)]="patientName" required>
-          </mat-form-field>
-          <!-- Show location only if appointmentType is PRESENTIEL -->
-          <mat-form-field appearance="outline" class="w-full" *ngIf="pendingType === 'PRESENTIEL'">
-            <mat-label>Lieu du rendez-vous</mat-label>
-            <input matInput [(ngModel)]="location" required>
-          </mat-form-field>
-        </div>
-        
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Notes (Optional)</mat-label>
-          <textarea matInput [(ngModel)]="notes" rows="3"></textarea>
-        </mat-form-field>
-      </mat-card-content>
-
-      <mat-divider></mat-divider>
-
-      <mat-card-actions align="end">
-        <button mat-raised-button 
-                color="primary" 
-                class="presentiel-button"
-                [disabled]="isLoading || !patientName"
-                (click)="bookAppointment('PRESENTIEL')">
-          Présentiel
-        </button>
-        <button mat-raised-button 
-                color="accent" 
-                class="enligne-button"
-                [disabled]="isLoading || !patientName"
-                (click)="bookAppointment('EN_LIGNE')">
-          En ligne
-        </button>
-      </mat-card-actions>
-    </mat-card>
-    <div *ngIf="loading" class="loading-overlay">
-      <mat-spinner></mat-spinner>
-      <!-- Or use any other spinner you like -->
-    </div>
-  `,
-  styles: [`
-    .appointment-card {
-  border-radius: 16px;
-  padding: 24px;
-  width: 100%;
-  max-width: 520px;
-  margin: auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  font-family: 'Roboto', sans-serif;
-}
-
-.doctor-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #673ab7, #512da8);
-  color: #fff;
-  font-weight: 600;
-  font-size: 18px;
-}
-
-.appointment-details {
-  padding-top: 20px;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  font-size: 15px;
-}
-
-.detail-label {
-  font-weight: 500;
-  color: #444;
-}
-
-.detail-value {
-  color: #222;
-}
-
-.w-full {
-  width: 100%;
-  margin-top: 16px;
-}
-
-.presentiel-button {
-  background-color: #673ab7;
-  color: white;
-  border-radius: 8px;
-  font-weight: 500;
-  padding: 6px 16px;
-}
-
-.enligne-button {
-  background-color: #ff4081;
-  color: white;
-  border-radius: 8px;
-  font-weight: 500;
-  padding: 6px 16px;
-}
-
-mat-divider {
-  margin: 20px 0;
-}
-
-mat-form-field {
-  margin-bottom: 14px;
-}
-
-mat-card-title {
-  font-size: 1.4rem;
-  font-weight: 600;
-}
-
-mat-card-subtitle {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.error-snackbar {
-  background-color: #d32f2f;
-  color: white;
-}
-
-.loading-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255, 255, 255, 0.7);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  `]
+  templateUrl: './appointment-dialog.component.html',
+  styleUrls: ['./appointment-dialog.component.scss']
 })
-
 export class AppointmentDialogComponent implements OnInit {
   patientName: string = '';
   notes: string = '';
@@ -263,9 +92,9 @@ export class AppointmentDialogComponent implements OnInit {
 
   bookAppointment(appointmentType: 'EN_LIGNE' | 'PRESENTIEL'): void {
     this.pendingType = appointmentType;
-    console.log('Setting loading to true...');
     this.loading = true;
     const userId = this.getUserIdFromLocalStorage();
+    
     if (!userId || !this.patientName) {
       this.snackBar.open('User information is missing. Please log in again.', 'Close', {
         duration: 3000,
@@ -275,9 +104,8 @@ export class AppointmentDialogComponent implements OnInit {
       return;
     }
 
-    // Require location for PRESENTIEL
     if (appointmentType === 'PRESENTIEL' && !this.location) {
-      this.snackBar.open('Veuillez saisir le lieu du rendez-vous.', 'Fermer', {
+      this.snackBar.open('Please enter the appointment location.', 'Close', {
         duration: 3000,
         panelClass: ['error-snackbar']
       });
@@ -285,7 +113,6 @@ export class AppointmentDialogComponent implements OnInit {
       return;
     }
 
-    // Use flexible object type so we can add meetingLink/location dynamically
     const reservationData: Record<string, any> = {
       date: this.formatDateForBackend(this.data.slot.start),
       heure: this.formatTimeForBackend(this.data.slot.start),
@@ -324,7 +151,6 @@ export class AppointmentDialogComponent implements OnInit {
           });
 
           this.dialogRef.close(true);
-          this.dialogRef.close('confirmed'); // This triggers the reload
         },
         error: (err) => {
           this.isLoading = false;
