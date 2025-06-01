@@ -118,11 +118,6 @@ public class ProgramService {
         return programDayRepository.save(day);
     }
 
-
-
-
-
-
     private void configureRestDay(ProgramDay day, ProgramDayDTO dto) {
         day.setTotalDurationMinutes(dto.getWarmUpMinutes() + dto.getCoolDownMinutes());
         day.setInstructions(dto.getInstructions());
@@ -183,9 +178,6 @@ public class ProgramService {
             throw new ServiceUnavailableException("User service unavailable");
         }
     }
-
-
-
 
     private void validateDayNumber(Program program, int dayNumber) {
         boolean dayExists = program.getDays().stream()
@@ -249,8 +241,6 @@ public class ProgramService {
 
         return assignmentRepository.save(assignment);
     }
-
-
 
     @Transactional
     public PatientProgramAssignment completeDay(String assignmentId, DayCompletionDTO completionDTO, String patientId) {
@@ -525,6 +515,7 @@ public class ProgramService {
 
     private ProgramDayDetailsDTO mapToDayDetails(ProgramDay day, Map<String, Exercise> exercisesMap) {
         return ProgramDayDetailsDTO.builder()
+                .id(day.getId())
                 .dayNumber(day.getDayNumber())
                 .restDay(day.isRestDay())
                 .totalDurationMinutes(day.getTotalDurationMinutes())
@@ -639,6 +630,31 @@ public class ProgramService {
 
         programDayRepository.delete(day);
     }
+
+    @Transactional
+    public Program updateProgram(String programId, ProgramDTO programDTO, String doctorId) {
+        validateDoctor(doctorId);
+
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        // Update fields from DTO
+        program.setName(programDTO.getName());
+        program.setDescription(programDTO.getDescription());
+        program.setProgramCategory(programDTO.getProgramCategory());
+        program.setProgramImage(programDTO.getProgramImage());
+        program.setStatus(programDTO.getStatus()); // ENUM: validated already
+        program.setDurationWeeks(programDTO.getDurationWeeks());
+        program.setUpdatedDate(LocalDateTime.now());
+
+        return programRepository.save(program);
+    }
+
+
 }
 
 

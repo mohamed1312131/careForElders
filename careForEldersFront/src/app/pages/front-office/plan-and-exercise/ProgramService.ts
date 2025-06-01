@@ -125,7 +125,7 @@ export class ProgramService {
     // Example: Assuming user service returns users with 'NORMAL_USER' role at this endpoint.
     // You might need to pass a doctorId header if your user service requires it for authorization.
     // const headers = new HttpHeaders().set('X-User-ID', doctorId); // If needed
-    return this.http.get<any[]>(`${this.userServiceUrl}/role/USER`);
+    return this.http.get<any[]>(`${this.userServiceUrl}/role/NORMAL_USER`);
     // Alternative: Fetch all users and filter by role on the frontend if the API doesn't support role filtering.
     // return this.http.get<any[]>(`${this.userServiceUrl}`).pipe(
     //   map(users => users.filter(user => user.role === 'NORMAL_USER'))
