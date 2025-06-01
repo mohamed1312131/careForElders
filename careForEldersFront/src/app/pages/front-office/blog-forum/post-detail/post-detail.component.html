@@ -90,7 +90,7 @@
                 {{ isPostLikedByUser() ? 'favorite' : 'favorite_border' }}
               </mat-icon>
             </button>
-            <span>{{ post.likes?.length || 0 }}</span>
+            <span>{{ post.likes.length || 0 }}</span>
           </div>
 
           <div class="comment-count">
@@ -357,7 +357,7 @@
                   {{ isCommentLikedByUser(comment) ? 'favorite' : 'favorite_border' }}
                 </mat-icon>
               </button>
-              <span>{{ comment.likes?.length || 0 }}</span>
+              <span>{{ comment.likes.length || 0 }}</span>
             </div>
 
             <button mat-button (click)="startReply(comment.id)">
@@ -543,7 +543,7 @@
                       {{ isCommentLikedByUser(reply) ? 'favorite' : 'favorite_border' }}
                     </mat-icon>
                   </button>
-                  <span>{{ reply.likes?.length || 0 }}</span>
+                  <span>{{ reply.likes.length || 0 }}</span>
                 </div>
 
                 <div class="edit-delete" *ngIf="canEditComment(reply)">
