@@ -61,31 +61,31 @@ const routes: Routes = [
       { 
         path: 'bill', 
         component: PatientBillListComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'create', 
         component: PatientBillFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'edit/:id', 
         component: PatientBillFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'view/:id', 
         component: PatientBillFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
         path: 'payment/:id', 
         component: PatientBillPaymentComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
       },
       { 
@@ -97,27 +97,27 @@ const routes: Routes = [
 
       // Blog/Forum
       { 
-        path: "blog", 
+        path: "post", 
         component: PostListComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
       { 
         path: "post/create", 
         component: PostFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
       { 
         path: "post/edit/:id", 
         component: PostFormComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
       { 
         path: "post/:id", 
         component: PostDetailComponent, 
-        canActivate: [SubscriptionGuard], 
+        //canActivate: [SubscriptionGuard], 
         data: { modules: 'blogForum' } 
       },
 

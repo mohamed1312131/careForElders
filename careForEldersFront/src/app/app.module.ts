@@ -70,6 +70,7 @@ import { CommonModule } from "@angular/common"
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
+    UserinfoComponent,
     MedicalRecordComponent,
     AddNoteDialogComponent,
     TruncatePipe,
@@ -77,7 +78,7 @@ import { CommonModule } from "@angular/common"
     UserinfoComponent,
     PlanListComponent,
     PlanDetailsComponent,
-    AdminDashboardComponent
+    AdminDashboardComponent,
   ],
   imports: [
     CommonModule,
@@ -115,8 +116,8 @@ import { CommonModule } from "@angular/common"
     MatExpansionModule,
     MatChipsModule,
     MatBadgeModule,
-    MatTabsModule
-
+    MatTabsModule,
+  
   ],
   exports: [TablerIconsModule],
   bootstrap: [AppComponent],

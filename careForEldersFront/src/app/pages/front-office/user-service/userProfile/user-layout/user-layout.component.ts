@@ -10,7 +10,7 @@ import { UserService } from 'src/app/services/user.service'; // Adjust path as n
   templateUrl: './user-layout.component.html',
   styleUrl: './user-layout.component.scss'
 })
-export class UserLayoutComponent implements OnInit, OnDestroy {
+export class UserLayoutComponent implements OnInit {
   isPlanMenuOpen = false;
   isPMedicalRecordMenuOpen = false;
   inNutritionmenu = false;

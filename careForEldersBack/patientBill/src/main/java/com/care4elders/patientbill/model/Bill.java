@@ -1,6 +1,7 @@
 package com.care4elders.patientbill.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class Bill {
     private String billNumber;
     
     @NotNull(message = "Patient ID is required")
-    private Integer patientId;
+    private String patientId;
     
     @NotBlank(message = "Patient name is required")
     private String patientName;
@@ -60,4 +61,6 @@ public class Bill {
     private List<BillItem> items;
     
     private String notes;
+
+    private BillItem.ServiceType serviceType;
 }
