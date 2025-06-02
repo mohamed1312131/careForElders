@@ -222,7 +222,7 @@ export class DoctorEditPlanComponent implements OnInit, OnDestroy {
   }
   
   // Method to unassign a patient (example, not fully implemented in UI yet)
-  onUnassignPatient(patientId: string): void {
+  /*onUnassignPatient(patientId: string): void {
     if (!confirm(`Are you sure you want to unassign ${this.getPatientName(patientId) || 'this patient'}?`)) {
       return;
     }
@@ -230,7 +230,7 @@ export class DoctorEditPlanComponent implements OnInit, OnDestroy {
     // this.programService.unassignProgramFromPatient(this.data.programId, patientId, this.doctorId).subscribe(...)
     console.log('Unassign patient:', patientId);
     this.snackBar.open('Unassign feature not fully implemented.', 'Close', {duration: 3000});
-  }
+  }*/
 
 
   closeDialog(result?: any): void {
@@ -290,4 +290,22 @@ export class DoctorEditPlanComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
+  onUnassignPatient(patientId: string): void {
+  if (!confirm(`Are you sure you want to unassign ${this.getPatientName(patientId) || 'this patient'}?`)) {
+    return;
+  }
+
+  this.programService.unassignProgramFromPatient(this.data.programId, patientId, this.doctorId)
+    .subscribe({
+      next: () => {
+        this.snackBar.open('Patient unassigned successfully.', 'Close', { duration: 3000, panelClass: 'success-snackbar' });
+        this.assignedPatients = this.assignedPatients.filter(p => p.id !== patientId);
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open('Error unassigning patient: ' + (err.error?.message || 'Unknown error'), 'Close', { duration: 5000, panelClass: 'error-snackbar' });
+      }
+    });
+}
+
 }

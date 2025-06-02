@@ -31,16 +31,15 @@ public class ProgramService {
 
     // Create empty program
     @Transactional
-    public Program createProgram(ProgramDTO programDTO, String doctorId) {
+    public Program createProgram(ProgramDTO programDTO, String doctorId, String imageUrl) {
         validateDoctor(doctorId);
 
-        // Create and save Program
         Program program = new Program();
         program.setName(programDTO.getName());
         program.setDescription(programDTO.getDescription());
         program.setDoctorId(doctorId);
         program.setProgramCategory(programDTO.getProgramCategory());
-        program.setProgramImage(programDTO.getProgramImage());
+        program.setProgramImage(imageUrl);  // Set Cloudinary URL here
         program.setStatus("DRAFT");
         program = programRepository.save(program);
 
@@ -220,7 +219,7 @@ public class ProgramService {
         assignment.setPatientId(assignmentDTO.getPatientId());
         assignment.setAssignedDate(LocalDateTime.now());
         assignment.setStatus("ACTIVE");
-        assignment.setCurrentDay(0);
+        assignment.setCurrentDay(1);
 
         // Initialize day statuses
         Map<Integer, DayStatus> dayStatuses = new HashMap<>();
@@ -240,6 +239,25 @@ public class ProgramService {
         assignment.setDayStatuses(dayStatuses);
 
         return assignmentRepository.save(assignment);
+    }
+
+    @Transactional
+    public void unassignPatientFromProgram(String programId, String patientId, String doctorId) {
+        // Validate ownership
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        // Find the assignment
+        PatientProgramAssignment assignment = assignmentRepository
+                .findByProgramIdAndPatientId(programId, patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
+
+        // Delete the assignment
+        assignmentRepository.delete(assignment);
     }
 
     @Transactional
@@ -278,6 +296,42 @@ public class ProgramService {
             assignment.setActualEndDate(LocalDateTime.now());
         }
 
+        assignment.setLastActivityDate(LocalDateTime.now());
+        return assignmentRepository.save(assignment);
+    }
+
+    @Transactional
+    public PatientProgramAssignment startDay(String assignmentId, int dayNumber, String patientId) {
+        PatientProgramAssignment assignment = getValidAssignment(assignmentId, patientId);
+
+        // Validate that this is the next day to be started
+        if (dayNumber != assignment.getCurrentDay() + 1) {
+            throw new InvalidProgramStateException("Can only start the next sequential day");
+        }
+
+        // Validate previous days are completed (except for day 1)
+        if (dayNumber > 1) {
+            for (int i = 1; i < dayNumber; i++) {
+                DayStatus prevDayStatus = assignment.getDayStatuses().get(i);
+                if (prevDayStatus == null || !prevDayStatus.isCompleted()) {
+                    throw new InvalidProgramStateException("Previous days must be completed first");
+                }
+            }
+        }
+
+        // Update current day and day status
+        assignment.setCurrentDay(dayNumber);
+
+        DayStatus dayStatus = assignment.getDayStatuses().get(dayNumber);
+        if (dayStatus == null) {
+            dayStatus = new DayStatus(
+                    false, null, 0, null, null, "",
+                    List.of(), 0, ""
+            );
+            assignment.getDayStatuses().put(dayNumber, dayStatus);
+        }
+
+        dayStatus.setActualStartDateTime(LocalDateTime.now());
         assignment.setLastActivityDate(LocalDateTime.now());
         return assignmentRepository.save(assignment);
     }
@@ -652,6 +706,28 @@ public class ProgramService {
         program.setUpdatedDate(LocalDateTime.now());
 
         return programRepository.save(program);
+    }
+
+    @Transactional
+    public void deleteProgram(String programId, String doctorId) {
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You are not authorized to delete this program");
+        }
+
+        // Step 1: Delete all patient assignments
+        assignmentRepository.deleteByProgramId(programId);
+
+        // Step 2: Delete all ProgramDays
+        List<String> dayIds = program.getProgramDayIds();
+        if (dayIds != null && !dayIds.isEmpty()) {
+            programDayRepository.deleteAllByIdIn(dayIds);
+        }
+
+        // Step 3: Delete the Program
+        programRepository.delete(program);
     }
 
 

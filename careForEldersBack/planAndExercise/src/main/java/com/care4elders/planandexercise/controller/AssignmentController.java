@@ -34,7 +34,7 @@ public class AssignmentController {
 
 
     @PostMapping("/{assignmentId}/complete-day")
-    public ResponseEntity<?> completeDay(
+        public ResponseEntity<?> completeDay(
             @PathVariable String assignmentId,
             @RequestBody DayCompletionDTO completionDTO,
             @RequestHeader("X-User-ID") String patientId) {
@@ -57,6 +57,19 @@ public class AssignmentController {
             );
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+    @PostMapping("/{assignmentId}/start-day/{dayNumber}")
+    public ResponseEntity<?> startDay(
+            @PathVariable String assignmentId,
+            @PathVariable int dayNumber,
+            @RequestHeader("X-User-ID") String patientId) {
+        try {
+            return ResponseEntity.ok(
+                    programService.startDay(assignmentId, dayNumber, patientId)
+            );
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
 
