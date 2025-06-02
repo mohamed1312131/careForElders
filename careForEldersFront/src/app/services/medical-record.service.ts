@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import {map} from "rxjs/operators";
 export interface MedicalDocument {
   _id: string;
   userId: string;
@@ -87,7 +88,14 @@ export class MedicalRecordService {
   getMedicalRecordDetails(id: string): Observable<MedicalRecord> {
     return this.http.get<MedicalRecord>(`${this.baseUrl}/${id}`);
   }
+  getDoctors(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:8081/users/doctors');
+  }
 
-
-
+  generateNotesSummary(notesText: string): Observable<string> {
+    const url = `${this.baseUrl}/summaries`;
+    return this.http.post<{summary: string}>(url, { text: notesText }).pipe(
+      map(response => response.summary)
+    );
+  }
 }

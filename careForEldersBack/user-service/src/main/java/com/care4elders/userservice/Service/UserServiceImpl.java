@@ -43,7 +43,8 @@ public class UserServiceImpl implements UserService {
                 user.getRole(),
                 user.getBirthDate(),
                 user.getProfileImage(),
-                user.getSpecialization()
+                user.getSpecialization(),
+                user.isTwoFactorEnabled()
         );
     }
 
@@ -69,11 +70,11 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
 
-        emailService.sendEmail(
+    /*    emailService.sendEmail(
                 user.getEmail(),
                 "Verify your account",
                 "Click this link to verify your email: http://localhost:8081/auth/verify?token=" + token
-        );
+        );*/
 
         return mapToResponse(savedUser);
     }
@@ -93,11 +94,12 @@ public class UserServiceImpl implements UserService {
         if (request.getBirthDate() != null) user.setBirthDate(request.getBirthDate());
         if (request.getProfileImage() != null) user.setProfileImage(request.getProfileImage());
         if (request.getRole() != null) user.setRole(request.getRole());
-
+        if (request.getTwoFactorEnabled() != null) {
+            user.setTwoFactorEnabled(request.getTwoFactorEnabled());
+        }
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-
         User updatedUser = userRepository.save(user);
 
         // Manual mapping to UserResponse
@@ -110,7 +112,7 @@ public class UserServiceImpl implements UserService {
         response.setBirthDate(updatedUser.getBirthDate());
         response.setProfileImage(updatedUser.getProfileImage());
         response.setRole(updatedUser.getRole());
-
+        response.setTwoFactorEnabled(updatedUser.isTwoFactorEnabled());
         return response;
     }
 

@@ -31,4 +31,5 @@ public class UserRequest {
 
     private String profileImage;
     private Role role;
+    private Boolean  twoFactorEnabled;
 }

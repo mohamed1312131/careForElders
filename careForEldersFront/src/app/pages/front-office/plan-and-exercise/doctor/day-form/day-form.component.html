@@ -1,25 +1,24 @@
-<!-- day-form.component.html -->
 <h2 mat-dialog-title>{{ isEditMode ? 'Edit Day' : 'Add New Day' }}</h2>
 <mat-dialog-content>
   <form [formGroup]="dayForm" class="day-form">
-    <!-- Day Number -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Day Number</mat-label>
-      <input matInput type="number" formControlName="dayNumber" required>
+      <input matInput type="number" formControlName="dayNumber" [readonly]="!isEditMode && dayForm.get('dayNumber')?.disabled">
       <mat-error *ngIf="dayForm.get('dayNumber')?.hasError('required')">
         Day number is required
       </mat-error>
       <mat-error *ngIf="dayForm.get('dayNumber')?.hasError('min')">
         Minimum day number is 1
       </mat-error>
+      <mat-error *ngIf="dayForm.get('dayNumber')?.hasError('dayNumberExists')">
+        This day number already exists
+      </mat-error>
     </mat-form-field>
 
-    <!-- Rest Day Toggle -->
     <mat-checkbox formControlName="isRestDay" class="mb-2">
       Rest Day (No Exercises)
     </mat-checkbox>
 
-    <!-- Warm-up/Cool-down Inputs -->
     <div *ngIf="!dayForm.get('isRestDay')?.value" class="row">
       <mat-form-field appearance="outline" class="half-width">
         <mat-label>Warm-up (minutes)</mat-label>
@@ -38,25 +37,45 @@
       </mat-form-field>
     </div>
 
-    <!-- Exercise Selection -->
     <div *ngIf="!dayForm.get('isRestDay')?.value">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Select Exercises</mat-label>
-        <mat-select formControlName="exerciseIds" multiple>
-          <mat-option *ngFor="let exercise of exercises" [value]="exercise.id">
-            {{ exercise.name }} ({{ exercise.defaultDurationMinutes }} mins)
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <ng-container *ngIf="isEditMode">
+        <h3 class="mat-subheading-2">Selected Exercises</h3>
+        <div *ngIf="currentDayExercises.length === 0" class="no-exercises-message hint-text mb-2">
+          No exercises assigned to this day. Click "Add Exercise" to assign.
+        </div>
+        <mat-list role="list" *ngIf="currentDayExercises.length > 0" class="mb-2 exercise-list-container">
+          <mat-list-item *ngFor="let exercise of currentDayExercises" role="listitem" class="exercise-list-item">
+            <span matListItemTitle class="exercise-name">{{ exercise.name }}</span>
+            <!--<span matListItemLine *ngIf="exercise.defaultDurationMinutes" class="exercise-duration">
+              {{ exercise.defaultDurationMinutes }} mins
+            </span> -->
+             <button mat-icon-button color="warn" (click)="removeExercise(exercise.id)" matListItemMeta aria-label="Remove exercise from day">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+        <button mat-stroked-button color="primary" (click)="openAddExerciseDialog()" type="button">
+          <mat-icon>add</mat-icon> Add Exercise
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="!isEditMode">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Exercises</mat-label>
+          <mat-select formControlName="exerciseIds" multiple>
+            <mat-option *ngFor="let exercise of exercises" [value]="exercise.id">
+              {{ exercise.name }} <!--({{ exercise.defaultDurationMinutes }} mins) -->
+            </mat-option>
+          </mat-select>
+          </mat-form-field>
+      </ng-container>
     </div>
 
-    <!-- Instructions -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Instructions</mat-label>
       <textarea matInput formControlName="instructions" rows="3"></textarea>
     </mat-form-field>
 
-    <!-- Patient Notes -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Notes for Patient</mat-label>
       <textarea matInput formControlName="notesForPatient" rows="2"></textarea>
@@ -66,9 +85,9 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="dialogRef.close()">Cancel</button>
-  <button mat-raised-button color="primary" 
+  <button mat-raised-button color="primary"
           (click)="saveDay()"
           [disabled]="dayForm.invalid">
-    {{ isEditMode ? 'Update' : 'Save' }}
+    {{ isEditMode ? 'Update Day' : 'Save Day' }}
   </button>
 </mat-dialog-actions>

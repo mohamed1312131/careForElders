@@ -1,61 +1,89 @@
-<h2 mat-dialog-title class="text-xl font-semibold text-blueGray-700">Select Exercises</h2>
+<h2 mat-dialog-title
+    class="text-2xl font-semibold text-slate-800 dark:text-slate-100 pb-4 mb-6 border-b border-slate-200 dark:border-slate-700">
+  Select Exercises
+</h2>
 
-<mat-dialog-content class="mat-typography">
-  <div class="py-2 space-y-4">
+<mat-dialog-content class="mat-typography min-h-[300px]">
+  <div *ngIf="isLoading" class="flex justify-center items-center h-40">
+    <mat-spinner diameter="50" color="primary"></mat-spinner>
+  </div>
 
-    <div *ngIf="errorMessage" class="p-4 bg-red-50 text-red-700 rounded">
-      {{ errorMessage }}
-    </div>
+  <div *ngIf="errorMessage && !isLoading"
+       class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 dark:bg-slate-800 dark:text-red-400 shadow"
+       role="alert">
+    <svg class="flex-shrink-0 inline w-5 h-5 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+    </svg>
+    <span class="sr-only">Error</span>
+    <div>{{ errorMessage }}</div>
+  </div>
 
-    <div *ngIf="!isLoading && !errorMessage">
-
-      <!-- Filters -->
-      <div class="flex flex-col md:flex-row gap-4 mb-4">
+  <div *ngIf="!isLoading && !errorMessage" class="space-y-6">
+    <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg shadow-sm">
+      <div class="flex flex-col sm:flex-row gap-4">
         <div class="flex-1">
-          <label class="block text-blueGray-600 text-sm mb-1">Category</label>
-          <select [(ngModel)]="selectedCategory" (change)="filterExercises()" class="w-full p-2 border rounded">
+          <label for="categoryFilter" class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Category</label>
+          <select id="categoryFilter"
+                  [(ngModel)]="selectedCategory"
+                  (change)="filterExercises()"
+                  class="bg-white border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500 transition-colors duration-150">
             <option value="">All Categories</option>
             <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
           </select>
         </div>
 
         <div class="flex-1">
-          <label class="block text-blueGray-600 text-sm mb-1">Difficulty</label>
-          <select [(ngModel)]="selectedDifficulty" (change)="filterExercises()" class="w-full p-2 border rounded">
+          <label for="difficultyFilter" class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Difficulty</label>
+          <select id="difficultyFilter"
+                  [(ngModel)]="selectedDifficulty"
+                  (change)="filterExercises()"
+                  class="bg-white border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500 transition-colors duration-150">
             <option value="">All Difficulties</option>
             <option *ngFor="let level of difficultyLevels" [value]="level">{{ level }}</option>
           </select>
         </div>
       </div>
-
-      <!-- Exercise List -->
-      <div *ngFor="let exercise of filteredExercises" class="mb-2 flex items-center">
-        <mat-checkbox
-          [(ngModel)]="exercise.selected"
-          class="mr-3"
-          color="primary">
-        </mat-checkbox>
-        <span class="text-blueGray-600 text-sm">{{ exercise.name }}</span>
-      </div>
-
-      <div *ngIf="filteredExercises.length === 0" class="text-center text-blueGray-400 text-sm">
-        No exercises found.
-      </div>
     </div>
 
+    <div class="max-h-80 overflow-y-auto pr-2 space-y-1 custom-scrollbar">
+      <div *ngIf="filteredExercises.length > 0; else noExercises">
+        <div *ngFor="let exercise of filteredExercises"
+             class="flex items-center p-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/70 transition-colors duration-150 cursor-pointer group"
+             (click)="toggleSelection(exercise, $event)">
+          <mat-checkbox
+            [(ngModel)]="exercise.selected"
+            (ngModelChange)="$event ? null : null" class="mr-4"
+            color="primary">
+          </mat-checkbox>
+          <span class="text-sm text-slate-800 dark:text-slate-200 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">{{ exercise.name }}</span>
+          <span class="ml-auto text-xs text-slate-500 dark:text-slate-400 px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded-full">{{ exercise.difficultyLevel }}</span>
+        </div>
+      </div>
+      <ng-template #noExercises>
+        <div class="text-center text-slate-500 dark:text-slate-400 py-10">
+          <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100">No exercises found</h3>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Try adjusting your filters.</p>
+        </div>
+      </ng-template>
+    </div>
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end" *ngIf="!isLoading">
-  <button mat-button (click)="onCancelClick()" class="text-blueGray-600 hover:text-blueGray-800 mr-2">
+<mat-dialog-actions align="end" *ngIf="!isLoading"
+                      class="pt-6 mt-6 border-t border-slate-200 dark:border-slate-700 px-6 pb-4">
+  <button mat-stroked-button
+          (click)="onCancelClick()"
+          class="mr-3 text-slate-700 border-slate-300 hover:bg-slate-50 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors duration-150">
     Cancel
   </button>
-  <button 
-    mat-raised-button 
-    color="primary" 
-    (click)="onAddClick()"
-    [disabled]="errorMessage"
-    class="bg-pink-500 text-white active:bg-pink-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150">
+  <button mat-raised-button
+          color="primary"
+          (click)="onAddClick()"
+          [disabled]="!anySelected() || !!errorMessage"
+          class="bg-pink-600 hover:bg-pink-700 focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 text-white font-medium text-sm px-5 py-2.5 rounded-lg shadow hover:shadow-md transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed">
     Add Selected
   </button>
 </mat-dialog-actions>

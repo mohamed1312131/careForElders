@@ -16,4 +16,5 @@ public class UserResponse {
     private LocalDate birthDate;
     private String profileImage;
     private String specialization;
+    private Boolean  twoFactorEnabled;
 }
