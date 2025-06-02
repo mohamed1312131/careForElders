@@ -12,5 +12,6 @@ public interface PatientProgramAssignmentRepository extends MongoRepository<Pati
     Optional<PatientProgramAssignment> findByProgramIdAndPatientId(String programId, String patientId);
     long countByProgramId(String programId);
     List<PatientProgramAssignment> findByProgramId(String programId);
+    void deleteByProgramId(String programId);
 
 }

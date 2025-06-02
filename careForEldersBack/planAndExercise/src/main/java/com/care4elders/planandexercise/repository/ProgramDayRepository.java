@@ -14,5 +14,6 @@ public interface ProgramDayRepository extends MongoRepository<ProgramDay, String
     Long countExercisesByProgramId(String programId);
     @Query(value = "{ 'programId' : ?0 }", count = true)
     Long countByProgramId(String programId);
+    void deleteAllByIdIn(List<String> ids);
 
 }

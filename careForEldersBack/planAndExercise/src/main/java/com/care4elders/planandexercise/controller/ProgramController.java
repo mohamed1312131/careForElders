@@ -5,13 +5,17 @@ import com.care4elders.planandexercise.entity.Program;
 import com.care4elders.planandexercise.entity.ProgramDay;
 import com.care4elders.planandexercise.exception.*;
 import com.care4elders.planandexercise.repository.ProgramDayRepository;
+import com.care4elders.planandexercise.service.CloudinaryService;
 import com.care4elders.planandexercise.service.ProgramService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 // ProgramController.java
@@ -22,19 +26,41 @@ import java.util.List;
 public class ProgramController {
     private final ProgramService programService;
     private final ProgramDayRepository programDayRepository;
-
-    @PostMapping("/create")
+    private final CloudinaryService cloudinaryService;
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProgram(
-            @Valid @RequestBody ProgramDTO programDTO,
+            @RequestPart("program") @Valid ProgramDTO programDTO,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile,
             @RequestHeader("X-User-ID") String doctorId) {
+
+        String imageUrl = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                // Upload to Cloudinary's "program_images" folder
+                imageUrl = cloudinaryService.uploadImage(imageFile);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to upload image: " + e.getMessage());
+            }
+        }
+
         try {
-            Program createdProgram = programService.createProgram(programDTO, doctorId);
+            Program createdProgram = programService.createProgram(programDTO, doctorId, imageUrl);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProgram);
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         } catch (ServiceUnavailableException ex) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
         }
+    }
+    @DeleteMapping("/programs/{programId}/patients/{patientId}")
+    public ResponseEntity<?> unassignPatient(
+            @PathVariable String programId,
+            @PathVariable String patientId,
+            @RequestHeader("doctor-id") String doctorId // or however you're passing doctor identity
+    ) {
+        programService.unassignPatientFromProgram(programId, patientId, doctorId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{programId}/days")
@@ -98,6 +124,18 @@ public class ProgramController {
             return ResponseEntity.ok(updatedDay);
         } catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/deleteById/{programId}")
+    public ResponseEntity<?> deleteProgram(@PathVariable String programId, @RequestHeader("X-User-ID") String doctorId) {
+        try {
+            programService.deleteProgram(programId, doctorId);
+            return ResponseEntity.noContent().build();
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (UnauthorizedAccessException ex) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
 

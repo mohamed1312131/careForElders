@@ -25,7 +25,7 @@ export class PlanListComponent implements OnInit {
   loadPrograms(): void {
     this.programService.getProgramsByUserId(this.userId)
       .subscribe({
-        next: (programs) => this.programs = programs,
+        next: (programs) => {this.programs = programs,console.log('Programs loaded:', programs)},
         error: (err) => console.error('Error loading programs:', err)
       });
   }

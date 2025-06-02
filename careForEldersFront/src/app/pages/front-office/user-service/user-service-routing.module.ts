@@ -56,8 +56,8 @@ const routes: Routes = [
       { 
         path: 'AI', 
         component: ChatAIComponent, 
-        canActivate: [SubscriptionGuard], 
-        data: { modules: 'Chat with doctors' } 
+        /*canActivate: [SubscriptionGuard], 
+        data: { modules: 'Chat with doctors' } */
       },
       { 
         path: 'bill', 

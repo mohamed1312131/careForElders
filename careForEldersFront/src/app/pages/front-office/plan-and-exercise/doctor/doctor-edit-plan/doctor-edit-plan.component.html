@@ -94,10 +94,13 @@
               </h3>
               <div *ngIf="assignedPatients.length > 0; else noAssignedPatients" class="assigned-patients-chips">
                 <mat-chip-listbox aria-label="Assigned patients">
-                  <mat-chip *ngFor="let patient of assignedPatients" selected="true" [color]="'primary'">
-                    <mat-icon matChipAvatar>person</mat-icon>
-                    {{ patient.name || patient.id }}
-                    </mat-chip>
+                  <mat-chip *ngFor="let patient of assignedPatients" selected="true" [color]="'primary'" class="assigned-chip">
+  <mat-icon matChipAvatar>person</mat-icon>
+  {{ patient.name || patient.id }}
+  <button mat-icon-button matTooltip="Unassign" (click)="onUnassignPatient(patient.id); $event.stopPropagation();" class="unassign-icon">
+    <mat-icon color="warn">cancel</mat-icon>
+  </button>
+</mat-chip>
                 </mat-chip-listbox>
               </div>
               <ng-template #noAssignedPatients>
