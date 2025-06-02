@@ -26,4 +26,5 @@ public class MedicalRecordController {
     public MedicalRecord updateMedicalRecord(@PathVariable String id, @RequestBody MedicalRecord medicalRecord) {
         return medicalRecordService.update(id, medicalRecord);
     }
+
 }

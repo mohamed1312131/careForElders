@@ -1,4 +1,4 @@
-package com.care4elders.medicalrecord.service;
+package com.care4elders.medicalrecord.config;
 
 import com.care4elders.medicalrecord.entity.Appointment;
 import com.care4elders.medicalrecord.repository.AppointmentRepository;
