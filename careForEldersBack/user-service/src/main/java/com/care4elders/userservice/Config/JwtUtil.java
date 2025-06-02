@@ -37,4 +37,15 @@ public class JwtUtil {
             return false;
         }
     }
+    public String generateTempToken(String email) {
+        // Short-lived token for 2FA validation (e.g. 5 minutes)
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("type", "otp") // Optional: add custom claim to distinguish token purpose
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5 min
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
 }

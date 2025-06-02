@@ -32,8 +32,8 @@ public class User {
     private String verificationToken;
     private LocalDateTime tokenExpiryDate;
     private String resetPasswordToken;
-
-
+    private boolean twoFactorEnabled;
+    private LocalDateTime LastLogin;
     // For all users (especially patients)
     private List<String> reservationIds;
     // For doctors only

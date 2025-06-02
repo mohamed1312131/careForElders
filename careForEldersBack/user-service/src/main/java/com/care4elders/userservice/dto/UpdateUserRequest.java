@@ -25,5 +25,5 @@ public class UpdateUserRequest {
     private LocalDate birthDate;
     private String profileImage;
     private Role role;
-
+    private Boolean twoFactorEnabled;
 }
