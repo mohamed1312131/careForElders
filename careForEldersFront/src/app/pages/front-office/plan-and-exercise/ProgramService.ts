@@ -90,8 +90,8 @@ deleteProgram(programId: string, doctorId: string): Observable<void> {
 }
 
 unassignProgramFromPatient(programId: string, patientId: string, doctorId: string): Observable<any> {
-  return this.http.delete(`/api/programs/${programId}/unassign/${patientId}`, {
-    params: { doctorId }
+  return this.http.delete(`${this.apiUrl}/programs/${programId}/patients/${patientId}`, {
+    headers: new HttpHeaders({ 'doctor-id': doctorId })
   });
 }
 
@@ -176,5 +176,8 @@ addDayToProgram(programId: string, dayData: any, doctorId: string): Observable<a
     dayData,
     { headers }
   );
+}
+getUnassignedPatientsForProgram(programId: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/${programId}/unassigned-patients`);
 }
 }
