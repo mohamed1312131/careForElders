@@ -1,0 +1,183 @@
+<div class="container mt-4" *ngIf="plan; else loadingOrError">
+  <button mat-icon-button color="primary" [routerLink]="['/front-office/nutrition/plan-list']" aria-label="Back to list">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+
+  <h2>Nutrition Plan Details</h2>
+
+  <!-- Loading Indicator for main plan -->
+  <div *ngIf="loading" class="text-center my-3">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading plan details...</p>
+  </div>
+
+  <div *ngIf="!loading && plan">
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <mat-card-title>Plan Information</mat-card-title>
+        <mat-card-subtitle>User ID: {{ plan.userId }} | Email: {{ plan.userEmail }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p><strong>Medical Conditions:</strong> {{ plan.medicalConditions }}</p>
+        <p><strong>Dietary Preferences:</strong> {{ plan.dietaryPreferences || 'N/A' }}</p>
+        <p><strong>Allergies:</strong> {{ plan.allergies || 'N/A' }}</p>
+        <p><strong>Plan Duration:</strong> {{ plan.planDuration }} days</p>
+        <p><strong>Target Calories:</strong> {{ plan.targetCalories }} kcal</p>
+        <p><strong>Status:</strong>
+          <span class="badge" [ngClass]="plan.active ? 'bg-success' : 'bg-secondary'">
+                      {{ plan.active ? 'Active' : 'Inactive' }}
+                  </span>
+        </p>
+        <p><strong>Created At:</strong> {{ plan.createdAt | date:'medium' }}</p>
+        <p><strong>Updated At:</strong> {{ plan.updatedAt | date:'medium' }}</p>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button color="primary" (click)="regeneratePlan()" [disabled]="loading">
+          <mat-icon>autorenew</mat-icon> Regenerate Plan (AI)
+        </button>
+        <!-- Add Edit button if needed -->
+        <!-- <button mat-button color="accent" [routerLink]="['/front-office/nutrition/edit', plan.id]">Edit Plan</button> -->
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <mat-card-title>AI Generated Plan Content</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ plan.aiGeneratedPlan || plan.content || 'No AI plan content available.' }}</pre>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <mat-card-title>Meal Schedule</mat-card-title>
+      </mat-card-header>
+      <mat-card-content *ngIf="!editingSchedule">
+        <p><strong>Breakfast:</strong> {{ plan.mealSchedule?.breakfastTime || 'Not set' }}</p>
+        <p><strong>Lunch:</strong> {{ plan.mealSchedule?.lunchTime || 'Not set' }}</p>
+        <p><strong>Dinner:</strong> {{ plan.mealSchedule?.dinnerTime || 'Not set' }}</p>
+        <p><strong>Snacks:</strong></p>
+        <ul *ngIf="plan.mealSchedule?.snackTimes?.length; else noSnacks">
+          <li *ngFor="let snack of plan.mealSchedule?.snackTimes">{{ snack }}</li>
+        </ul>
+        <ng-template #noSnacks><p>No snack times set.</p></ng-template>
+      </mat-card-content>
+      <!-- Schedule Editing Form -->
+      <mat-card-content *ngIf="editingSchedule">
+        <mat-form-field appearance="fill" class="w-100 mb-2">
+          <mat-label>Breakfast Time (HH:mm)</mat-label>
+          <input matInput type="time" [(ngModel)]="editableSchedule.breakfastTime">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-100 mb-2">
+          <mat-label>Lunch Time (HH:mm)</mat-label>
+          <input matInput type="time" [(ngModel)]="editableSchedule.lunchTime">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="w-100 mb-2">
+          <mat-label>Dinner Time (HH:mm)</mat-label>
+          <input matInput type="time" [(ngModel)]="editableSchedule.dinnerTime">
+        </mat-form-field>
+        <h5>Snack Times</h5>
+        <div *ngFor="let snack of editableSchedule.snackTimes; let i = index; trackBy: trackBySnackTime" class="d-flex align-items-center mb-2">
+          <mat-form-field appearance="fill" class="flex-grow-1 me-2">
+            <mat-label>Snack Time {{i + 1}} (HH:mm)</mat-label>
+            <input matInput type="time" [(ngModel)]="editableSchedule.snackTimes![i]">
+          </mat-form-field>
+          <button mat-icon-button color="warn" (click)="removeSnackTime(i)">
+            <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+        </div>
+        <button mat-stroked-button color="primary" (click)="addSnackTime()">
+          <mat-icon>add</mat-icon> Add Snack Time
+        </button>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button *ngIf="!editingSchedule" (click)="editSchedule()">Edit Schedule</button>
+        <button mat-button *ngIf="editingSchedule" (click)="cancelEditSchedule()">Cancel</button>
+        <button mat-raised-button color="primary" *ngIf="editingSchedule" (click)="saveSchedule()">Save Schedule</button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card class="mb-4">
+      <mat-card-header>
+        <mat-card-title>Settings & Interactions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-slide-toggle [checked]="plan.emailRemindersEnabled" (change)="toggleEmailReminders()">
+          Email Reminders Enabled
+        </mat-slide-toggle>
+        <p *ngIf="plan.lastReminderSent">Last reminder sent: {{ plan.lastReminderSent | date:'medium' }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-icon-button color="primary" (click)="likePlan()" matTooltip="Like Plan">
+          <mat-icon>thumb_up</mat-icon> {{ plan.likes }}
+        </button>
+        <button mat-icon-button color="warn" (click)="dislikePlan()" matTooltip="Dislike Plan">
+          <mat-icon>thumb_down</mat-icon> {{ plan.dislikes }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Comments ({{ comments.length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Loading Indicator for comments -->
+        <div *ngIf="loadingComments" class="text-center my-3">
+          <mat-spinner diameter="30"></mat-spinner>
+          <p>Loading comments...</p>
+        </div>
+
+        <!-- Comment Form -->
+        <button mat-stroked-button color="primary" (click)="showCommentForm = !showCommentForm" *ngIf="!showCommentForm">
+          Add Comment
+        </button>
+        <div *ngIf="showCommentForm" class="mb-3">
+          <mat-form-field appearance="fill" class="w-100">
+            <mat-label>Your Comment</mat-label>
+            <textarea matInput [(ngModel)]="newCommentText" placeholder="Write your comment here..." rows="3"></textarea>
+            <mat-error *ngIf="commentError">{{ commentError }}</mat-error>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="submitComment()" [disabled]="isSubmittingComment || !newCommentText.trim()">
+            Submit Comment
+          </button>
+          <button mat-button (click)="showCommentForm = false; newCommentText = ''; commentError = '';">Cancel</button>
+        </div>
+
+        <!-- Comment List -->
+        <div *ngIf="!loadingComments && comments.length > 0">
+          <mat-list>
+            <mat-list-item *ngFor="let comment of comments">
+              <mat-icon matListItemIcon>comment</mat-icon>
+              <div matListItemTitle>{{ comment.comment }}</div>
+              <div matListItemLine>
+                <span>User: {{ comment.userId }}</span>
+                <span class="mx-2">|</span>
+                <span>{{ comment.timestamp | date:'short' }}</span>
+              </div>
+              <!-- Add delete button if user has permission -->
+              <button mat-icon-button color="warn" (click)="deleteComment(comment.commentId)" matListItemMeta *ngIf="comment.commentId">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <p *ngIf="!loadingComments && comments.length === 0" class="text-muted">No comments yet.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div class="container mt-4 text-center">
+    <div *ngIf="loading">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading plan details...</p>
+    </div>
+    <div *ngIf="!loading" class="alert alert-danger">
+      Plan not found or an error occurred while loading details.
+      <button mat-button color="primary" [routerLink]="['/front-office/nutrition/plan-list']">Back to List</button>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,172 @@
+<div class="container mt-4">
+  <h2>Admin Dashboard</h2>
+
+  <button class="btn btn-primary mb-3" (click)="createNewPlan()">
+    Add New Plan
+  </button>
+
+  <div class="card mb-4" *ngIf="showForm">
+    <div class="card-header">
+      {{isEditing ? 'Edit Plan' : 'Create New Plan'}}
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="submitPlan()">
+        <div class="mb-3">
+          <label class="form-label">User ID</label>
+          <input type="text" class="form-control"
+                 [(ngModel)]="editableUserId"
+                 name="userId" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">User Email</label>
+          <input type="email" class="form-control"
+                 [(ngModel)]="editableUserEmail"
+                 name="userEmail" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Medical Conditions</label>
+          <textarea class="form-control" rows="3"
+                    [(ngModel)]="editableMedicalConditions"
+                    name="medicalConditions" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Dietary Preferences</label>
+          <textarea class="form-control" rows="2"
+                    [(ngModel)]="editableDietaryPreferences"
+                    name="dietaryPreferences"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Allergies</label>
+          <textarea class="form-control" rows="2"
+                    [(ngModel)]="editableAllergies"
+                    name="allergies"></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Plan Duration (days)</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="editablePlanDuration"
+                   name="planDuration" required min="1" max="365">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Target Calories</label>
+            <input type="number" class="form-control"
+                   [(ngModel)]="editableTargetCalories"
+                   name="targetCalories" required min="800" max="5000">
+          </div>
+        </div>
+
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="activeCheck"
+                 [(ngModel)]="editableActive"
+                 name="active">
+          <label class="form-check-label" for="activeCheck">Active</label>
+        </div>
+
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="emailCheck"
+                 [(ngModel)]="editableEmailRemindersEnabled"
+                 name="emailRemindersEnabled">
+          <label class="form-check-label" for="emailCheck">Email Reminders Enabled</label>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">
+            <h5>Meal Schedule</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Breakfast Time (HH:mm)</label>
+              <input type="time" class="form-control"
+                     [(ngModel)]="editableBreakfastTime"
+                     name="breakfastTime">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Lunch Time (HH:mm)</label>
+              <input type="time" class="form-control"
+                     [(ngModel)]="editableLunchTime"
+                     name="lunchTime">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Dinner Time (HH:mm)</label>
+              <input type="time" class="form-control"
+                     [(ngModel)]="editableDinnerTime"
+                     name="dinnerTime">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Snack Times</label>
+              <div *ngFor="let snack of editableSnackTimes; let i = index; trackBy: trackBySnackTime" class="input-group mb-2">
+                <input type="time" class="form-control"
+                       [(ngModel)]="editableSnackTimes[i]"
+                       [name]="'snackTime' + i">
+                <button type="button" class="btn btn-outline-danger" (click)="removeSnackTime(i)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+              <button type="button" class="btn btn-outline-primary mt-2" (click)="addSnackTime()">
+                <i class="bi bi-plus"></i> Add Snack Time
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">AI Generated Plan Content</label>
+          <textarea class="form-control" rows="5"
+                    [(ngModel)]="editableAiGeneratedPlan"
+                    name="aiGeneratedPlan"></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancel</button>
+          <button type="button" class="btn btn-success" *ngIf="!isEditing" (click)="generatePlanWithAI()">
+            Generate with AI
+          </button>
+          <button type="submit" class="btn btn-primary">
+            {{isEditing ? 'Update' : 'Create'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Medical Conditions</th>
+        <th>Target Calories</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let plan of plans">
+        <td>{{plan.userId}}</td>
+        <td>{{plan.medicalConditions | slice:0:50}}{{plan.medicalConditions.length > 50 ? '...' : ''}}</td>
+        <td>{{plan.targetCalories}}</td>
+        <td>
+          <span class="badge" [ngClass]="plan.active ? 'bg-success' : 'bg-secondary'">
+            {{plan.active ? 'Active' : 'Inactive'}}
+          </span>
+        </td>
+        <td>{{plan.createdAt | date:'shortDate'}}</td>
+        <td>
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-primary" (click)="editPlan(plan)">Edit</button>
+            <button class="btn btn-outline-danger" (click)="deletePlan(plan.id)">Delete</button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

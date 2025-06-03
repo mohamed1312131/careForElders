@@ -1,0 +1,85 @@
+<div class="container mt-4">
+  <h2>Nutrition Plans</h2>
+
+  <!-- Search Bar -->
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="Search by keyword (e.g., condition, preference)..."
+           [(ngModel)]="searchTerm" (keyup.enter)="onSearchTermChange()">
+    <button class="btn btn-outline-secondary" type="button" (click)="onSearchTermChange()">Search</button>
+    <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()" *ngIf="searchTerm">Clear</button>
+  </div>
+
+  <!-- Optional: Button to navigate to create plan -->
+  <div class="mb-3">
+    <button class="btn btn-primary" (click)="navigateToCreate()">Create New Plan</button>
+    <!-- Add other filter controls here if needed (e.g., by user, by condition) -->
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="text-center">
+    <mat-spinner diameter="50"></mat-spinner> <!-- Assuming Angular Material Spinner -->
+    <p>Loading plans...</p>
+  </div>
+
+  <!-- Plan List Table/Cards -->
+  <div *ngIf="!loading && plans.length > 0">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Conditions</th>
+        <th>Preferences</th>
+        <th>Allergies</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Likes/Dislikes</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let plan of plans" (click)="viewPlanDetails(plan.id)" style="cursor: pointer;">
+        <td>{{ plan.userId }}</td>
+        <td>{{ plan.medicalConditions | slice:0:50 }}{{ plan.medicalConditions.length > 50 ? '...' : '' }}</td>
+        <td>{{ plan.dietaryPreferences || 'N/A' }}</td>
+        <td>{{ plan.allergies || 'N/A' }}</td>
+        <td>
+            <span class="badge" [ngClass]="plan.active ? 'bg-success' : 'bg-secondary'">
+              {{ plan.active ? 'Active' : 'Inactive' }}
+            </span>
+        </td>
+        <td>{{ plan.createdAt | date:'shortDate'}}</td> <!-- Assuming Date object -->
+        <td>
+          <span class="me-2"><i class="bi bi-hand-thumbs-up"></i> {{ plan.likes }}</span>
+          <span><i class="bi bi-hand-thumbs-down"></i> {{ plan.dislikes }}</span>
+        </td>
+        <td>
+          <!-- Action buttons - stop propagation to prevent row click -->
+          <button class="btn btn-sm btn-outline-primary me-1" (click)="viewPlanDetails(plan.id); $event.stopPropagation();">Details</button>
+          <button class="btn btn-sm btn-outline-danger" (click)="deletePlan(plan.id, $event); $event.stopPropagation();">
+            <i class="bi bi-trash"></i>
+          </button>
+          <!-- Add edit button if needed -->
+          <!-- <button class="btn btn-sm btn-outline-secondary ms-1" (click)="navigateToEdit(plan.id); $event.stopPropagation();">Edit</button> -->
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <mat-paginator
+      [length]="totalPlans"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="handlePageEvent($event)"
+      aria-label="Select page">
+    </mat-paginator> <!-- Assuming Angular Material Paginator -->
+
+  </div>
+
+  <!-- No Plans Found Message -->
+  <div *ngIf="!loading && plans.length === 0" class="text-center mt-4">
+    <p>No nutrition plans found.</p>
+    <button class="btn btn-primary" (click)="navigateToCreate()">Create First Plan</button>
+  </div>
+
+</div>

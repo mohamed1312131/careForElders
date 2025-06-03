@@ -1,0 +1,88 @@
+<div class="site-wrap">
+  <nav class="site-nav">
+    <div class="name">
+      Pepper
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <path d="M11.5,22C11.64,22 11.77,22 11.9,21.96C12.55,21.82 13.09,21.38 13.34,20.78C13.44,20.54 13.5,20.27 13.5,20H9.5A2,2 0 0,0 11.5,22M18,10.5C18,7.43 15.86,4.86 13,4.18V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V4.18C7.13,4.86 5,7.43 5,10.5V16L3,18V19H20V18L18,16M19.97,10H21.97C21.82,6.79 20.24,3.97 17.85,2.15L16.42,3.58C18.46,5 19.82,7.35 19.97,10M6.58,3.58L5.15,2.15C2.76,3.97 1.18,6.79 1,10H3C3.18,7.35 4.54,5 6.58,3.58Z" />
+      </svg>
+    </div>
+
+    <ul>
+      <li>
+      <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
+      <ul *ngIf="isPlanMenuOpen">
+        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
+        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
+         <li><a routerLink="/user/userProfile/plan/userprogram" routerLinkActive="active">My plan</a></li>
+         <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
+      </ul>
+    </li>
+      <ul>
+        <li>
+          <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isPlanMenuOpen }">Nutrition</a>
+          <ul *ngIf="inNutritionmenu">
+            <li><a  routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+            <li><a  routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <a (click)="toggleMedicalRecordMenu()" [ngClass]="{ active: isPMedicalRecordMenuOpen }">Medical Record</a>
+          <ul *ngIf="inMedicalRecordmenu">
+            <li><a  routerLink="/user/userProfile/medicalRecord/medicalrecordlist" routerLinkActive="active">Medical Records List </a></li>
+            <li>
+              <a [routerLink]="['/user/userProfile/medicalRecord/medicalrecord', userId]" routerLinkActive="active">
+                Medical Record
+              </a>
+            </li>
+
+          </ul>
+        </li>
+      </ul>
+      <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
+      <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
+      <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
+      <li><a *ngIf="isDoctor" routerLink="mySchedule" routerLinkActive="active">My Schedule</a></li>
+      <li><a routerLink="bill" routerLinkActive="active">Billing</a></li>
+      <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
+      <li><a routerLink="paramedical/list" routerLinkActive="active">Paramedical List</a></li>
+      <li><a routerLink="paramedical/nearby" routerLinkActive="active">Paramedical Near By Pro</a></li>
+      <li><a routerLink="paramedical/create" routerLinkActive="active">Paramedical create form</a></li>
+      <li><a routerLink="paramedical/appointements" routerLinkActive="active">Paramedical appointements</a></li>
+        
+      
+      <li><a routerLink="Abonnement" routerLinkActive="active">Abonnement</a></li>
+      <li><a routerLink="post" routerLinkActive="active">Community Forum</a></li>
+      <li><a [routerLink]="['/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
+      <li><a (click)="logout()">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <header>
+      <div class="breadcrumbs">
+  <a routerLink="/">Home</a>
+  <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+    <span>&nbsp;&gt;&nbsp;</span>
+    <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+    <span *ngIf="last">{{ crumb.label }}</span>
+  </ng-container>
+</div>
+      <h1 class="title">{{ currentTitle }}</h1>
+
+     <!-- <nav class="nav-tabs">
+        <a routerLink="/deals/pipeline" routerLinkActive="active">
+          Deals <span>14</span>
+        </a>
+        <a routerLink="/library" routerLinkActive="active">
+          Library <span>24</span>
+        </a>
+        <a routerLink="/search-library" routerLinkActive="active">
+          Search Library
+        </a>
+      </nav> -->
+    </header>
+
+    <div class="router-content-area"><router-outlet></router-outlet></div> </main>
+</div>
