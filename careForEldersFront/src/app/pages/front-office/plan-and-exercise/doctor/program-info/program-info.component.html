@@ -133,6 +133,8 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Assigned Date</th>
+                <th>Status</th>
+                <th>action</th>
               </tr>
             </thead>
             <tbody>
@@ -140,6 +142,15 @@
                 <td data-label="Name">{{ patient.name }}</td>
                 <td data-label="Email">{{ patient.email || 'N/A' }}</td>
                 <td data-label="Assigned Date">{{ patient.assignedDate | date:'mediumDate' }}</td>
+                <td data-label="Status">
+                  <span [ngClass]="{
+                    'status-active': patient.status === 'active',
+                    'status-inactive': patient.status === 'inactive',
+                    'status-pending': patient.status === 'pending'
+                  }">{{ patient.status }}</span> </td>
+                  <td><button mat-icon-button color="accent" (click)="openUserDialog(patient, data.programId)">
+  <mat-icon>info</mat-icon>
+</button></td>
               </tr>
             </tbody>
           </table>
@@ -152,4 +163,43 @@
       <button mat-flat-button color="primary" (click)="closeDialog()">Close</button>
     </mat-dialog-actions>
   </ng-container>
+</div>
+<div class="chart-section">
+  <button mat-stroked-button color="primary" (click)="toggleChart()" class="chart-toggle-btn">
+    <mat-icon>{{ showChart ? 'visibility_off' : 'insert_chart' }}</mat-icon>
+    {{ showChart ? 'Hide Statistics' : 'Show Program Statistics' }}
+  </button>
+
+  <div *ngIf="showChart" class="chart-container">
+    <div id="chart" *ngIf="chartOptions.series && chartOptions.series.length > 0">
+   <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!" [labels]="chartOptions.labels!" [responsive]="chartOptions.responsive!"
+        [legend]="chartOptions.legend!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [colors]="chartOptions.colors!">
+      </apx-chart>
+
+      
+      <div *ngIf="chartData" class="chart-summary">
+        <div class="summary-item">
+          <span class="summary-label">Total Assignments:</span>
+          <span class="summary-value">{{ chartData.totalAssignments }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Completed:</span>
+          <span class="summary-value">{{ chartData.completedAssignments }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Active:</span>
+          <span class="summary-value">{{ chartData.activeAssignments }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="showChart && (!chartOptions.series || chartOptions.series.length === 0)" class="no-data-message">
+      <mat-icon>info</mat-icon>
+      <p>No statistics data available for this program</p>
+    </div>
+  </div>
 </div>

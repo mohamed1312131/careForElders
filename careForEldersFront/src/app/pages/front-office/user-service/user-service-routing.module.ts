@@ -40,12 +40,61 @@ const routes: Routes = [
     path: 'userProfile',
     component: UserLayoutComponent,
     children: [
-      {
-        path: 'AI',
-        component: ChatAIComponent
-      },{
-        path: 'bill',
-        component: PatientBillListComponent
+
+      // Basic Plan Features (available to all)
+      { path: 'search', component: SearchDoctorComponent },
+      { path: 'doctor/:id', component: DoctorDetailsComponent },
+      { path: 'Reservation', component: MyReservationsComponent },
+      { path: 'Abonnement', component: AbonnementTypeComponent },
+      { path: 'unauthorized', component: UnauthorizedComponent },
+
+      // Doctor-specific features
+      { path: 'doctor/:id/AddAvailability', component: AddAvailabilityComponent },
+      { path: 'mySchedule', component: MyScheduleComponent },
+
+      // Silver Plan Features
+      { 
+        path: 'AI', 
+        component: ChatAIComponent, 
+        /*canActivate: [SubscriptionGuard], 
+        data: { modules: 'Chat with doctors' } */
+      },
+      { 
+        path: 'bill', 
+        component: PatientBillListComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'patientBill' } 
+      },
+      { 
+        path: 'create', 
+        component: PatientBillFormComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'patientBill' } 
+      },
+      { 
+        path: 'edit/:id', 
+        component: PatientBillFormComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'patientBill' } 
+      },
+      { 
+        path: 'view/:id', 
+        component: PatientBillFormComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'patientBill' } 
+      },
+      { 
+        path: 'payment/:id', 
+        component: PatientBillPaymentComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'patientBill' } 
+      },
+      { 
+        path: 'history/:id', 
+        component: PatientBillHistoryComponent, 
+        canActivate: [SubscriptionGuard], 
+        data: { modules: 'patientBill' } 
+
       },
 
 {
