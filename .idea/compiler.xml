@@ -20,8 +20,6 @@
         </processorPath>
         <module name="patientBill" />
         <module name="notification" />
-        <module name="nutrition" />
-        <module name="paramedicalCare" />
         <module name="chat" />
         <module name="planAndExercise" />
         <module name="medicalRecord" />
@@ -30,6 +28,24 @@
         <module name="subscription" />
         <module name="user-service" />
         <module name="event" />
+      </profile>
+      <profile name="Annotation profile for nutrition" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="nutrition" />
+      </profile>
+      <profile name="Annotation profile for paramedicalCare" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="paramedicalCare" />
       </profile>
     </annotationProcessing>
   </component>
