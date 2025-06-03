@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-<<<<<<< Updated upstream
+
 import { UserComponent } from './user/user.component';
 
-=======
+
 import { UsersComponent } from './user/user.component';
 import { UserLayoutComponent } from './userProfile/user-layout/user-layout.component';
 import { UserinfoComponent } from './userinfo/userinfo.component';
@@ -40,15 +40,12 @@ import { AppointmentsComponent } from '../paramedical-care/appointments/appointm
 import { NearbyProfessionalsComponent } from '../paramedical-care/nearby-professionals/nearby-professionals.component';
 import { ProfessionalDetailComponent } from '../paramedical-care/professional-detail/professional-detail.component';
 import { ProfessionalFormComponent } from '../paramedical-care/professional-form/professional-form.component';
->>>>>>> Stashed changes
+
 
 const routes: Routes = [
   {
     path: '',
-<<<<<<< Updated upstream
-    component: UserComponent,
-  }
-=======
+
     component: UserLayoutComponent,
   },
   {
