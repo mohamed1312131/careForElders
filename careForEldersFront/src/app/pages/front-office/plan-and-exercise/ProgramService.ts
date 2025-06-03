@@ -180,4 +180,24 @@ addDayToProgram(programId: string, dayData: any, doctorId: string): Observable<a
 getUnassignedPatientsForProgram(programId: string): Observable<any[]> {
   return this.http.get<any[]>(`${this.apiUrl}/${programId}/unassigned-patients`);
 }
+getRecommendedPrograms(userId: string): Observable<any[]> {
+  const headers = new HttpHeaders().set('X-User-ID', userId);
+  return this.http.get<any[]>(`${this.apiUrl}/recommendations`, { headers });
+}
+selfAssignProgram(programId: string, userId: string): Observable<any> {
+  const headers = new HttpHeaders().set('X-User-ID', userId);
+  return this.http.post<any>(
+    `${this.apiUrl2}/self-assign?programId=${programId}`,
+    {}, // empty body since we're using query param
+    { headers }
+  );
+}
+getProgramStatistics(programId: string): Observable<any> {
+  return this.http.get<any>(`${this.apiUrl}/${programId}/statistics`);
+}
+getPatientAssignmentDetails(programId: string, patientId: string): Observable<any> {
+  return this.http.get<any>(
+    `${this.apiUrl2}/program/${programId}/patient/${patientId}`
+  );
+}
 }

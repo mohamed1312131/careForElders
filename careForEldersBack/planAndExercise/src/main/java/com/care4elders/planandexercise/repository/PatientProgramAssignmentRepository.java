@@ -19,4 +19,6 @@ public interface PatientProgramAssignmentRepository extends MongoRepository<Pati
     boolean existsByProgramIdAndPatientId(@Param("programId") String programId,
                                           @Param("patientId") String patientId);
 
+    long countByProgramIdAndStatus(String programId, String status);
+
 }

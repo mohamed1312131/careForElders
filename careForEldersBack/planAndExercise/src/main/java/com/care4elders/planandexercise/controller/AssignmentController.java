@@ -4,6 +4,7 @@ package com.care4elders.planandexercise.controller;
 import com.care4elders.planandexercise.DTO.DayCompletionDTO;
 import com.care4elders.planandexercise.DTO.ProgramAssignmentDTO;
 import com.care4elders.planandexercise.exception.EntityNotFoundException;
+import com.care4elders.planandexercise.exception.InvalidProgramStateException;
 import com.care4elders.planandexercise.service.ProgramService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -72,5 +73,33 @@ public class AssignmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
     }
+    @PostMapping("/self-assign")
+    public ResponseEntity<?> selfAssignProgram(
+            @RequestParam String programId,
+            @RequestHeader("X-User-ID") String patientId) {
+        System.out.println("Assigning program " + programId + " to user " + patientId);
+        try {
+            return ResponseEntity.ok(
+                    programService.selfAssignProgram(programId, patientId)
+            );
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        } catch (InvalidProgramStateException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+    @GetMapping("/program/{programId}/patient/{patientId}")
+    public ResponseEntity<?> getPatientAssignmentDetails(
+            @PathVariable String programId,
+            @PathVariable String patientId) {
+        try {
+            return ResponseEntity.ok(
+                    programService.getPatientAssignmentDetails(programId, patientId)
+            );
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
 
 }
