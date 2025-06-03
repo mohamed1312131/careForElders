@@ -9,6 +9,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="config-server" />
+        <module name="nutrition" />
+        <module name="paramedicalCare" />
         <module name="service-registry" />
       </profile>
       <profile name="Annotation profile for care4elders" enabled="true">
@@ -20,8 +22,6 @@
         </processorPath>
         <module name="patientBill" />
         <module name="notification" />
-        <module name="nutrition" />
-        <module name="paramedicalCare" />
         <module name="chat" />
         <module name="planAndExercise" />
         <module name="medicalRecord" />
