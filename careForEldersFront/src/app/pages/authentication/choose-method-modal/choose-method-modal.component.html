@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Choose Verification Method</h2>
+<mat-dialog-content>
+  <p>Please select how you would like to receive your verification code:</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" (click)="choose('sms')">SMS</button>
+  <button mat-stroked-button color="accent" (click)="choose('email')">Email</button>
+  <button mat-button (click)="cancel()">Cancel</button>
+</mat-dialog-actions>

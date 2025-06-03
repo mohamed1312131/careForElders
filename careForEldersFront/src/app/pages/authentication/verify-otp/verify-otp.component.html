@@ -1,0 +1,8 @@
+<div class="otp-container">
+  <h2>Enter OTP</h2>
+  <form [formGroup]="otpForm" (ngSubmit)="verifyOtp()">
+    <input formControlName="otp" placeholder="6-digit OTP" maxlength="6" />
+    <button type="submit" [disabled]="otpForm.invalid">Verify</button>
+  </form>
+  <div *ngIf="verificationError" class="error">{{ verificationError }}</div>
+</div>
