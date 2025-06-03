@@ -9,6 +9,9 @@ import com.care4elders.planandexercise.repository.ProgramDayRepository;
 import com.care4elders.planandexercise.repository.ProgramRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -198,6 +201,7 @@ public class ProgramService {
         if (!program.getDoctorId().equals(doctorId)) {
             throw new UnauthorizedAccessException("You don't own this program");
         }
+
 
         // Validate patient
         /*UserDTO patient = restTemplate.getForObject(
@@ -730,6 +734,45 @@ public class ProgramService {
         programRepository.delete(program);
     }
 
+    public List<UserDTO> getUnassignedPatients(String programId) {
+        // Step 1: Get assigned patient IDs for the program
+        List<PatientProgramAssignment> assignments = assignmentRepository.findByProgramId(programId);
+        Set<String> assignedPatientIds = assignments.stream()
+                .map(PatientProgramAssignment::getPatientId)
+                .collect(Collectors.toSet());
+
+        // Step 2: Get all patients from user-service
+        List<UserDTO> allPatients = getAllPatientsFromUserService();
+
+        // Step 3: Filter out assigned patients
+        return allPatients.stream()
+                .filter(patient -> patient.getId() != null)
+                .filter(patient -> !assignedPatientIds.contains(patient.getId()))
+                .collect(Collectors.toList());
+    }
+
+    private List<UserDTO> getAllPatientsFromUserService() {
+        try {
+            ParameterizedTypeReference<List<UserDTO>> responseType =
+                    new ParameterizedTypeReference<List<UserDTO>>() {};
+
+            ResponseEntity<List<UserDTO>> response = restTemplate.exchange(
+                    "http://user-service/users?role=NORMAL_USER",
+                    HttpMethod.GET,
+                    null,
+                    responseType
+            );
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody();
+            }
+            throw new EntityNotFoundException("Failed to fetch patients from user-service");
+        } catch (ResourceAccessException e) {
+            throw new ServiceUnavailableException("User service unavailable");
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching patients", e);
+        }
+    }
 
 }
 
