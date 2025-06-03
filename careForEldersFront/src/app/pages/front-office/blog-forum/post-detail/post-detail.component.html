@@ -115,7 +115,31 @@
 
     <!-- Comments section -->
     <div class="comments-section">
-      <h2>Comments ({{ comments.length }})</h2>
+      <!-- Enhanced comments header with auto-refresh controls -->
+      <div class="comments-header">
+        <h2>Comments ({{ comments.length }})</h2>
+        <div class="refresh-controls">
+          <div class="refresh-info">
+            <small>Last updated: {{ getTimeSinceLastRefresh() }}</small>
+          </div>
+          <div class="refresh-buttons">
+            <button 
+              mat-icon-button 
+              (click)="manualRefresh()" 
+              [disabled]="isLoadingComments"
+              matTooltip="Refresh comments">
+              <mat-icon>refresh</mat-icon>
+            </button>
+            <button 
+              mat-icon-button 
+              (click)="toggleAutoRefresh()" 
+              [color]="autoRefreshEnabled ? 'primary' : ''"
+              [matTooltip]="autoRefreshEnabled ? 'Disable auto-refresh' : 'Enable auto-refresh'">
+              <mat-icon>{{ autoRefreshEnabled ? 'sync' : 'sync_disabled' }}</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Enhanced Sentiment and Emotion Filters -->
       <div class="filter-section" *ngIf="comments.length > 0">
@@ -152,20 +176,6 @@
               {{ option.label }}
             </mat-chip>
           </mat-chip-list>
-
-          <h4>Filter by Emotion:</h4>
-          <mat-chip-list>
-            <mat-chip 
-              *ngFor="let option of emotionOptions"
-              [selected]="selectedEmotionFilter === option.value"
-              (click)="selectedEmotionFilter = option.value; onEmotionFilterChange()"
-              color="accent">
-              <span *ngIf="option.value !== 'ALL'">
-                <mat-icon>{{ getEmotionIcon(option.value) }}</mat-icon>
-              </span>
-              {{ option.label }}
-            </mat-chip>
-          </mat-chip-list>
         </div>
 
         <!-- Statistics -->
@@ -189,7 +199,7 @@
               id="comment-textarea"
               matInput 
               [(ngModel)]="newCommentContent" 
-              (input)="autoResizeTextarea($event)"
+              (input)="autoResizeTextarea($event); onCommentContentChange()"
               rows="3" 
               placeholder="Share your thoughts..."
               maxlength="5000">
@@ -216,12 +226,34 @@
           </div>
         </div>
 
+        <!-- Enhanced transcript display -->
+        <div class="transcript-container" *ngIf="showTranscript && (isRecordingComment || isRecordingReply)">
+          <div class="transcript-header">
+            <div class="transcript-title">
+              <mat-icon>record_voice_over</mat-icon>
+              <span>Speech Recognition Active</span>
+            </div>
+            <button mat-icon-button (click)="stopSpeechRecognition()" matTooltip="Stop recording">
+              <mat-icon color="warn">close</mat-icon>
+            </button>
+          </div>
+          <div class="transcript-content">
+            <p class="transcript-text">
+              <span class="final-text">{{ getCurrentTranscriptForDisplay() }}</span>
+              <span class="interim-text">{{ interimTranscript }}</span>
+            </p>
+          </div>
+          <div class="transcript-footer">
+            <small>Speak clearly. The transcript will update as you speak.</small>
+          </div>
+        </div>
+
         <div class="comment-form-actions">
           <button 
             mat-raised-button 
             color="primary" 
             (click)="addComment()" 
-            [disabled]="!newCommentContent.trim() || isSubmittingComment || isRecordingComment">
+            [disabled]="!isCommentButtonEnabled || isSubmittingComment || isRecordingComment">
             <mat-icon>send</mat-icon>
             <span *ngIf="!isSubmittingComment">Post Comment</span>
             <span *ngIf="isSubmittingComment">Posting...</span>
@@ -377,61 +409,91 @@
             </div>
           </div>
 
-          <!-- Enhanced Reply form with speech recognition -->
-          <div class="reply-form" *ngIf="replyingToCommentId === comment.id">
-            <div class="reply-input-wrapper">
-              <mat-form-field appearance="outline" class="reply-textarea-field">
-                <mat-label>Write a reply</mat-label>
-                <textarea 
-                  id="reply-textarea"
-                  matInput 
-                  [(ngModel)]="replyContent" 
-                  (input)="autoResizeTextarea($event)"
-                  rows="2" 
-                  placeholder="Write your reply..."
-                  maxlength="5000">
-                </textarea>
-                <mat-hint align="end">{{ replyContent.length }}/5000</mat-hint>
-                
-                <!-- Speech recognition button positioned inside the form field -->
-                <button 
-                  mat-icon-button 
-                  matSuffix
-                  type="button"
-                  (click)="startRecordingForReply()"
-                  [disabled]="isSubmittingReply || !isSpeechRecognitionSupported"
-                  [matTooltip]="isRecordingReply ? 'Stop recording' : 'Start voice input'"
-                  [color]="isRecordingReply ? 'warn' : 'primary'"
-                  class="reply-speech-button">
-                  <mat-icon>{{ isRecordingReply ? 'mic_off' : 'mic' }}</mat-icon>
-                </button>
-              </mat-form-field>
-              
-              <!-- Recording indicator for replies -->
-              <div class="reply-recording-indicator" *ngIf="isRecordingReply">
-                <div class="pulse-dot"></div>
-                <span class="recording-text">Recording...</span>
-              </div>
-            </div>
-            
-            <div class="reply-actions">
-              <button mat-button (click)="cancelReply()" type="button">
-                <mat-icon>cancel</mat-icon>
-                Cancel
-              </button>
-              <button 
-                mat-raised-button 
-                color="primary" 
-                (click)="submitReply()" 
-                type="button"
-                [disabled]="!replyContent.trim() || isSubmittingReply || isRecordingReply">
-                <mat-icon>send</mat-icon>
-                <span *ngIf="!isSubmittingReply">Post Reply</span>
-                <span *ngIf="isSubmittingReply">Posting...</span>
-              </button>
-            </div>
-          </div>
 
+<!-- Enhanced Reply form with speech recognition - FIXED VERSION -->
+<div class="reply-form" *ngIf="replyingToCommentId === comment.id">
+  <div class="reply-input-wrapper"> <!-- Using reply-input-wrapper, matching comment structure -->
+    <mat-form-field appearance="outline" class="reply-textarea-field"> <!-- Textarea field -->
+      <mat-label>Write a reply</mat-label>
+      <textarea
+        id="reply-textarea"
+        matInput
+        [(ngModel)]="replyContent"
+        (input)="autoResizeTextarea($event); onReplyContentChange()"
+        rows="2"
+        placeholder="Write your reply..."
+        maxlength="5000">
+      </textarea>
+      <mat-hint align="end">{{ replyContent.length }}/5000</mat-hint>
+      <!-- Speech button removed from here -->
+    </mat-form-field>
+
+    <!-- Speech recognition controls for replies - Structure mirrors comment form -->
+    <div class="speech-controls"> <!-- Use same class name for style reuse -->
+      <button
+        mat-icon-button
+        type="button" 
+        (click)="startRecordingForReply()"
+        [disabled]="isSubmittingReply || !isSpeechRecognitionSupported"
+        [matTooltip]="isRecordingReply ? 'Stop recording' : 'Start voice input'"
+        [color]="isRecordingReply ? 'warn' : 'primary'"
+        class="reply-speech-button"> 
+        <mat-icon>{{ isRecordingReply ? 'mic_off' : 'mic' }}</mat-icon>
+      </button>
+
+      <!-- Recording indicator for replies -->
+      <div class="recording-indicator" *ngIf="isRecordingReply"> <!-- Use same class name -->
+        <div class="pulse-dot"></div>
+        <span class="recording-text">Recording...</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Enhanced transcript display for replies -->
+  <div class="reply-transcript-container" *ngIf="showTranscript && isRecordingReply && transcriptContext === 'reply'">
+    <div class="transcript-header">
+      <div class="transcript-title">
+        <mat-icon>record_voice_over</mat-icon>
+        <span>Recording Reply...</span>
+      </div>
+      <button mat-icon-button (click)="stopSpeechRecognition()" matTooltip="Stop recording">
+        <mat-icon color="warn">close</mat-icon>
+      </button>
+    </div>
+    <div class="transcript-content">
+      <p class="transcript-text">
+        <span class="final-text">{{ replyContent }}</span>
+        <span class="interim-text">{{ interimTranscript }}</span>
+      </p>
+    </div>
+    <div class="transcript-footer">
+      <small>Speak clearly for your reply. The transcript will update as you speak.</small>
+    </div>
+  </div>
+  
+  <!-- Speech recognition status indicator for replies -->
+  <div class="speech-status" *ngIf="isRecordingReply">
+    <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
+    <small>Listening for your reply...</small>
+  </div>
+  
+  <div class="reply-actions">
+    <button mat-button (click)="cancelReply()" type="button">
+      <mat-icon>cancel</mat-icon>
+      Cancel
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="submitReply()" 
+      type="button"
+      [disabled]="!isReplyButtonEnabled || isSubmittingReply || isRecordingReply">
+      <mat-icon>send</mat-icon>
+      <span *ngIf="!isSubmittingReply">Post Reply</span>
+      <span *ngIf="isSubmittingReply">Posting...</span>
+    </button>
+  </div>
+</div>
           <!-- Enhanced Replies -->
           <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
             <div class="reply" *ngFor="let reply of comment.replies">

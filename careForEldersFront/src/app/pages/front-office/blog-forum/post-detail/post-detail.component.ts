@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy } from "@angular/core"
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core"
 import { ActivatedRoute, Router } from "@angular/router"
 import { MatSnackBar } from "@angular/material/snack-bar"
 import { MatDialog } from "@angular/material/dialog"
-import { Subscription } from "rxjs"
+import { Subscription, interval } from "rxjs"
 import { PostService } from "../post.service"
 import { CommentService } from "../comment.service"
 import { Post } from "../models/post.model"
@@ -30,11 +30,25 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   // Comment form
   newCommentContent = ""
   isSubmittingComment = false
-  // Speech recognition states
-  isRecordingComment = false;
-  isRecordingReply = false;
+
+  // Enhanced Speech recognition states
+  isRecordingComment = false
+  isRecordingReply = false
+  interimTranscript = ""
+  transcriptContext: 'comment' | 'reply' | null = null
+  showTranscript = false
   
-  private speechRecognitionSub?: Subscription;
+  private speechRecognitionSub?: Subscription
+  private interimTranscriptSub?: Subscription
+  private listeningStatusSub?: Subscription
+
+  // Auto-refresh functionality
+  private autoRefreshSub?: Subscription
+  autoRefreshEnabled = true
+  autoRefreshInterval = 30000 // 30 seconds
+  lastRefreshTime: Date = new Date()
+  newCommentsCount = 0
+
   // Reply functionality
   replyingToCommentId: string | null = null
   replyContent = ""
@@ -101,6 +115,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     private speechRecognitionService: SpeechRecognitionService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -109,61 +124,249 @@ export class PostDetailComponent implements OnInit, OnDestroy {
       if (this.postId) {
         this.loadPost()
         this.loadComments()
+        this.startAutoRefresh()
+      }
+    })
+
+    // Subscribe to listening status
+    this.listeningStatusSub = this.speechRecognitionService.getListeningStatus().subscribe(status => {
+      if (!status) {
+        // Speech recognition stopped
+        this.isRecordingComment = false
+        this.isRecordingReply = false
+        setTimeout(() => {
+          this.showTranscript = false
+          this.transcriptContext = null
+        }, 2000)
       }
     })
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe()
-    this.stopSpeechRecognition();
+    this.stopSpeechRecognition()
+    this.stopAutoRefresh()
+    if (this.listeningStatusSub) {
+      this.listeningStatusSub.unsubscribe()
+    }
   }
 
-  // Speech recognition methods
+  // Auto-refresh functionality
+  startAutoRefresh(): void {
+    if (this.autoRefreshEnabled) {
+      this.autoRefreshSub = interval(this.autoRefreshInterval).subscribe(() => {
+        this.refreshComments()
+      })
+    }
+  }
+
+  stopAutoRefresh(): void {
+    if (this.autoRefreshSub) {
+      this.autoRefreshSub.unsubscribe()
+      this.autoRefreshSub = undefined
+    }
+  }
+
+  toggleAutoRefresh(): void {
+    this.autoRefreshEnabled = !this.autoRefreshEnabled
+    if (this.autoRefreshEnabled) {
+      this.startAutoRefresh()
+      this.snackBar.open("Auto-refresh enabled", "Close", { duration: 2000 })
+    } else {
+      this.stopAutoRefresh()
+      this.snackBar.open("Auto-refresh disabled", "Close", { duration: 2000 })
+    }
+  }
+
+  refreshComments(): void {
+    if (this.isLoadingComments || this.isSubmittingComment || this.isSubmittingReply) {
+      return // Don't refresh if already loading or submitting
+    }
+
+    const previousCommentsCount = this.comments.length
+    
+    this.commentService.getCommentsByPostId(this.postId).subscribe({
+      next: (comments) => {
+        const newComments = comments.map((comment) => ({
+          ...comment,
+          wordCount: comment.wordCount || this.getWordCount(comment.content || ""),
+          characterCount: comment.characterCount || this.getCharacterCount(comment.content || ""),
+          readingTimeSeconds: comment.readingTimeSeconds || this.getReadingTimeSeconds(comment.content || ""),
+          keywords: comment.keywords || this.getKeywordChips(comment.content || ""),
+        }))
+
+        // Check for new comments
+        if (newComments.length > previousCommentsCount) {
+          this.newCommentsCount = newComments.length - previousCommentsCount
+          this.showNewCommentsNotification()
+        }
+
+        this.comments = newComments
+        this.applyFilters()
+        this.lastRefreshTime = new Date()
+      },
+      error: (error) => {
+        console.error("Error refreshing comments", error)
+      },
+    })
+  }
+
+  showNewCommentsNotification(): void {
+    const message = this.newCommentsCount === 1 
+      ? "1 new comment added" 
+      : `${this.newCommentsCount} new comments added`
+    
+    this.snackBar.open(message, "View", {
+      duration: 5000,
+      panelClass: ["success-snackbar"],
+    }).onAction().subscribe(() => {
+      // Scroll to the newest comment
+      this.scrollToNewestComment()
+    })
+  }
+
+  scrollToNewestComment(): void {
+    setTimeout(() => {
+      const commentElements = document.querySelectorAll('.comment')
+      if (commentElements.length > 0) {
+        commentElements[0].scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  }
+
+  manualRefresh(): void {
+    this.refreshComments()
+    this.snackBar.open("Comments refreshed", "Close", { duration: 2000 })
+  }
+
+  getTimeSinceLastRefresh(): string {
+    const now = new Date()
+    const diffInSeconds = Math.floor((now.getTime() - this.lastRefreshTime.getTime()) / 1000)
+    
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}s ago`
+    } else {
+      const diffInMinutes = Math.floor(diffInSeconds / 60)
+      return `${diffInMinutes}m ago`
+    }
+  }
+
+  // Enhanced getter for comment button state
+  get isCommentButtonEnabled(): boolean {
+    return !!(this.newCommentContent && this.newCommentContent.trim().length > 0);
+  }
+
+  // Enhanced getter for reply button state
+  get isReplyButtonEnabled(): boolean {
+    return !!(this.replyContent && this.replyContent.trim().length > 0);
+  }
+
+  // Method to handle input changes
+  onCommentContentChange(): void {
+    // This will automatically trigger the getter for isCommentButtonEnabled
+    // Trigger change detection to update button state
+    this.cdr.detectChanges()
+  }
+
+  onReplyContentChange(): void {
+    // This will automatically trigger the getter for isReplyButtonEnabled
+    this.cdr.detectChanges()
+  }
+
+  // Enhanced Speech recognition methods
   startRecordingForComment(): void {
-    this.isRecordingComment = true;
-    this.isRecordingReply = false;
-    this.startSpeechRecognition("comment");
+    if (this.isRecordingComment) {
+      this.stopSpeechRecognition()
+      return
+    }
+    
+    this.isRecordingComment = true
+    this.isRecordingReply = false
+    this.startSpeechRecognition("comment")
   }
 
   startRecordingForReply(): void {
-    this.isRecordingComment = false;
-    this.isRecordingReply = true;
-    this.startSpeechRecognition("reply");
+    if (this.isRecordingReply) {
+      this.stopSpeechRecognition()
+      return
+    }
+    
+    this.isRecordingComment = false
+    this.isRecordingReply = true
+    this.startSpeechRecognition("reply")
   }
 
   private startSpeechRecognition(context: "comment" | "reply"): void {
-    this.stopSpeechRecognition();
+    this.stopSpeechRecognition()
+    this.transcriptContext = context
+    this.showTranscript = true
+    this.speechRecognitionService.clearTranscript()
     
+    // Subscribe to interim results for real-time feedback
+    this.interimTranscriptSub = this.speechRecognitionService.getInterimTranscript().subscribe({
+      next: (interim) => {
+        this.interimTranscript = interim
+        this.cdr.detectChanges()
+      }
+    })
+    
+    // Subscribe to final transcript
     this.speechRecognitionSub = this.speechRecognitionService.startListening().subscribe({
       next: (transcript) => {
         if (context === "comment") {
-          this.newCommentContent = transcript;
+          this.newCommentContent = transcript
+          // Trigger change detection to update button state
+          this.cdr.detectChanges()
         } else {
-          this.replyContent = transcript;
+          this.replyContent = transcript
+          this.cdr.detectChanges()
         }
       },
       error: (err) => {
         this.snackBar.open(`Speech recognition error: ${err}`, "Close", {
           duration: 4000,
           panelClass: ["error-snackbar"],
-        });
-        this.stopSpeechRecognition();
+        })
+        this.stopSpeechRecognition()
       }
-    });
+    })
   }
 
   stopSpeechRecognition(): void {
     if (this.speechRecognitionSub) {
-      this.speechRecognitionSub.unsubscribe();
-      this.speechRecognitionSub = undefined;
+      this.speechRecognitionSub.unsubscribe()
+      this.speechRecognitionSub = undefined
     }
-    this.speechRecognitionService.stopListening();
-    this.isRecordingComment = false;
-    this.isRecordingReply = false;
+    
+    if (this.interimTranscriptSub) {
+      this.interimTranscriptSub.unsubscribe()
+      this.interimTranscriptSub = undefined
+    }
+    
+    this.speechRecognitionService.stopListening()
+    this.isRecordingComment = false
+    this.isRecordingReply = false
+    
+    // Keep transcript visible for a moment before hiding
+    setTimeout(() => {
+      this.showTranscript = false
+      this.interimTranscript = ""
+      this.transcriptContext = null
+    }, 2000)
   }
 
   get isSpeechRecognitionSupported(): boolean {
-    return this.speechRecognitionService.isSupported();
+    return this.speechRecognitionService.isSupported()
+  }
+
+  // Get current transcript for display
+  getCurrentTranscriptForDisplay(): string {
+    if (this.transcriptContext === 'comment') {
+      return this.newCommentContent
+    } else if (this.transcriptContext === 'reply') {
+      return this.replyContent
+    }
+    return ""
   }
 
   // Image event handlers for debugging
@@ -332,6 +535,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
     this.cancelEditComment()
     this.cancelEditReply()
     this.cancelReply()
+    this.stopSpeechRecognition()
   }
 
   submitEditComment(): void {
@@ -851,6 +1055,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
 
         this.applyFilters()
         this.isLoadingComments = false
+        this.lastRefreshTime = new Date()
       },
       error: (error) => {
         console.error("Error loading comments", error)
@@ -878,6 +1083,12 @@ export class PostDetailComponent implements OnInit, OnDestroy {
         this.applyFilters()
         this.newCommentContent = ""
         this.isSubmittingComment = false
+        
+        // Immediately refresh comments to get the latest data
+        setTimeout(() => {
+          this.refreshComments()
+        }, 1000)
+        
         this.snackBar.open("Comment added successfully", "Close", { duration: 3000 })
       },
       error: (error) => {
@@ -897,6 +1108,7 @@ export class PostDetailComponent implements OnInit, OnDestroy {
   cancelReply(): void {
     this.replyingToCommentId = null
     this.replyContent = ""
+    this.stopSpeechRecognition()
   }
 
   submitReply(): void {
@@ -924,6 +1136,12 @@ export class PostDetailComponent implements OnInit, OnDestroy {
 
         this.cancelReply()
         this.isSubmittingReply = false
+        
+        // Immediately refresh comments to get the latest data
+        setTimeout(() => {
+          this.refreshComments()
+        }, 1000)
+        
         this.snackBar.open("Reply added successfully", "Close", { duration: 3000 })
       },
       error: (error) => {

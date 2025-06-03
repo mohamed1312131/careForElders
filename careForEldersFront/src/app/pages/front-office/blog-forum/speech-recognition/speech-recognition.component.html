@@ -1,0 +1,70 @@
+<div class="speech-container">
+  <h3>Enhanced Speech to Text</h3>
+  
+  <div *ngIf="!speechService.isSupported()" class="error">
+    <p>Speech recognition is not supported in this browser.</p>
+    <p>Please try using Chrome, Edge, or Safari.</p>
+  </div>
+  
+  <div *ngIf="speechService.isSupported()">
+    <div class="controls">
+      <button 
+        (click)="toggleListening()" 
+        [class.listening]="isListening"
+        [disabled]="!speechService.isSupported()"
+        class="record-btn">
+        <span class="btn-icon">{{ isListening ? '🛑' : '🎤' }}</span>
+        {{ isListening ? 'Stop Recording' : 'Start Recording' }}
+      </button>
+      
+      <button 
+        (click)="clearTranscript()" 
+        class="clear-btn"
+        [disabled]="!transcript && !interimTranscript">
+        Clear
+      </button>
+    </div>
+
+    <div class="language-selector">
+      <label for="language">Language:</label>
+      <select id="language" (change)="changeLanguage($event)" value="en-US">
+        <option value="en-US">English (US)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="es-ES">Spanish</option>
+        <option value="fr-FR">French</option>
+        <option value="de-DE">German</option>
+        <option value="it-IT">Italian</option>
+        <option value="pt-BR">Portuguese (Brazil)</option>
+      </select>
+    </div>
+
+    <!-- Real-time transcript display -->
+    <div class="transcript-display" *ngIf="transcript || interimTranscript || isListening">
+      <h4>Live Transcript:</h4>
+      <div class="transcript-content">
+        <span class="final-text">{{ transcript }}</span>
+        <span class="interim-text" *ngIf="interimTranscript">{{ interimTranscript }}</span>
+        <span class="cursor" *ngIf="isListening">|</span>
+      </div>
+      <div class="transcript-stats" *ngIf="transcript">
+        <small>Words: {{ getWordCount() }} | Characters: {{ transcript.length }}</small>
+      </div>
+    </div>
+
+    <div class="status" *ngIf="isListening">
+      <div class="listening-indicator">
+        <div class="pulse-dot"></div>
+        <span>🎤 Listening... Speak now!</span>
+      </div>
+    </div>
+
+    <!-- Confidence indicator -->
+    <div class="confidence-indicator" *ngIf="lastConfidence > 0">
+      <label>Recognition Confidence:</label>
+      <div class="confidence-bar">
+        <div class="confidence-fill" [style.width.%]="lastConfidence * 100"></div>
+      </div>
+      <small>{{ (lastConfidence * 100).toFixed(1) }}%</small>
+    </div>
+  </div>
+</div>
