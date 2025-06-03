@@ -165,4 +165,10 @@ public class ProgramController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
         }
     }
+    @GetMapping("/programs/{programId}/unassigned-patients")
+    public List<UserDTO> getUnassignedPatients(
+            @PathVariable String programId
+    ) {
+        return programService.getUnassignedPatients(programId);
+    }
 }
