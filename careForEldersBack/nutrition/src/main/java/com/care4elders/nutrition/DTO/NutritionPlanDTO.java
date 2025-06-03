@@ -1,117 +1,184 @@
 package com.care4elders.nutrition.DTO;
 
+import com.care4elders.nutrition.entity.MealSchedule;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class NutritionPlanDTO {
+
     private String id;
-    private String meal;
-    private String description;
-    private int calories;
-    private String pictureUrl;
+    private String userId;
+    private String userEmail;
 
-    public List<String> getIngredients() {
-        return ingredients;
+    @Size(max = 500, message = "Medical conditions should not exceed 500 characters")
+    private String medicalConditions;
+
+    @Size(max = 500, message = "Dietary preferences should not exceed 500 characters")
+    private String dietaryPreferences;
+
+    @Size(max = 500, message = "Allergies should not exceed 500 characters")
+    private String allergies;
+
+    private String aiGeneratedPlan;
+    private String content; // Add this field for backward compatibility
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime lastReminderSent;
+
+    private boolean active = true;
+    private boolean emailRemindersEnabled = true;
+
+    private Integer likes = 0;
+    private Integer dislikes = 0;
+    private List<Map<String, Object>> comments = new ArrayList<>();
+
+    private MealSchedule mealSchedule;
+
+    @Min(value = 1, message = "Plan duration must be at least 1 day")
+    @Max(value = 365, message = "Plan duration cannot exceed 365 days")
+    private Integer planDuration = 30;
+
+    @Min(value = 800, message = "Target calories must be at least 800")
+    @Max(value = 5000, message = "Target calories cannot exceed 5000")
+    private Integer targetCalories = 2000;
+
+    // Constructors
+    public NutritionPlanDTO() {}
+
+    public NutritionPlanDTO(String userId, String userEmail, String medicalConditions,
+                            String dietaryPreferences, String allergies) {
+        this.userId = userId;
+        this.userEmail = userEmail;
+        this.medicalConditions = medicalConditions;
+        this.dietaryPreferences = dietaryPreferences;
+        this.allergies = allergies;
+        this.active = true;
+        this.emailRemindersEnabled = true;
+        this.likes = 0;
+        this.dislikes = 0;
+        this.comments = new ArrayList<>();
+        this.planDuration = 30;
+        this.targetCalories = 2000;
     }
 
-    public void setIngredients(List<String> ingredients) {
-        this.ingredients = ingredients;
+    // Getters and Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
+    public String getUserEmail() { return userEmail; }
+    public void setUserEmail(String userEmail) { this.userEmail = userEmail; }
+
+    public String getMedicalConditions() { return medicalConditions; }
+    public void setMedicalConditions(String medicalConditions) { this.medicalConditions = medicalConditions; }
+
+    public String getDietaryPreferences() { return dietaryPreferences; }
+    public void setDietaryPreferences(String dietaryPreferences) { this.dietaryPreferences = dietaryPreferences; }
+
+    public String getAllergies() { return allergies; }
+    public void setAllergies(String allergies) { this.allergies = allergies; }
+
+    public String getAiGeneratedPlan() { return aiGeneratedPlan; }
+    public void setAiGeneratedPlan(String aiGeneratedPlan) { this.aiGeneratedPlan = aiGeneratedPlan; }
+
+    // Add content getter and setter for backward compatibility
+    public String getContent() {
+        // Return aiGeneratedPlan if content is null
+        return content != null ? content : aiGeneratedPlan;
     }
 
-    public List<String> getComments() {
-        return comments;
+    public void setContent(String content) {
+        this.content = content;
+        // Also set aiGeneratedPlan for consistency
+        if (this.aiGeneratedPlan == null) {
+            this.aiGeneratedPlan = content;
+        }
     }
 
-    public void setComments(List<String> comments) {
-        this.comments = comments;
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public LocalDateTime getLastReminderSent() { return lastReminderSent; }
+    public void setLastReminderSent(LocalDateTime lastReminderSent) { this.lastReminderSent = lastReminderSent; }
+
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+
+    public boolean isEmailRemindersEnabled() { return emailRemindersEnabled; }
+    public void setEmailRemindersEnabled(boolean emailRemindersEnabled) { this.emailRemindersEnabled = emailRemindersEnabled; }
+
+    public Integer getLikes() { return likes; }
+    public void setLikes(Integer likes) { this.likes = likes; }
+
+    public Integer getDislikes() { return dislikes; }
+    public void setDislikes(Integer dislikes) { this.dislikes = dislikes; }
+
+    public List<Map<String, Object>> getComments() { return comments; }
+    public void setComments(List<Map<String, Object>> comments) { this.comments = comments; }
+
+    public MealSchedule getMealSchedule() { return mealSchedule; }
+    public void setMealSchedule(MealSchedule mealSchedule) { this.mealSchedule = mealSchedule; }
+
+    public Integer getPlanDuration() { return planDuration; }
+    public void setPlanDuration(Integer planDuration) { this.planDuration = planDuration; }
+
+    public Integer getTargetCalories() { return targetCalories; }
+    public void setTargetCalories(Integer targetCalories) { this.targetCalories = targetCalories; }
+
+    // Utility methods
+    public void addComment(Map<String, Object> comment) {
+        if (this.comments == null) {
+            this.comments = new ArrayList<>();
+        }
+        this.comments.add(comment);
     }
 
-    public int getLikes() {
-        return likes;
+    public void incrementLikes() {
+        this.likes = (this.likes != null) ? this.likes + 1 : 1;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
+    public void incrementDislikes() {
+        this.dislikes = (this.dislikes != null) ? this.dislikes + 1 : 1;
     }
 
-    public int getDislikes() {
-        return dislikes;
+    public boolean hasEmailReminders() {
+        return emailRemindersEnabled && userEmail != null && !userEmail.trim().isEmpty();
     }
 
-    public void setDislikes(int dislikes) {
-        this.dislikes = dislikes;
+    public boolean isValidForCreation() {
+        return userId != null && !userId.trim().isEmpty() &&
+                userEmail != null && !userEmail.trim().isEmpty() &&
+                medicalConditions != null && !medicalConditions.trim().isEmpty();
     }
 
-    private List<String> ingredients;     // ✅ New
-    private List<String> comments;        // ✅ New
-    private int likes;                    // ✅ New
-    private int dislikes;
-
-    public String getId() {
-        return id;
+    @Override
+    public String toString() {
+        return "NutritionPlanDTO{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", userEmail='" + userEmail + '\'' +
+                ", medicalConditions='" + medicalConditions + '\'' +
+                ", dietaryPreferences='" + dietaryPreferences + '\'' +
+                ", allergies='" + allergies + '\'' +
+                ", active=" + active +
+                ", emailRemindersEnabled=" + emailRemindersEnabled +
+                ", planDuration=" + planDuration +
+                ", targetCalories=" + targetCalories +
+                ", likes=" + likes +
+                ", dislikes=" + dislikes +
+                '}';
     }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    private String mealTime;
-    private String notes;
-    private String recommendedAgeGroup;
-
-    public String getMeal() {
-        return meal;
-    }
-
-    public void setMeal(String meal) {
-        this.meal = meal;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getCalories() {
-        return calories;
-    }
-
-    public void setCalories(int calories) {
-        this.calories = calories;
-    }
-
-    public String getPictureUrl() {
-        return pictureUrl;
-    }
-
-    public void setPictureUrl(String pictureUrl) {
-        this.pictureUrl = pictureUrl;
-    }
-
-    public String getMealTime() {
-        return mealTime;
-    }
-
-    public void setMealTime(String mealTime) {
-        this.mealTime = mealTime;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public String getRecommendedAgeGroup() {
-        return recommendedAgeGroup;
-    }
-
-    public void setRecommendedAgeGroup(String recommendedAgeGroup) {
-        this.recommendedAgeGroup = recommendedAgeGroup;
-    }
-// Getters and Setters
 }
