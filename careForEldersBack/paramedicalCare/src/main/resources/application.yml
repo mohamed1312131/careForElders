@@ -6,7 +6,13 @@ spring:
     name: paramedicalCare
   data:
     uri: mongodb://localhost:27017/paramedicalCare
+google:
+  maps:
+    api-key: AIzaSyDhJ1QaIMu0XptyDLOUSs1YzQ4SmH7jVG8
 
+  data:
+    mongodb:
+      auto-index-creation: true # Ensure geospatial index is created
 eureka:
   client:
     service-url:
