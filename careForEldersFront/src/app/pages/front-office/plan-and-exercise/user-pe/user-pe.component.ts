@@ -25,4 +25,7 @@ export class UserPEComponent {
   navigateToDetails(): void {
     this.router.navigate(['user/userProfile/plan/plandetails', this.program.programId]);
   }
+  onImageError(event: Event) {
+  (event.target as HTMLImageElement).src = 'assets/default-workout.png';
+}
 }

@@ -26,6 +26,7 @@ public class PatientProgramAssignment {
     private LocalDateTime startDate;
     private LocalDateTime targetEndDate;
     private LocalDateTime actualEndDate;
+    private String programImage;
     private String status; // ACTIVE, COMPLETED, PAUSED, ABANDONED
     private List<StatusHistory> statusHistory;
     private String doctorNotes;

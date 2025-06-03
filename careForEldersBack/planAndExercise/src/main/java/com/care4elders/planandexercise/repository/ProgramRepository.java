@@ -18,4 +18,5 @@ public interface ProgramRepository extends MongoRepository<Program, String> {
             "{ $count: 'totalExercises' }"
     })
     Long countExercisesByProgramId(String programId);
+    List<Program> findByStatus(String status);
 }
