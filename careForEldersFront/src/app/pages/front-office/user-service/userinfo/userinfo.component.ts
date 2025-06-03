@@ -112,6 +112,14 @@ console.log(updatedData);
     console.log('Updating user data...');
     console.log('Form data:', this.userForm.getRawValue());
     if (this.userForm.valid) {
+      console.log("onUpdate() function is running"); // Check if this logs
+      try {
+        console.log("Attempting to show toast...");
+        this.toastr.success("Test toast message");
+        console.log("Toast called successfully (but did it show?)");
+      } catch (error) {
+        console.error("Toast error:", error); // Should catch any errors
+      }
       console.log('Form is valid');
       const changedFields = this.getChangedFields();
       console.log('Changed fields:', changedFields);
@@ -125,6 +133,7 @@ console.log(updatedData);
       console.log('Updating user...',changedFields);
       this.userService.updateUser(this.userId, changedFields).subscribe({
         next: () => {
+
           this.toastr.success('User information updated successfully.', 'Success ✅');
           this.originalUserData = { ...this.originalUserData, ...changedFields };
 
