@@ -17,6 +17,7 @@ public class PatientProgramDTO {
     private String description;
     private LocalDateTime assignedDate;
     private double completionPercentage;
+    private String programImage;
     private String status;
     private int currentDay;
     private int totalDays;
@@ -25,6 +26,7 @@ public class PatientProgramDTO {
         this.name = program.getName();
         this.description = program.getDescription();
         this.assignedDate = assignment.getAssignedDate();
+        this.programImage=program.getProgramImage();
         this.completionPercentage = assignment.getCompletionPercentage();
         this.status = assignment.getStatus();
         this.currentDay = assignment.getCurrentDay();
