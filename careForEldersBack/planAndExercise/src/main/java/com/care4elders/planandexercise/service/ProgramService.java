@@ -773,6 +773,146 @@ public class ProgramService {
             throw new RuntimeException("Error fetching patients", e);
         }
     }
+    public List<Program> getRecommendedPrograms(String userId) {
+        // Fetch medical record from MedicalRecord service
+        MedicalRecord record = restTemplate.getForObject(
+                "http://MEDICALRECORD/api/medical-records/user/" + userId,
+                MedicalRecord.class
+        );
+
+        // Return empty if no record or no notes
+        if (record == null || record.getNotes() == null || record.getNotes().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Extract lowercase note content
+        Set<String> noteContents = record.getNotes().stream()
+                .map(MedicalRecord.MedicalNote::getContent)
+                .filter(Objects::nonNull)
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        // Fetch assigned program IDs for this user
+        Set<String> assignedProgramIds = assignmentRepository
+                .findByPatientId(userId)
+                .stream()
+                .map(PatientProgramAssignment::getProgramId)
+                .collect(Collectors.toSet());
+
+        // Fetch all programs with status = "PUBLISHED"
+        List<Program> allPublishedPrograms = programRepository.findByStatus("PUBLISHED");
+
+        // Filter by medical notes and assignment
+        return allPublishedPrograms.stream()
+                .filter(program -> {
+                    String category = program.getProgramCategory();
+                    return category != null
+                            && noteContents.stream().anyMatch(note -> note.contains(category.toLowerCase()))
+                            && !assignedProgramIds.contains(program.getId());
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PatientProgramAssignment selfAssignProgram(String programId, String patientId) {
+        // Validate patient exists (optional - uncomment if needed)
+    /*
+    UserDTO patient = restTemplate.getForObject(
+            "http://user-service/users/{Id}",
+            UserDTO.class,
+            patientId
+    );
+
+    if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
+        throw new EntityNotFoundException("Invalid patient ID");
+    }
+    */
+
+        // Validate program exists and is active
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!"PUBLISHED".equals(program.getStatus())) {
+            throw new InvalidProgramStateException("Program is not available for self-assignment");
+        }
+
+        // Check if already assigned
+        Optional<PatientProgramAssignment> existingAssignment = assignmentRepository
+                .findByProgramIdAndPatientId(programId, patientId);
+
+        if (existingAssignment.isPresent()) {
+            throw new InvalidProgramStateException("You are already assigned to this program");
+        }
+
+        // Get program days
+        List<ProgramDay> days = programDayRepository.findByProgramIdOrderByDayNumberAsc(programId);
+
+        // Create assignment
+        PatientProgramAssignment assignment = new PatientProgramAssignment();
+        assignment.setProgramId(programId);
+        assignment.setPatientId(patientId);
+        assignment.setAssignedDate(LocalDateTime.now());
+        assignment.setStatus("ACTIVE");
+        assignment.setCurrentDay(1);
+        //assignment.setSelfAssigned(true); // Add this field to track self-assignments
+
+        // Initialize day statuses
+        Map<Integer, DayStatus> dayStatuses = new HashMap<>();
+        for (ProgramDay day : days) {
+            dayStatuses.put(day.getDayNumber(), new DayStatus(
+                    false,
+                    null,
+                    0,
+                    null,
+                    null,
+                    "",
+                    List.of(),
+                    0,
+                    ""
+            ));
+        }
+        assignment.setDayStatuses(dayStatuses);
+
+        return assignmentRepository.save(assignment);
+    }
+    public ProgramStatisticsDTO getProgramStatistics(String programId) {
+        // Get total assignments count
+        long totalAssignments = assignmentRepository.countByProgramId(programId);
+
+        // Get completed assignments count
+        long completedAssignments = assignmentRepository.countByProgramIdAndStatus(programId, "COMPLETED");
+
+        // Get active assignments count
+        long activeAssignments = assignmentRepository.countByProgramIdAndStatus(programId, "ACTIVE");
+
+        return new ProgramStatisticsDTO(totalAssignments, completedAssignments, activeAssignments);
+    }
+    public PatientAssignmentDetailsDTO getPatientAssignmentDetails(String programId, String patientId) {
+        PatientProgramAssignment assignment = assignmentRepository.findByProgramIdAndPatientId(programId, patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
+
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        // If you have user service integration, you could fetch patient details here
+        // UserDTO patient = getUserDetails(patientId);
+
+        return PatientAssignmentDetailsDTO.builder()
+                .assignmentId(assignment.getId())
+                .programId(programId)
+                .programName(program.getName())
+                .patientId(patientId)
+                //.patientName(patient.getFirstName() + " " + patient.getLastName())
+                .assignedDate(assignment.getAssignedDate())
+                .status(assignment.getStatus())
+                .currentDay(assignment.getCurrentDay())
+                .completionPercentage(assignment.getCompletionPercentage())
+                .dayStatuses(assignment.getDayStatuses())
+                .lastActivityDate(assignment.getLastActivityDate())
+                .actualEndDate(assignment.getActualEndDate())
+                .build();
+    }
+
 
 }
 

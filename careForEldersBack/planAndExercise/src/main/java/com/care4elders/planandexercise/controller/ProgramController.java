@@ -1,6 +1,7 @@
 package com.care4elders.planandexercise.controller;
 
 import com.care4elders.planandexercise.DTO.*;
+import com.care4elders.planandexercise.entity.PatientProgramAssignment;
 import com.care4elders.planandexercise.entity.Program;
 import com.care4elders.planandexercise.entity.ProgramDay;
 import com.care4elders.planandexercise.exception.*;
@@ -171,4 +172,22 @@ public class ProgramController {
     ) {
         return programService.getUnassignedPatients(programId);
     }
+    @GetMapping("/recommendations")
+    public ResponseEntity<?> getRecommendedPrograms(@RequestHeader("X-User-ID") String userId) {
+        try {
+            List<Program> recommendedPrograms = programService.getRecommendedPrograms(userId);
+            return ResponseEntity.ok(recommendedPrograms);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch recommended programs: " + ex.getMessage());
+        }
+    }
+    @GetMapping("/{programId}/statistics")
+    public ResponseEntity<ProgramStatisticsDTO> getProgramStatistics(@PathVariable String programId) {
+        ProgramStatisticsDTO statistics = programService.getProgramStatistics(programId);
+        return ResponseEntity.ok(statistics);
+    }
+
+
+
 }

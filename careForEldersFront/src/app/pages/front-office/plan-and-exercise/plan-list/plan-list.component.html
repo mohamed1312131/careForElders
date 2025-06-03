@@ -1,17 +1,52 @@
-<!-- plan-list.component.html -->
-<div class="workout-list-container">
-  <h1 class="list-title">Your Workout Programs</h1>
-  
-  <div *ngIf="programs.length === 0" class="no-programs">
-    <p>No programs assigned yet.</p>
-  </div>
+<div class="program-dashboard-container">
 
-  <div class="cards-wrapper">
-    <div class="program-card" *ngFor="let program of programs">
-      <app-user-pe 
-        [program]="program"
-        >
-      </app-user-pe>
+  <section class="program-section">
+    <div class="section-header">
+      <h2 class="section-title">Your Workout Programs</h2>
+      <mat-divider></mat-divider>
     </div>
-  </div>
+
+    <div *ngIf="!programs || programs.length === 0; else yourProgramsGrid" class="empty-state">
+      <mat-icon class="empty-state-icon" aria-hidden="true">sentiment_dissatisfied</mat-icon>
+      <p>No workout programs have been assigned to you yet.</p>
+      <p class="empty-state-suggestion">Check back later or contact your administrator if you believe this is an error.</p>
+    </div>
+    <ng-template #yourProgramsGrid>
+      <div class="cards-grid">
+        <mat-card *ngFor="let program of programs" class="program-item-card" matRipple>
+          <app-user-pe [program]="program"></app-user-pe>
+          </mat-card>
+      </div>
+    </ng-template>
+  </section>
+
+  <section class="program-section">
+    <div class="section-header">
+      <h2 class="section-title">Recommended Programs</h2>
+      <mat-divider></mat-divider>
+    </div>
+
+    <div *ngIf="!recommendedPrograms || recommendedPrograms.length === 0; else recommendedProgramsGrid" class="empty-state">
+      <mat-icon class="empty-state-icon" aria-hidden="true">explore</mat-icon>
+      <p>No recommended programs available at the moment.</p>
+      <p class="empty-state-suggestion">We're always looking for new programs that might suit you!</p>
+    </div>
+    <ng-template #recommendedProgramsGrid>
+      <div class="cards-grid">
+        <mat-card *ngFor="let program of recommendedPrograms" class="program-item-card recommended-item-card" matRipple>
+          <app-user-pe [program]="program"></app-user-pe>
+          <mat-card-actions class="program-card-actions" align="end">
+            <button mat-stroked-button color="primary" (click)="assignProgram(program)" aria-label="Assign program">
+              <mat-icon>add_circle_outline</mat-icon>
+              <span>ASSIGN</span>
+            </button>
+            <button mat-icon-button color="accent" (click)="openInfo(program)" aria-label="Show program information">
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </ng-template>
+  </section>
+
 </div>

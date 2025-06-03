@@ -28,4 +28,5 @@ public class MedicalDocumentService {
     public MedicalDocument getDocumentById(String id) {
         return repository.findById(id).orElse(null);
     }
+
 }

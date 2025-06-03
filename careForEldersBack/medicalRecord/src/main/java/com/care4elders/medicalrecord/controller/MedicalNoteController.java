@@ -3,6 +3,7 @@ package com.care4elders.medicalrecord.controller;
 import com.care4elders.medicalrecord.entity.MedicalNote;
 import com.care4elders.medicalrecord.service.MedicalNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,5 +28,12 @@ public class MedicalNoteController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
         service.deleteNote(id);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MedicalNote> getMedicalNoteById(@PathVariable String id) {
+        return service.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
