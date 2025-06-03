@@ -113,18 +113,4 @@ public class ProgramController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
     }
-    @PutMapping("/update/{programId}")
-    public ResponseEntity<?> updateProgram(
-            @PathVariable String programId,
-            @Valid @RequestBody ProgramDTO programDTO,
-            @RequestHeader("X-User-ID") String doctorId) {
-        try {
-            Program updatedProgram = programService.updateProgram(programId, programDTO, doctorId);
-            return ResponseEntity.ok(updatedProgram);
-        } catch (EntityNotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (UnauthorizedAccessException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-        }
-    }
 }

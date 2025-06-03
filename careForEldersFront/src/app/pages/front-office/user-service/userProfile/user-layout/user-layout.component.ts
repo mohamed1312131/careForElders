@@ -49,7 +49,7 @@ export class UserLayoutComponent implements OnInit {
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
-        this.userId = user.id; // Assuming `id` is the property name
+        this.userId = user.id; // Assuming id is the property name
       } catch (error) {
         console.error('Failed to parse user from localStorage', error);
       }

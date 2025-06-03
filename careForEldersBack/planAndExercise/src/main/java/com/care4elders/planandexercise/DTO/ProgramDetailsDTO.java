@@ -25,6 +25,5 @@ public class ProgramDetailsDTO {
     private String createdBy;
     private List<ProgramDayDetailsDTO> days;
 
-
     // Getters and setters
 }

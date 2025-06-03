@@ -10,16 +10,55 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+<<<<<<< Updated upstream
         <module name="patientBill" />
         <module name="appointmentAvailability" />
         <module name="chat" />
         <module name="planAndExercise" />
+=======
+        <module name="notification" />
+        <module name="nutrition" />
+        <module name="paramedicalCare" />
+        <module name="chat" />
+        <module name="planAndExercise" />
+        <module name="medicalRecord" />
+        <module name="appointmentAvailability" />
+        <module name="subscription" />
+        <module name="user-service" />
+        <module name="event" />
+>>>>>>> Stashed changes
       </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+<<<<<<< Updated upstream
         <module name="blogForum" />
+=======
+        <module name="api-gateway" />
+        <module name="config-server" />
+        <module name="service-registry" />
+      </profile>
+      <profile name="Annotation profile for blogForum" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="blogForum" />
+      </profile>
+      <profile name="Annotation profile for patientBill" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="patientBill" />
+>>>>>>> Stashed changes
       </profile>
     </annotationProcessing>
   </component>

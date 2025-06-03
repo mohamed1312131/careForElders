@@ -24,6 +24,9 @@ public class Reservation {
     // Conditional validation (handled in Service)
     private String meetingLink;  // Required if EN_LIGNE
     private String location;    // Required if PRESENTIEL
+    private boolean reminderSent = false;
+
+
 }
 
 

@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -88,10 +87,10 @@ public class PdfServiceImpl implements PdfService {
             infoTable.addCell(createCell(bill.getBillNumber(), false));
             
             infoTable.addCell(createCell("Invoice Date:", true));
-            infoTable.addCell(createCell(formatDateTime(bill.getBillDate()), false));
+            infoTable.addCell(createCell(formatDate(bill.getBillDate()), false));
             
             infoTable.addCell(createCell("Due Date:", true));
-            infoTable.addCell(createCell(formatDateTime(bill.getDueDate()), false));
+            infoTable.addCell(createCell(formatDate(bill.getDueDate()), false));
             
             infoTable.addCell(createCell("Status:", true));
             Cell statusCell = createCell(bill.getStatus(), false);
@@ -495,7 +494,7 @@ public class PdfServiceImpl implements PdfService {
         return cell;
     }
     
-    private String formatDate(LocalDate date) {
+    private String formatDate(Date date) {
         if (date == null) return "N/A";
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
         return formatter.format(date);

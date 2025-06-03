@@ -7,6 +7,8 @@ import { AppListsComponent } from './lists/lists.component';
 import { AppMenuComponent } from './menu/menu.component';
 import { AppTooltipsComponent } from './tooltips/tooltips.component';
 import { TestingComponent } from '../front-office/appointment-availability/testing/testing.component';
+import { ReservationAdminComponent } from './reservation-admin/reservation-admin.component';
+import { AbonnementAdminComponent } from './abonnement-admin/abonnement-admin.component';
 
 export const UiComponentsRoutes: Routes = [
   {
@@ -34,6 +36,12 @@ export const UiComponentsRoutes: Routes = [
       },
       {path:'testing',
         component: TestingComponent
+      },
+      {path:'Reservation',
+        component: ReservationAdminComponent
+      },
+      {path:'Abonnement',
+        component: AbonnementAdminComponent
       }
     ],
   },

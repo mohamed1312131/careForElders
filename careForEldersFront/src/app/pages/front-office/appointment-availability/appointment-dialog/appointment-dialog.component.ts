@@ -146,9 +146,11 @@ export class AppointmentDialogComponent implements OnInit {
           }
 
           this.snackBar.open(message, 'Close', {
-            duration: 5000,
-            panelClass: ['success-snackbar']
-          });
+            duration: 2000,
+            panelClass: ['success-snackbar']})
+            .afterDismissed().subscribe(() => {
+            window.location.reload();
+            });
 
           this.dialogRef.close(true);
         },
