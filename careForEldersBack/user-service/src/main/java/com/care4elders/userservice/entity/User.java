@@ -54,6 +54,7 @@ public class User {
     private Double height; // in cm
     private Double weight; // in kg
     private String organDonorStatus;
+    private String emergencyContactEmail;
     public User(Object o, String admin, String smith, String mail, String admin1, Object o1, String s, Role role) {
     }
 
