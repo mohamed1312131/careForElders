@@ -1,0 +1,135 @@
+<div class="program-info-dialog-wrapper">
+  <div *ngIf="isLoading && !errorLoading" class="loading-container">
+    <mat-spinner diameter="60" color="primary"></mat-spinner>
+    <p class="loading-text">Loading program details...</p>
+  </div>
+
+  <div *ngIf="errorLoading" class="error-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button mat-stroked-button (click)="loadProgramDetails()">Try Again</button>
+    <button mat-button (click)="closeDialog()" class="close-error-button">Close</button>
+  </div>
+
+  <ng-container *ngIf="program && !isLoading && !errorLoading">
+    <div class="program-header-image-container">
+      <img [src]="program.programImage || 'assets/images/default-program-banner.jpg'"
+           alt="{{ program.name }} banner"
+           class="program-header-image">
+    </div>
+
+    <h2 mat-dialog-title class="dialog-title">{{ program.name }}</h2>
+
+    <mat-dialog-content class="dialog-content">
+      <p *ngIf="program.description" class="program-description">{{ program.description }}</p>
+
+      <div class="metadata-grid">
+        <div class="meta-item" *ngIf="program.programCategory">
+          <mat-icon>category</mat-icon>
+          <span>Category: <strong>{{ program.programCategory }}</strong></span>
+        </div>
+        <div class="meta-item" *ngIf="program.createdBy">
+          <mat-icon>person_outline</mat-icon>
+          <span>Created by: <strong>{{ program.createdBy }}</strong></span>
+        </div>
+        <div class="meta-item" *ngIf="program.createdDate">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Created: <strong>{{ program.createdDate | date:'mediumDate' }}</strong></span>
+        </div>
+        <div class="meta-item" *ngIf="program.updatedDate">
+          <mat-icon>update</mat-icon>
+          <span>Last Updated: <strong>{{ program.updatedDate | date:'mediumDate' }}</strong></span>
+        </div>
+      </div>
+
+      <mat-divider class="section-divider"></mat-divider>
+
+      <h3 class="section-title">Program Schedule</h3>
+      <mat-accordion multi="true" displayMode="default">
+        <mat-expansion-panel *ngFor="let day of program.days; let i = index" [expanded]="i < 2">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="day-panel-title">
+              <mat-icon>{{ day.restDay ? 'hotel' : 'fitness_center' }}</mat-icon>
+              Day {{ day.dayNumber }}
+              <span *ngIf="day.restDay" class="rest-day-indicator">(Rest Day)</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="day-content">
+            <div *ngIf="day.restDay" class="rest-day-content">
+              <mat-icon>self_improvement</mat-icon>
+              <p>Take this day to rest and recover.</p>
+            </div>
+
+            <ng-container *ngIf="!day.restDay">
+              <div class="day-summary">
+                <div *ngIf="day.warmUpMinutes" class="summary-item">
+                  <mat-icon color="accent">whatshot</mat-icon>
+                  <span>Warm-up: {{ day.warmUpMinutes }} min</span>
+                </div>
+                <div *ngIf="day.coolDownMinutes" class="summary-item">
+                  <mat-icon color="primary">ac_unit</mat-icon>
+                  <span>Cool-down: {{ day.coolDownMinutes }} min</span>
+                </div>
+              </div>
+
+              <p *ngIf="day.instructions" class="day-instructions"><strong>Instructions:</strong> {{ day.instructions }}</p>
+              <p *ngIf="day.notesForPatient" class="day-notes"><strong>Notes for Patient:</strong> {{ day.notesForPatient }}</p>
+
+              <div *ngIf="day.exercises && day.exercises.length > 0" class="exercises-section">
+                <h4 class="subsection-title">Exercises for Day {{day.dayNumber}}</h4>
+                <div class="exercises-grid">
+                  <mat-card *ngFor="let exercise of day.exercises" class="exercise-card">
+                    <div *ngIf="!exercise.safeVideoUrl" class="exercise-media-container">
+                       <img mat-card-image [src]="exercise.imageUrl || 'assets/images/default-exercise.png'"
+                           alt="{{ exercise.name }}" class="exercise-image">
+                    </div>
+                    <div *ngIf="exercise.safeVideoUrl" class="video-container exercise-media-container">
+                      <iframe width="560" height="315" [src]="exercise.safeVideoUrl"
+                              frameborder="0" allowfullscreen
+                              title="Exercise Video: {{exercise.name}}"></iframe>
+                    </div>
+
+                    <mat-card-header>
+                      <mat-card-title>{{ exercise.name }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <p *ngIf="exercise.description" class="exercise-description">{{ exercise.description }}</p>
+                      <mat-list dense class="exercise-details-list">
+                        <mat-list-item *ngIf="exercise.defaultDurationMinutes">
+                          <mat-icon matListItemIcon>timer</mat-icon>
+                          Duration: {{ exercise.defaultDurationMinutes }} min
+                        </mat-list-item>
+                        <mat-list-item *ngIf="exercise.difficultyLevel">
+                          <mat-icon matListItemIcon>leaderboard</mat-icon>
+                          Difficulty: {{ exercise.difficultyLevel }}
+                        </mat-list-item>
+                        <mat-list-item *ngIf="exercise.equipmentNeeded && exercise.equipmentNeeded.length > 0">
+                          <mat-icon matListItemIcon>fitness_center</mat-icon>
+                          Equipment: {{ exercise.equipmentNeeded.join(', ') || 'None' }}
+                        </mat-list-item>
+                         <mat-list-item *ngIf="exercise.videoTutorialUrl && !exercise.safeVideoUrl">
+                           <mat-icon matListItemIcon>videocam</mat-icon>
+                           <a [href]="exercise.videoTutorialUrl" target="_blank" rel="noopener noreferrer">Watch Tutorial (External)</a>
+                         </mat-list-item>
+                      </mat-list>
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+
+
+      
+
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-flat-button color="primary" (click)="closeDialog()">Close</button>
+    </mat-dialog-actions>
+  </ng-container>
+</div>

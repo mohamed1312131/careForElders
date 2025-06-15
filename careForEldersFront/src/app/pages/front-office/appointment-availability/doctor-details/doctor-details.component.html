@@ -1,25 +1,74 @@
-<!-- Greeting based on role -->
-<p *ngIf="isDoctor">Hey doctor!</p>
-<p *ngIf="!isDoctor">Hey user!</p>
-
-<div class="container">
-  <div *ngIf="doctor">
-    <h2>{{ doctor.firstName }} {{ doctor.lastName }}</h2>
-    <p>Email: {{ doctor.email }}</p>
-    <p>Specialty: {{ doctor.specialty }}</p>
+<div class="doctor-details-container">
+  <!-- Greeting based on role -->
+  <div class="greeting">
+    <p *ngIf="isDoctor" class="welcome-message">Hey doctor!</p>
+    <p *ngIf="!isDoctor" class="welcome-message">Hey user!</p>
   </div>
 
-  <button *ngIf="isDoctor && doctor" (click)="onAddAvailability(doctor.id)">Add Availability</button>
-
-  <h3>Doctor Availability Calendar</h3>
-
-  <div class="view-switch-buttons">
-    <button (click)="view = CalendarView.Day">Day</button>
-    <button (click)="view = CalendarView.Week">Week</button>
-    <button (click)="view = CalendarView.Month">Month</button>
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading doctor details...</p>
   </div>
 
-  <div class="calendar-container">
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <p class="error-message">{{ error }}</p>
+    <button mat-raised-button color="warn" (click)="ngOnInit()">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+  <!-- Doctor Information -->
+  <div *ngIf="doctor && !isLoading && !error" class="doctor-info">
+    <div class="doctor-header">
+      <h2>{{ doctor.firstName }} {{ doctor.lastName }}</h2>
+      <div class="doctor-details">
+        <p><mat-icon>email</mat-icon> {{ doctor.email }}</p>
+        <p><mat-icon>medical_services</mat-icon> {{ doctor.specialty }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Section -->
+  <div *ngIf="!isLoading && !error" class="calendar-section">
+    <h3>Doctor Availability Calendar</h3>
+
+    <div class="calendar-controls">
+      <div class="navigation-buttons">
+        <button mat-icon-button (click)="navigatePrevious()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-stroked-button (click)="navigateToday()">Today</button>
+        <button mat-icon-button (click)="navigateNext()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <span class="current-date">
+          {{ viewDate | date: (view === CalendarView.Month ? 'MMMM y' : 'MMMM d, y') }}
+        </span>
+      </div>
+
+      <div class="view-switch-buttons">
+        <button mat-stroked-button 
+                [class.active]="view === CalendarView.Day" 
+                (click)="view = CalendarView.Day">
+          Day
+        </button>
+        <button mat-stroked-button 
+                [class.active]="view === CalendarView.Week" 
+                (click)="view = CalendarView.Week">
+          Week
+        </button>
+        <button mat-stroked-button 
+                [class.active]="view === CalendarView.Month" 
+                (click)="view = CalendarView.Month">
+          Month
+        </button>
+      </div>
+    </div>
+
     <div class="calendar-container">
       <mwl-calendar-day-view
         *ngIf="view === CalendarView.Day"
@@ -30,7 +79,6 @@
         [dayEndHour]="dayEndStart.hour"
         [dayEndMinute]="dayEndStart.minute"
         [hourSegmentHeight]="hourSegmentHeight"
-        (dayClicked)="handleDayClick($event)"
         (eventClicked)="handleEventClick($event)"
         style="height: 500px;">
       </mwl-calendar-day-view>
@@ -44,7 +92,6 @@
         [dayEndHour]="dayEndStart.hour"
         [dayEndMinute]="dayEndStart.minute"
         [hourSegmentHeight]="hourSegmentHeight"
-        (dayClicked)="handleDayClick($event)"
         (eventClicked)="handleEventClick($event)"
         style="height: 500px;">
       </mwl-calendar-week-view>
@@ -53,9 +100,9 @@
         *ngIf="view === CalendarView.Month"
         [viewDate]="viewDate"
         [events]="events"
-        [activeDayIsOpen]="true"
+        [activeDayIsOpen]="false"
         [weekStartsOn]="0"
-        (dayClicked)="handleDayClick($event)"
+        (eventClicked)="handleEventClick($event)"
         style="height: 500px;">
       </mwl-calendar-month-view>
     </div>

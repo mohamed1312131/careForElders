@@ -1,5 +1,8 @@
 package com.care4elders.appointmentavailability.entity;
 
 public enum StatutReservation {
-    PLANIFIEE, CONFIRMEE, ANNULEE, TERMINEE
+    CONFIRME,
+    EN_ATTENTE,
+    ANNULE,
+    TERMINE
 }

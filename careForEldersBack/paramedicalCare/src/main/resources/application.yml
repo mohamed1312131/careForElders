@@ -5,9 +5,15 @@ spring:
   application:
     name: paramedicalCare
   data:
-    uri: mongodb://mongodb:27017/paramedicalCare
+    uri: mongodb://localhost:27017/paramedicalCare
+google:
+  maps:
+    api-key: AIzaSyDhJ1QaIMu0XptyDLOUSs1YzQ4SmH7jVG8
 
+  data:
+    mongodb:
+      auto-index-creation: true # Ensure geospatial index is created
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/

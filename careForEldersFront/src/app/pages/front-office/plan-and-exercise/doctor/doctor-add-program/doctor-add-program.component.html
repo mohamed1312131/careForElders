@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/styles/tailwind.css">
 <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css">
 <section class="py-1 bg-blueGray-50">
-    <div class="w-full lg:w-8/12 px-4 mx-auto mt-6">
+    
       <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-100 border-0">
   
         <div class="rounded-t bg-white mb-0 px-6 py-6">
@@ -21,7 +21,7 @@
         </div>
   
         <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <form>
+          <form enctype="multipart/form-data">
             <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
               Program Information
             </h6>
@@ -66,9 +66,10 @@
                   </label>
                   <input 
                     type="file" 
-                    (change)="onFileSelected($event)"
-                    accept="image/*"
-                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150">
+        (change)="onFileSelected($event)"
+        accept="image/*"
+        name="programImage"
+        class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150">
                 </div>
               </div>
   
@@ -195,5 +196,5 @@
           </form>
         </div>
       </div>
-    </div>
+
   </section>

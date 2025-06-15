@@ -7,6 +7,7 @@ import com.care4elders.chat.entity.Chat;
 import com.care4elders.chat.entity.Message;
 import com.care4elders.chat.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,6 +23,7 @@ public class ChatServiceImpl implements ChatService {
     private final MemoryService memoryService;
     private final OllamaClient ollamaClient;
     private final PatientGateway patientGateway;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public ChatDTO createNewChat(String patientId) {
@@ -34,12 +36,13 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatDTO addPatientPrompt(String chatId, String prompt) {
+        // 1. Retrieve the chat
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new RuntimeException("Chat not found"));
 
         String patientId = chat.getPatientId();
 
-        // 1. Save patient message
+        // 2. Create and save patient message
         List<Double> patientEmbedding = embeddingClient.getEmbedding(prompt);
         Message patientMessage = Message.builder()
                 .sender("PATIENT")
@@ -49,33 +52,40 @@ public class ChatServiceImpl implements ChatService {
                 .build();
         chat.getMessages().add(patientMessage);
 
-        // 2. Memory: enrich and retrieve relevant past info
-        memoryService.savePatientMessage(patientId, prompt); // enrich
+        // 3. Immediately send the user message via WebSocket
+        ChatDTO intermediateChat = mapToDTO(chat);
+       // messagingTemplate.convertAndSend("/topic/chat/" + chatId, intermediateChat);
+
+        // 4. Save to memory and retrieve relevant context
+        memoryService.savePatientMessage(patientId, prompt);
         List<String> memories = memoryService.retrieveRelevantMemories(patientId, prompt);
 
-        // 3. Get patient info from USER-SERVICE
+        // 5. Get patient info
         var patientInfo = patientGateway.getPatientInfo(patientId);
 
-        // 4. Build prompt for AI
+        // 6. Build the system prompt with context
         StringBuilder systemPrompt = new StringBuilder();
-        systemPrompt.append("Patient Info:\n")
+        systemPrompt.append("You are a helpful health assistant for elderly patients. ")
+                .append("Here's some information about the patient:\n")
                 .append("- Name: ").append(patientInfo.getFirstName()).append("\n")
                 .append("- Birth Date: ").append(patientInfo.getBirthDate()).append("\n\n");
 
         if (!memories.isEmpty()) {
-            systemPrompt.append("Relevant Information:\n");
+            systemPrompt.append("Relevant previous conversations:\n");
             for (String memory : memories) {
                 systemPrompt.append("- ").append(memory).append("\n");
             }
             systemPrompt.append("\n");
         }
 
-        systemPrompt.append("Current User Prompt:\n").append(prompt);
+        systemPrompt.append("Current conversation:\n")
+                .append("Patient: ").append(prompt).append("\n")
+                .append("Assistant: ");
 
-        // 5. Generate AI Response
+        // 7. Generate AI response (stream this in a real implementation)
         String aiReply = ollamaClient.chat(systemPrompt.toString());
 
-        // 6. Save AI message
+        // 8. Create and save AI message
         Message aiMessage = Message.builder()
                 .sender("AI")
                 .content(aiReply)
@@ -83,10 +93,17 @@ public class ChatServiceImpl implements ChatService {
                 .build();
         chat.getMessages().add(aiMessage);
 
-        // 7. Store AI message in memory too
+        // 9. Store AI message in memory
         memoryService.saveAIMessage(patientId, aiReply);
 
-        return mapToDTO(chatRepository.save(chat));
+        // 10. Save the updated chat
+        Chat savedChat = chatRepository.save(chat);
+        ChatDTO finalChat = mapToDTO(savedChat);
+
+        // 11. Send the final updated chat via WebSocket
+        //messagingTemplate.convertAndSend("/topic/chat/" + chatId, finalChat);
+
+        return mapToDTO(savedChat);
     }
 
     @Override

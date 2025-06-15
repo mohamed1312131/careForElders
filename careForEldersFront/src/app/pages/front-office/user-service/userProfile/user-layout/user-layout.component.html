@@ -9,19 +9,47 @@
 
     <ul>
       <li>
-        <a (click)="toggleDealsMenu()" [ngClass]="{ active: isDealsMenuOpen }">Deals</a>
-        <ul *ngIf="isDealsMenuOpen">
-          <li><a routerLink="/chat/test/deals/create" routerLinkActive="active">Create New Deal</a></li>
-          <li><a routerLink="/chat/test/deals/modify" routerLinkActive="active">Modify Deal</a></li>
-          <li><a routerLink="/chat/test/deals/pipeline" routerLinkActive="active">Pipeline</a></li>
-        </ul>
-      </li>
-      <li><a routerLink="/chat/test/activities" routerLinkActive="active">Activities</a></li>
-      <li><a routerLink="AI" routerLinkActive="active">AI</a></li> <li><a routerLink="/chat/test/funds" routerLinkActive="active">Funds</a></li>
+      <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
+      <ul *ngIf="isPlanMenuOpen">
+        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
+        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
+         <li><a routerLink="/user/userProfile/plan/userprogram" routerLinkActive="active">My plan</a></li>
+         <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
+      </ul>
+    </li>
+      <ul>
+        <li>
+          <a (click)="toggleMedicalRecordMenu()" [ngClass]="{ active: isPMedicalRecordMenuOpen }">Medical Record</a>
+          <ul *ngIf="inMedicalRecordmenu">
+            <li *ngIf="!isDoctor"><a  routerLink="/user/userProfile/medicalRecord/medicalrecordlist" routerLinkActive="active">Medical Records List </a></li>
+            <li>
+              <a [routerLink]="['/user/userProfile/medicalRecord/medicalrecord', userId]" routerLinkActive="active">
+                Medical Record
+              </a>
+            </li>
+
+          </ul>
+        </li>
+      </ul>
+      <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
+      <li><a routerLink="mySchedule" routerLinkActive="active">My Schedule</a></li>
+      <li><a routerLink="bill" routerLinkActive="active">Billing</a></li>
       <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
       <li><a routerLink="Abonnement" routerLinkActive="active">Abonnement</a></li>
+
+      <li><a routerLink="blog" routerLinkActive="active">Check Post</a></li>
+      <ul>
+        <li>
+          <a (click)="toggleUserMenu()" [ngClass]="{ active: isUserMenuOpen }">User Service</a>
+          <ul *ngIf="inUserMenu">
+            <li ><a [routerLink]="['/user/userProfile/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
+            <li ><a [routerLink]="['/user/userProfile/users']" routerLinkActive="active">Users Dashboard</a></li>
+          </ul>
+        </li>
+      </ul>
+
       <li><a (click)="logout()">Logout</a></li>
     </ul>
   </nav>
@@ -29,16 +57,13 @@
   <main>
     <header>
       <div class="breadcrumbs">
-        <a routerLink="/">Home</a>
-        <ng-container *ngIf="router.url.includes('/user/userProfile/AI')">
-          <span>&nbsp;&gt;&nbsp;</span> <a routerLink="/user/userProfile">User Profile</a>
-          <span>&nbsp;&gt;&nbsp;AI</span>
-        </ng-container>
-        <ng-container *ngIf="!router.url.includes('/user/userProfile/AI') && router.url.includes('/user/userProfile')">
-          <span>&nbsp;&gt;&nbsp;User Profile</span>
-        </ng-container>
-
-      </div>
+  <a routerLink="/">Home</a>
+  <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+    <span>&nbsp;&gt;&nbsp;</span>
+    <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+    <span *ngIf="last">{{ crumb.label }}</span>
+  </ng-container>
+</div>
       <h1 class="title">{{ currentTitle }}</h1>
 
      <!-- <nav class="nav-tabs">

@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core"
-import { BrowserModule } from "@angular/platform-browser"
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations"
 import { HttpClientModule } from "@angular/common/http"
 
@@ -32,6 +31,36 @@ import { FrontOfficeModule } from "./pages/front-office/front-office.module"
 import { ToastrModule } from 'ngx-toastr';
 import { UserinfoComponent } from './pages/front-office/user-service/userinfo/userinfo.component';
 
+import {MedicalRecordComponent} from "./pages/front-office/medical-record/medical-record/medical-record.component";
+import {AddNoteDialogComponent} from "./pages/front-office/medical-record/add-note-dialog/add-note-dialog.component";
+import {TruncatePipe} from "./pages/front-office/medical-record/truncate.pipe";
+import {
+  DocumentPreviewDialogComponent
+} from "./pages/front-office/medical-record/document-preview-dialog/document-preview-dialog.component";
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatListModule } from '@angular/material/list';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatTabsModule } from '@angular/material/tabs';
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {MatToolbarModule} from "@angular/material/toolbar";
+import {MatIconModule} from "@angular/material/icon";
+import {PlanListComponent} from "./pages/front-office/nutrition/plan-list/plan-list.component";
+import {PlanDetailsComponent} from "./pages/front-office/nutrition/plan-details/plan-details.component";
+import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dashboard/admin-dashboard.component";
+import { CommonModule } from "@angular/common"
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -41,15 +70,24 @@ import { UserinfoComponent } from './pages/front-office/user-service/userinfo/us
     HeaderComponent,
     BrandingComponent,
     AppNavItemComponent,
-    UserinfoComponent
+    UserinfoComponent,
+    MedicalRecordComponent,
+    AddNoteDialogComponent,
+    TruncatePipe,
+    DocumentPreviewDialogComponent,
+    UserinfoComponent,
+    PlanListComponent,
+    PlanDetailsComponent,
+    AdminDashboardComponent,
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule, // Required for animations
     FormsModule,
     ReactiveFormsModule,
+
     MaterialModule,
     TablerIconsModule.pick(TablerIcons),
     ToastrModule.forRoot({
@@ -60,8 +98,26 @@ import { UserinfoComponent } from './pages/front-office/user-service/userinfo/us
       preventDuplicates: true,        // Prevent duplicate toasts
       newestOnTop: true,              // Ensure the most recent toast is on top
     }),
-
-
+    MatSidenavModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatListModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatDialogModule,
+    MatProgressBarModule,
+    MatPaginatorModule,
+    MatExpansionModule,
+    MatChipsModule,
+    MatBadgeModule,
+    MatTabsModule,
+  
   ],
   exports: [TablerIconsModule],
   bootstrap: [AppComponent],

@@ -6,7 +6,6 @@ spring:
     name: blogForum
   data:
     uri: mongodb://mongodb:27017/blogForum
-
 # use this while running with locally
 eureka:
   client:
@@ -14,3 +13,22 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+# Add these new sections
+  web:
+    resources:
+      static-locations: 
+        - classpath:/static/
+        - file:uploads/
+      static-path-pattern: /**
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      enabled: true
+# Custom upload settings
+app:
+  upload:
+    dir: uploads
+    max-file-size: 5242880  # 5MB in bytes
+

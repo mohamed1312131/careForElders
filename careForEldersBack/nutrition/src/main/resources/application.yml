@@ -5,9 +5,65 @@ spring:
   application:
     name: nutrition
   data:
-    uri: mongodb://mongodb:27017/nutrition
+    mongodb:  # ✅ FIX 1: Add 'mongodb' here
+      uri: mongodb://localhost:27017/nutrition
+  task:
+    execution:
+          pool:
+            core-size: 2
+            max-size: 4
+            queue-capacity: 100
+    scheduling:
+          pool:
+            size: 2
 
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
+
+huggingface:
+  api:
+    token: hf_your_actual_token_here  # ✅ FIX 2: Remove 'Bearer' prefix
+    # ✅ REQUIRED: Mail configuration for JavaMailSender bean
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: ${MAIL_USERNAME:your-email@gmail.com}
+      password: ${MAIL_PASSWORD:your-app-password}
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true
+# Custom Email Settings (disabled for testing)
+app:
+  email:
+    from: test@example.com
+    enabled: false  # Set to false to disable email sending
+  reminders:
+    enabled: true
+    advance-minutes: 30  # Send reminders 30 minutes before meal time
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+  server:
+    port: 8087
+
+# Enable async processing for reminders
+# Meal Reminder Settings
+meal:
+  reminders:
+    breakfast: "08:00"
+    lunch: "12:30"
+    dinner: "19:00"
+    snack: "15:30"
+logging:
+  level:
+    com.care4elders.nutrition: DEBUG

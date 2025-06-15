@@ -1,117 +1,362 @@
-// Option A: Within your component's SCSS file (requires potentially disabling view encapsulation or using a global style)
-/* In your component's SCSS file (e.g., your-component.scss) */
-/* If you must pierce encapsulation, use a global style or a mixin included globally */
+// Import Angular Material theming functions if you need to access palette colors directly
+// @use '@angular/material' as mat;
 
-// Using a global style approach (put this in styles.scss or a theme file)
-mat-expansion-panel-header {
-    padding: 16px 24px; // Add padding
-    background-color: var(--expansion-header-bg, #f8fafc); // Use a CSS variable for flexibility
-    transition: background-color 0.2s ease-in-out; // Smooth transition for states
-    border-bottom: 1px solid var(--expansion-header-border, #e2e8f0); // Subtle border
-  
-    // Style for the content within the header (title, description)
-    .mat-content {
-      // Add styles for text color, font weight etc.
-      color: var(--expansion-header-text, #333);
+// :host {
+//   // Access theme colors if needed, e.g.
+//   // background-color: mat.get-color-from-palette(mat.m2-define-palette(mat.$m2-grey-palette), 100);
+// }
+
+.program-info-dialog-wrapper {
+  // The dialog panel itself can be styled globally or via panelClass in open() method
+  // This wrapper is for content structure within the dialog.
+  max-height: 90vh; // Already set in HTML, ensure dialog panel respects this
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-container, .error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  min-height: 300px; // Ensure it takes some space
+}
+
+.loading-text {
+  margin-top: 16px;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.error-container {
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+  }
+  .error-message {
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+  }
+  button {
+    margin-top: 8px;
+  }
+  .close-error-button {
+    margin-left: 8px;
+  }
+}
+
+
+.program-header-image-container {
+  width: 100%;
+  max-height: 250px; // Control banner height
+  overflow: hidden;
+  margin-bottom: 16px; // Space below image before title
+  border-radius: 4px; // Slight rounding if desired
+
+  .program-header-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; // Crop to fill, maintain aspect ratio
+    display: block;
+  }
+}
+
+
+.dialog-title {
+  font-size: 1.8rem; // Adjust as per Material typography scale
+  font-weight: 500;
+  margin-bottom: 8px; // Space below the title
+  padding: 0 24px; // Align with mat-dialog-content padding
+  margin-top: -8px; // Pull up slightly if header image has margin
+}
+
+.dialog-content {
+  padding: 0 24px 24px 24px; // Consistent padding for content area
+  flex-grow: 1; // Allow content to take available space
+  overflow-y: auto; // Handled by the dialog component itself mostly
+
+  .program-description {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.67);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+}
+
+.metadata-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    color: rgba(0,0,0,0.7);
+    mat-icon {
+      margin-right: 10px;
+      color: var(--mdc-theme-primary, #6200ee); // Use Material theme primary or a specific color
     }
-  
-    // Hover state
-    &:hover:not([aria-disabled='true']) {
-      background-color: var(--expansion-header-bg-hover, #f1f5f9); // Slightly darker on hover
+    strong {
+      color: rgba(0,0,0,0.87);
     }
-  
-    // Focus state (ensure clear outline)
-    &:focus {
-      outline: 2px solid var(--expansion-header-outline, #3b82f6); // Blue outline example
-      outline-offset: -2px; // Ensure outline stays within bounds
+  }
+}
+
+.section-divider {
+  margin: 24px 0;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: var(--mdc-theme-primary, #6200ee);
+}
+
+.subsection-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 16px 0 12px 0;
+}
+
+mat-accordion {
+  .day-panel-title {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px; // Space between icon and text
+    mat-icon {
+      color: rgba(0,0,0,0.54);
     }
-  
-    // Expanded state
-    &[aria-expanded='true'] {
-      background-color: var(--expansion-header-bg-expanded, #e2e8f0); // Different background when expanded
-      font-weight: 600; // Make text bold when expanded (optional)
-  
-      // Style the expansion indicator icon if needed
-      .mat-expansion-indicator::after {
-        color: var(--expansion-header-indicator-expanded, #0f172a); // Darker icon color
+  }
+  .rest-day-indicator {
+    color: var(--mdc-theme-error, #B00020); // Use Material theme error color
+    font-style: italic;
+    font-size: 0.9em;
+    margin-left: 8px;
+  }
+}
+
+.day-content {
+  padding: 16px 0; // Add padding inside expansion panel content
+
+  .rest-day-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    color: rgba(0,0,0,0.6);
+    mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      margin-bottom: 8px;
+    }
+  }
+
+  .day-summary {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+  }
+
+  .day-instructions, .day-notes {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 4px;
+    strong {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+  }
+}
+
+.exercises-section {
+  margin-top: 20px;
+}
+
+.exercises-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.exercise-card {
+  display: flex;
+  flex-direction: column;
+
+  .exercise-media-container {
+    position: relative; // For video aspect ratio or image styling
+    width: 100%;
+    background-color: #f0f0f0; // Placeholder background
+  }
+
+  .exercise-image {
+    width: 100%;
+    height: 180px; // Fixed height or use aspect ratio
+    object-fit: cover;
+  }
+
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+  mat-card-header {
+    padding-bottom: 8px;
+  }
+  mat-card-title {
+    font-size: 1.1rem; // Adjust as needed
+  }
+  .exercise-description {
+    font-size: 0.85rem;
+    color: rgba(0,0,0,0.67);
+    margin-bottom: 12px;
+  }
+  .exercise-details-list {
+    padding-top: 0;
+    .mat-mdc-list-item { // Targeting Material 15+ class names
+      height: auto !important; // Allow dynamic height
+      padding: 4px 0 !important;
+      font-size: 0.85rem;
+    }
+    .mat-mdc-list-item-leading-icon { // Targeting Material 15+ class names
+      margin-right: 8px !important;
+      color: rgba(0,0,0,0.54);
+    }
+  }
+}
+
+
+.patients-section {
+  margin-top: 24px;
+
+  .table-container {
+    border-radius: 4px;
+    overflow-x: auto; // For responsiveness if table is wide
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+
+  .patients-table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+    }
+    thead th {
+      background-color: rgba(0,0,0,0.04);
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: rgba(0,0,0,0.67);
+    }
+    tbody tr {
+      &:hover {
+        background-color: rgba(0,0,0,0.02);
+      }
+      &:last-child td {
+        border-bottom: none;
       }
     }
-  
-    // Style the expansion indicator icon
-    .mat-expansion-indicator::after {
-       color: var(--expansion-header-indicator, #64748b); // Default icon color
-    }
   }
-  
-  // Option B: Leveraging Angular Material Theming (BEST PRACTICE in Angular)
-  // This involves defining styles within your Material theme file (_theme.scss).
-  // You would define a custom palette or override component styles within the theme.
-  // This is more involved and requires understanding Angular Material's theming but is the most maintainable approach.
-  // Example (conceptual, requires proper theme structure):
-  /*
-  .my-custom-theme {
-    .mat-expansion-panel-header {
-      // ... your styles here, using theme variables ...
-    }
-  }
-  */
-  /* In your component's SCSS file (e.g., your-component.scss) */
-/* If you need to pierce encapsulation, use a global style or a mixin included globally */
-
-// Using a global style approach (put this in styles.scss)
-mat-expansion-panel-header {
-    @apply px-6 py-4 bg-gray-50 border-b border-gray-200 transition duration-200 ease-in-out; // Base styles
-  
-    // Apply hover state utilities
-    &:hover:not([aria-disabled='true']) {
-      @apply bg-gray-100; // Slightly darker background on hover
-    }
-  
-    // Apply focus state utilities
-    &:focus {
-      @apply outline-none ring-2 ring-blue-500 ring-offset-2; // Focus ring
-    }
-  
-    // Apply expanded state utilities
-    &[aria-expanded='true'] {
-      @apply bg-gray-200 font-semibold; // Different background and bold font when expanded
-    }
-  
-    // Style for the content within the header
-    .mat-content {
-      @apply text-gray-800; // Text color
-    }
-  
-    // Style the expansion indicator icon
-     .mat-expansion-indicator::after {
-      @apply text-gray-500; // Default icon color
-     }
-  
-    &[aria-expanded='true'] .mat-expansion-indicator::after {
-      @apply text-gray-900; // Darker icon color when expanded
-    }
-  }
-
-  /* program-info.component.scss */
-.loading-spinner {
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
 }
 
-.error-message {
-  color: #dc3545;
-  text-align: center;
-  padding: 2rem;
+.dialog-actions {
+  padding: 16px 24px !important; // Ensure padding for actions
+  border-top: 1px solid rgba(0,0,0,0.12); // Separator for actions
 }
-
-.exercise-video-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  mat-icon {
-    font-size: 1rem;
-    height: 1rem;
-    width: 1rem;
+.chart-section {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  
+  .chart-toggle-btn {
+    margin-bottom: 15px;
+    
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+  
+  .chart-container {
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    
+    #chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .chart-summary {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      
+      .summary-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .summary-label {
+          font-size: 14px;
+          color: #666;
+          margin-bottom: 5px;
+        }
+        
+        .summary-value {
+          font-size: 18px;
+          font-weight: 500;
+        }
+      }
+    }
+    
+    .no-data-message {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #666;
+      
+      mat-icon {
+        margin-right: 10px;
+      }
+    }
   }
 }

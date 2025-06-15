@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.care4elders.blogforum.model.Post;
@@ -13,16 +12,17 @@ import com.care4elders.blogforum.model.Post;
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {
     
-    List<Post> findByAuthorId(String authorId);
+    List<Post> findByIsDeletedFalseOrderByCreatedAtDesc();
     
-    Page<Post> findByPublishedTrue(Pageable pageable);
+    Page<Post> findByPublishedTrueAndIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
     
-    @Query("{'title': {$regex: ?0, $options: 'i'}}")
-    List<Post> findByTitleContainingIgnoreCase(String title);
+    List<Post> findByPublishedTrueAndIsDeletedFalse();
     
-    @Query("{'content': {$regex: ?0, $options: 'i'}}")
-    List<Post> findByContentContainingIgnoreCase(String content);
+    List<Post> findByTitleContainingIgnoreCaseAndPublishedTrueAndIsDeletedFalse(String title);
     
-    @Query("{'tags': {$in: [?0]}}")
-    List<Post> findByTag(String tag);
+    List<Post> findByContentContainingIgnoreCaseAndPublishedTrueAndIsDeletedFalse(String content);
+    
+    List<Post> findByTagsContainingAndPublishedTrueAndIsDeletedFalse(String tag);
+    
+    List<Post> findByAuthorIdAndIsDeletedFalseOrderByCreatedAtDesc(String authorId);
 }

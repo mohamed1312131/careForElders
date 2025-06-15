@@ -9,6 +9,9 @@ import com.care4elders.planandexercise.repository.ProgramDayRepository;
 import com.care4elders.planandexercise.repository.ProgramRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
@@ -31,16 +34,15 @@ public class ProgramService {
 
     // Create empty program
     @Transactional
-    public Program createProgram(ProgramDTO programDTO, String doctorId) {
+    public Program createProgram(ProgramDTO programDTO, String doctorId, String imageUrl) {
         validateDoctor(doctorId);
 
-        // Create and save Program
         Program program = new Program();
         program.setName(programDTO.getName());
         program.setDescription(programDTO.getDescription());
         program.setDoctorId(doctorId);
         program.setProgramCategory(programDTO.getProgramCategory());
-        program.setProgramImage(programDTO.getProgramImage());
+        program.setProgramImage(imageUrl);  // Set Cloudinary URL here
         program.setStatus("DRAFT");
         program = programRepository.save(program);
 
@@ -118,11 +120,6 @@ public class ProgramService {
         return programDayRepository.save(day);
     }
 
-
-
-
-
-
     private void configureRestDay(ProgramDay day, ProgramDayDTO dto) {
         day.setTotalDurationMinutes(dto.getWarmUpMinutes() + dto.getCoolDownMinutes());
         day.setInstructions(dto.getInstructions());
@@ -169,7 +166,7 @@ public class ProgramService {
     private void validateDoctor(String doctorId) {
         try {
             UserDTO doctor = restTemplate.getForObject(
-                    "http://USER-SERVICE/users/{Id}",
+                    "http://user-service/users/{Id}",
                     UserDTO.class,
                     doctorId
             );
@@ -184,9 +181,6 @@ public class ProgramService {
         }
     }
 
-
-
-
     private void validateDayNumber(Program program, int dayNumber) {
         boolean dayExists = program.getDays().stream()
                 .anyMatch(d -> d.getDayNumber() == dayNumber);
@@ -198,7 +192,7 @@ public class ProgramService {
     @Transactional
     public PatientProgramAssignment assignProgramToPatient(ProgramAssignmentDTO assignmentDTO, String doctorId) {
         // Validate doctor
-        validateDoctor(doctorId);
+       // validateDoctor(doctorId);
 
         // Get and validate program
         Program program = programRepository.findById(assignmentDTO.getProgramId())
@@ -208,16 +202,17 @@ public class ProgramService {
             throw new UnauthorizedAccessException("You don't own this program");
         }
 
+
         // Validate patient
-        UserDTO patient = restTemplate.getForObject(
-                "http://USER-SERVICE/users/{Id}",
+        /*UserDTO patient = restTemplate.getForObject(
+                "http://user-service/users/{Id}",
                 UserDTO.class,
                 assignmentDTO.getPatientId()
         );
 
         if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
             throw new EntityNotFoundException("Invalid patient ID");
-        }
+        } */
 
         List<ProgramDay> days = programDayRepository.findByProgramIdOrderByDayNumberAsc(assignmentDTO.getProgramId());
 
@@ -228,7 +223,7 @@ public class ProgramService {
         assignment.setPatientId(assignmentDTO.getPatientId());
         assignment.setAssignedDate(LocalDateTime.now());
         assignment.setStatus("ACTIVE");
-        assignment.setCurrentDay(0);
+        assignment.setCurrentDay(1);
 
         // Initialize day statuses
         Map<Integer, DayStatus> dayStatuses = new HashMap<>();
@@ -250,7 +245,24 @@ public class ProgramService {
         return assignmentRepository.save(assignment);
     }
 
+    @Transactional
+    public void unassignPatientFromProgram(String programId, String patientId, String doctorId) {
+        // Validate ownership
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
 
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        // Find the assignment
+        PatientProgramAssignment assignment = assignmentRepository
+                .findByProgramIdAndPatientId(programId, patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
+
+        // Delete the assignment
+        assignmentRepository.delete(assignment);
+    }
 
     @Transactional
     public PatientProgramAssignment completeDay(String assignmentId, DayCompletionDTO completionDTO, String patientId) {
@@ -292,6 +304,42 @@ public class ProgramService {
         return assignmentRepository.save(assignment);
     }
 
+    @Transactional
+    public PatientProgramAssignment startDay(String assignmentId, int dayNumber, String patientId) {
+        PatientProgramAssignment assignment = getValidAssignment(assignmentId, patientId);
+
+        // Validate that this is the next day to be started
+        if (dayNumber != assignment.getCurrentDay() + 1) {
+            throw new InvalidProgramStateException("Can only start the next sequential day");
+        }
+
+        // Validate previous days are completed (except for day 1)
+        if (dayNumber > 1) {
+            for (int i = 1; i < dayNumber; i++) {
+                DayStatus prevDayStatus = assignment.getDayStatuses().get(i);
+                if (prevDayStatus == null || !prevDayStatus.isCompleted()) {
+                    throw new InvalidProgramStateException("Previous days must be completed first");
+                }
+            }
+        }
+
+        // Update current day and day status
+        assignment.setCurrentDay(dayNumber);
+
+        DayStatus dayStatus = assignment.getDayStatuses().get(dayNumber);
+        if (dayStatus == null) {
+            dayStatus = new DayStatus(
+                    false, null, 0, null, null, "",
+                    List.of(), 0, ""
+            );
+            assignment.getDayStatuses().put(dayNumber, dayStatus);
+        }
+
+        dayStatus.setActualStartDateTime(LocalDateTime.now());
+        assignment.setLastActivityDate(LocalDateTime.now());
+        return assignmentRepository.save(assignment);
+    }
+
     private PatientProgramAssignment getValidAssignment(String assignmentId, String patientId) {
         PatientProgramAssignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
@@ -308,15 +356,15 @@ public class ProgramService {
     }
     public List<PatientProgramDTO> getProgramsByPatientId(String patientId) {
         // Verify patient exists
-        UserDTO patient = restTemplate.getForObject(
-                "http://USER-SERVICE/users/{Id}",
+        /*UserDTO patient = restTemplate.getForObject(
+                "http://user-service/users/{Id}",
                 UserDTO.class,
                 patientId
         );
 
         if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
             throw new EntityNotFoundException("Patient not found");
-        }
+        } */
 
         // Get all assignments for the patient
         List<PatientProgramAssignment> assignments = assignmentRepository.findByPatientId(patientId);
@@ -525,6 +573,7 @@ public class ProgramService {
 
     private ProgramDayDetailsDTO mapToDayDetails(ProgramDay day, Map<String, Exercise> exercisesMap) {
         return ProgramDayDetailsDTO.builder()
+                .id(day.getId())
                 .dayNumber(day.getDayNumber())
                 .restDay(day.isRestDay())
                 .totalDurationMinutes(day.getTotalDurationMinutes())
@@ -577,7 +626,7 @@ public class ProgramService {
     private UserDTO getUserDetails(String patientId) {
         try {
             return restTemplate.getForObject(
-                    "http://user-service/users/{id}",
+                    "http://user-service/users/{Id}",
                     UserDTO.class,
                     patientId
             );
@@ -585,7 +634,286 @@ public class ProgramService {
             // Handle error or return default
             return new UserDTO("Unknown", "User", "N/A");
         }
+
     }
+    @Transactional
+    public ProgramDay updateProgramDay(String programId, String dayId, ProgramDayDTO dayDTO, String doctorId) {
+        //validateDoctor(doctorId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        ProgramDay existingDay = programDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("Day not found"));
+
+        // Update day properties
+        existingDay.setRestDay(dayDTO.isRestDay());
+        existingDay.setInstructions(dayDTO.getInstructions());
+        existingDay.setNotesForPatient(dayDTO.getNotesForPatient());
+        existingDay.setWarmUpMinutes(dayDTO.getWarmUpMinutes());
+        existingDay.setCoolDownMinutes(dayDTO.getCoolDownMinutes());
+
+        if (!dayDTO.isRestDay()) {
+            List<Exercise> exercises = exerciseRepository.findAllById(dayDTO.getExerciseIds());
+            validateExercisesFound(dayDTO, exercises);
+            existingDay.setExerciseIds(dayDTO.getExerciseIds());
+            existingDay.setTotalDurationMinutes(calculateTotalDuration(exercises, dayDTO));
+        } else {
+            existingDay.setExerciseIds(Collections.emptyList());
+            existingDay.setTotalDurationMinutes(dayDTO.getWarmUpMinutes() + dayDTO.getCoolDownMinutes());
+        }
+
+        return programDayRepository.save(existingDay);
+    }
+
+    @Transactional
+    public void deleteProgramDay(String programId, String dayId, String doctorId) {
+        //validateDoctor(doctorId);
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        ProgramDay day = programDayRepository.findById(dayId)
+                .orElseThrow(() -> new EntityNotFoundException("Day not found"));
+
+        // Remove from program's day list
+        program.getProgramDayIds().remove(dayId);
+        programRepository.save(program);
+
+        programDayRepository.delete(day);
+    }
+
+    @Transactional
+    public Program updateProgram(String programId, ProgramDTO programDTO, String doctorId) {
+        validateDoctor(doctorId);
+
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You don't own this program");
+        }
+
+        // Update fields from DTO
+        program.setName(programDTO.getName());
+        program.setDescription(programDTO.getDescription());
+        program.setProgramCategory(programDTO.getProgramCategory());
+        program.setProgramImage(programDTO.getProgramImage());
+        program.setStatus(programDTO.getStatus()); // ENUM: validated already
+        program.setDurationWeeks(programDTO.getDurationWeeks());
+        program.setUpdatedDate(LocalDateTime.now());
+
+        return programRepository.save(program);
+    }
+
+    @Transactional
+    public void deleteProgram(String programId, String doctorId) {
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!program.getDoctorId().equals(doctorId)) {
+            throw new UnauthorizedAccessException("You are not authorized to delete this program");
+        }
+
+        // Step 1: Delete all patient assignments
+        assignmentRepository.deleteByProgramId(programId);
+
+        // Step 2: Delete all ProgramDays
+        List<String> dayIds = program.getProgramDayIds();
+        if (dayIds != null && !dayIds.isEmpty()) {
+            programDayRepository.deleteAllByIdIn(dayIds);
+        }
+
+        // Step 3: Delete the Program
+        programRepository.delete(program);
+    }
+
+    public List<UserDTO> getUnassignedPatients(String programId) {
+        // Step 1: Get assigned patient IDs for the program
+        List<PatientProgramAssignment> assignments = assignmentRepository.findByProgramId(programId);
+        Set<String> assignedPatientIds = assignments.stream()
+                .map(PatientProgramAssignment::getPatientId)
+                .collect(Collectors.toSet());
+
+        // Step 2: Get all patients from user-service
+        List<UserDTO> allPatients = getAllPatientsFromUserService();
+
+        // Step 3: Filter out assigned patients
+        return allPatients.stream()
+                .filter(patient -> patient.getId() != null)
+                .filter(patient -> !assignedPatientIds.contains(patient.getId()))
+                .collect(Collectors.toList());
+    }
+
+    private List<UserDTO> getAllPatientsFromUserService() {
+        try {
+            ParameterizedTypeReference<List<UserDTO>> responseType =
+                    new ParameterizedTypeReference<List<UserDTO>>() {};
+
+            ResponseEntity<List<UserDTO>> response = restTemplate.exchange(
+                    "http://user-service/users?role=NORMAL_USER",
+                    HttpMethod.GET,
+                    null,
+                    responseType
+            );
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return response.getBody();
+            }
+            throw new EntityNotFoundException("Failed to fetch patients from user-service");
+        } catch (ResourceAccessException e) {
+            throw new ServiceUnavailableException("User service unavailable");
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching patients", e);
+        }
+    }
+    public List<Program> getRecommendedPrograms(String userId) {
+        // Fetch medical record from MedicalRecord service
+        MedicalRecord record = restTemplate.getForObject(
+                "http://MEDICALRECORD/api/medical-records/user/" + userId,
+                MedicalRecord.class
+        );
+
+        // Return empty if no record or no notes
+        if (record == null || record.getNotes() == null || record.getNotes().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Extract lowercase note content
+        Set<String> noteContents = record.getNotes().stream()
+                .map(MedicalRecord.MedicalNote::getContent)
+                .filter(Objects::nonNull)
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
+
+        // Fetch assigned program IDs for this user
+        Set<String> assignedProgramIds = assignmentRepository
+                .findByPatientId(userId)
+                .stream()
+                .map(PatientProgramAssignment::getProgramId)
+                .collect(Collectors.toSet());
+
+        // Fetch all programs with status = "PUBLISHED"
+        List<Program> allPublishedPrograms = programRepository.findByStatus("PUBLISHED");
+
+        // Filter by medical notes and assignment
+        return allPublishedPrograms.stream()
+                .filter(program -> {
+                    String category = program.getProgramCategory();
+                    return category != null
+                            && noteContents.stream().anyMatch(note -> note.contains(category.toLowerCase()))
+                            && !assignedProgramIds.contains(program.getId());
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public PatientProgramAssignment selfAssignProgram(String programId, String patientId) {
+        // Validate patient exists (optional - uncomment if needed)
+    /*
+    UserDTO patient = restTemplate.getForObject(
+            "http://user-service/users/{Id}",
+            UserDTO.class,
+            patientId
+    );
+
+    if (patient == null || !"NORMAL_USER".equals(patient.getRole())) {
+        throw new EntityNotFoundException("Invalid patient ID");
+    }
+    */
+
+        // Validate program exists and is active
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        if (!"PUBLISHED".equals(program.getStatus())) {
+            throw new InvalidProgramStateException("Program is not available for self-assignment");
+        }
+
+        // Check if already assigned
+        Optional<PatientProgramAssignment> existingAssignment = assignmentRepository
+                .findByProgramIdAndPatientId(programId, patientId);
+
+        if (existingAssignment.isPresent()) {
+            throw new InvalidProgramStateException("You are already assigned to this program");
+        }
+
+        // Get program days
+        List<ProgramDay> days = programDayRepository.findByProgramIdOrderByDayNumberAsc(programId);
+
+        // Create assignment
+        PatientProgramAssignment assignment = new PatientProgramAssignment();
+        assignment.setProgramId(programId);
+        assignment.setPatientId(patientId);
+        assignment.setAssignedDate(LocalDateTime.now());
+        assignment.setStatus("ACTIVE");
+        assignment.setCurrentDay(1);
+        //assignment.setSelfAssigned(true); // Add this field to track self-assignments
+
+        // Initialize day statuses
+        Map<Integer, DayStatus> dayStatuses = new HashMap<>();
+        for (ProgramDay day : days) {
+            dayStatuses.put(day.getDayNumber(), new DayStatus(
+                    false,
+                    null,
+                    0,
+                    null,
+                    null,
+                    "",
+                    List.of(),
+                    0,
+                    ""
+            ));
+        }
+        assignment.setDayStatuses(dayStatuses);
+
+        return assignmentRepository.save(assignment);
+    }
+    public ProgramStatisticsDTO getProgramStatistics(String programId) {
+        // Get total assignments count
+        long totalAssignments = assignmentRepository.countByProgramId(programId);
+
+        // Get completed assignments count
+        long completedAssignments = assignmentRepository.countByProgramIdAndStatus(programId, "COMPLETED");
+
+        // Get active assignments count
+        long activeAssignments = assignmentRepository.countByProgramIdAndStatus(programId, "ACTIVE");
+
+        return new ProgramStatisticsDTO(totalAssignments, completedAssignments, activeAssignments);
+    }
+    public PatientAssignmentDetailsDTO getPatientAssignmentDetails(String programId, String patientId) {
+        PatientProgramAssignment assignment = assignmentRepository.findByProgramIdAndPatientId(programId, patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Assignment not found"));
+
+        Program program = programRepository.findById(programId)
+                .orElseThrow(() -> new EntityNotFoundException("Program not found"));
+
+        // If you have user service integration, you could fetch patient details here
+        // UserDTO patient = getUserDetails(patientId);
+
+        return PatientAssignmentDetailsDTO.builder()
+                .assignmentId(assignment.getId())
+                .programId(programId)
+                .programName(program.getName())
+                .patientId(patientId)
+                //.patientName(patient.getFirstName() + " " + patient.getLastName())
+                .assignedDate(assignment.getAssignedDate())
+                .status(assignment.getStatus())
+                .currentDay(assignment.getCurrentDay())
+                .completionPercentage(assignment.getCompletionPercentage())
+                .dayStatuses(assignment.getDayStatuses())
+                .lastActivityDate(assignment.getLastActivityDate())
+                .actualEndDate(assignment.getActualEndDate())
+                .build();
+    }
+
+
 }
 
 

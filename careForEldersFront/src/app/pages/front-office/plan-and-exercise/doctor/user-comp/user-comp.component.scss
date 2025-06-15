@@ -1,0 +1,218 @@
+:host {
+  display: block;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif; // Example modern font
+}
+
+.program-dialog-container {
+  min-width: 500px; // Minimum width for the dialog
+  max-width: 800px; // Maximum width
+  width: 90vw; // Responsive width
+  border-radius: 8px; // Rounded corners for the dialog itself (if not handled by MatDialog)
+  overflow: hidden; // Ensures content respects border radius
+}
+
+.dialog-header {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 12px 24px; // More padding for header
+  .dialog-title {
+    font-size: 1.4em;
+    font-weight: 500;
+  }
+  .spacer {
+    flex: 1 1 auto;
+  }
+}
+
+
+.dialog-content {
+  padding: 24px;
+  background-color: #f9f9f9; // Light background for content area
+  max-height: 70vh; // Max height for scrollability
+}
+
+.loading-indicator, .error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+  gap: 16px;
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+  p {
+    font-size: 1.1em;
+    color: #555;
+  }
+}
+
+.info-card {
+  margin-bottom: 24px;
+  border-radius: 8px; // Rounded corners for cards
+  background-color: #ffffff; // White background for cards
+
+  .mat-card-header {
+    padding-bottom: 8px;
+  }
+  .header-avatar-icon {
+    // Custom styling for avatar icon if needed
+    transform: scale(1.5); // Make icon a bit larger
+  }
+  .mat-card-title {
+    font-size: 1.3em;
+   
+  color: #3f51b5; // Indigo 700 equivalent
+  }
+  .mat-card-subtitle {
+    font-size: 0.95em;
+    color: #666;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+  div {
+    padding: 8px 0;
+  }
+  .info-label {
+    font-weight: 500;
+    color: #333;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+  }
+  .info-value {
+    color: #555;
+    font-size: 1em;
+  }
+}
+
+.progress-section {
+  margin-top: 20px;
+  .info-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .progress-bar {
+    height: 12px;
+    border-radius: 6px;
+  }
+}
+
+.section-divider {
+  margin: 24px 0;
+}
+
+.section-title {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #5c6bc0;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #c5cae9;
+}
+
+.day-statuses-container {
+  .day-panel {
+    margin-bottom: 12px;
+    border-radius: 6px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    .mat-expansion-panel-header {
+        background-color: #fff;
+        border-radius: 6px; // For header when collapsed
+    }
+     &.mat-expanded .mat-expansion-panel-header {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+  }
+
+  .panel-title {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    .day-icon {
+      margin-right: 12px;
+    }
+  }
+  .panel-description {
+    font-size: 0.9em;
+    color: #777;
+    align-self: center; // Align with title
+  }
+
+  .day-details {
+    padding: 16px 24px; // Padding inside expanded panel
+    background-color: #fdfdfd; // Slightly off-white for content
+    border-top: 1px solid #eee;
+    p {
+      margin-bottom: 10px;
+      font-size: 0.95em;
+      line-height: 1.6;
+      strong {
+        color: #444;
+      }
+    }
+    .coach-comment {
+        font-style: italic;
+        color: #555;
+        background-color: #eef2ff; // Light blueish background for comments
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    .status-icon-inline {
+        vertical-align: middle;
+        margin-left: 8px;
+        font-size: 18px;
+    }
+  }
+}
+
+.no-data-message {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-style: italic;
+}
+
+.dialog-actions {
+  padding: 12px 24px;
+  background-color: #f1f1f1; // Slightly different background for actions
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
+// Status Chip Styling
+.status-chip-completed {
+  background-color: #66bb6a !important;
+  color: white !important;
+}
+.status-chip-in-progress {
+  background-color: #42a5f5 !important;
+  color: white !important;
+}
+.status-chip-not-started {
+ background-color: #ef5350 !important;
+  color: #333 !important;
+}
+.status-chip-cancelled {
+  background-color: #bdbdbd !important;
+  color: white !important;
+}
+.status-chip-default {
+  background-color: #bdbdbd !important;
+  color: #333 !important;
+}

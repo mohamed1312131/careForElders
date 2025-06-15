@@ -16,4 +16,8 @@ public class UserResponse {
     private LocalDate birthDate;
     private String profileImage;
     private String specialization;
+    private Boolean  twoFactorEnabled;
+    private String emergencyContactName;
+    private String emergencyContactPhone;
+    private String emergencyContactEmail;
 }

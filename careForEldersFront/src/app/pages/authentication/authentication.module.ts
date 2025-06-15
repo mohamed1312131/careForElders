@@ -30,21 +30,30 @@ import { RegisterComponent } from './register/register.component';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
 import { ResetPasswordFormComponent } from './reset-password-form/reset-password-form.component';
 import {AuthService} from "../../services/auth.service";
+import {VerifyOtpComponent} from "./verify-otp/verify-otp.component";
+import {OtpModalComponent} from "./otp-modal/otp-modal.component";
+import {MatDialogModule} from "@angular/material/dialog";
+import {ChooseMethodModalComponent} from "./choose-method-modal/choose-method-modal.component";
+import {OAuth2RedirectComponent} from "./OAuth2Redirect/OAuth2RedirectComponent";
 
 @NgModule({
   declarations: [
     RegisterComponent,
     LoginComponent,
     PasswordResetComponent,
-    ResetPasswordFormComponent
+    ResetPasswordFormComponent,
+    VerifyOtpComponent,
+    OtpModalComponent,
+    ChooseMethodModalComponent,
+    OAuth2RedirectComponent
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(AuthenticationRoutes),
     FormsModule,
     ReactiveFormsModule,
+    MatDialogModule,
 
-  
     MatIconModule,
     MatCardModule,
     MatInputModule,

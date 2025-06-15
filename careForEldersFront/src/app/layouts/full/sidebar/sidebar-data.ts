@@ -22,15 +22,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'medical Record',
     iconName: 'lock',
-    route: '/front-office/medical-record',
-  },
-    {
-    navCap: 'Events',  // New Events section
-  },
-  {
-    displayName: 'Events Management',
-    iconName: 'calendar-event',  // Using an appropriate icon
-    route: '/admin/events',      // Matching your route
+    route: '/user/medicalRecord',
   },
   {
     navCap: 'Ui Components',

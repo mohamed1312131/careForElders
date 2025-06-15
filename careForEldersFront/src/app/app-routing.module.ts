@@ -2,8 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
-import { EventsListComponent } from './pages/event/events-list/events-list.component';
-import { EventRegistrationComponent } from './pages/event/event-registration/event-registration.component';
+import { MedicalRecordComponent } from './pages/front-office/medical-record/medical-record/medical-record.component';
+import { EventRegistrationComponent } from './pages/front-office/event/event-registration/event-registration.component';
+import { EventsListComponent } from './pages/front-office/event/events-list/events-list.component';
 
 
 const routes: Routes = [
@@ -11,46 +12,32 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./pages/front-office/front-office.module').then(m => m.FrontOfficeModule),
-  },
-  {
+  },   {
     path: 'events',
     component: EventRegistrationComponent,
     data: { title: 'Events' }
+  },
+  {
+    path: 'authentication',
+    loadChildren: () =>
+    import('./pages/authentication/authentication.module').then((m) => m.AuthenticationModule),
   },
 
   // Admin routes
   {
     path: 'admin',
-    component: BlankComponent,
-    children: [
-      {
-        path: '',
-        redirectTo: 'authentication/login',
-        pathMatch: 'full',
-      },
-      {
-        path: 'authentication',
-        loadChildren: () =>
-          import('./pages/authentication/authentication.module').then((m) => m.AuthenticationModule),
-      },
-    ],
-  },
-  {
-    path: 'admin',
     component: FullComponent,
-    
     children: [
       {
         path: 'dashboard',
         loadChildren: () =>
           import('./pages/pages.module').then((m) => m.PagesModule),
       },
-       {
+                  {
         path: 'events',  // This will be /admin/events
         component: EventsListComponent,
         data: { title: 'Events Management' }
       },
-      
       {
         path: 'ui-components',
         loadChildren: () =>
@@ -61,14 +48,9 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/extra/extra.module').then((m) => m.ExtraModule),
       },
+      { path: 'medical-record', component: MedicalRecordComponent },
     ],
-  },
-
-  // Wildcard route for a 404 page
-  {
-    path: '**',
-    redirectTo: '',
-  },
+  }
 ];
 
 @NgModule({

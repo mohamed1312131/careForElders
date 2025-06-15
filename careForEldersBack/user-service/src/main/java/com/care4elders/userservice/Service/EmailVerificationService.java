@@ -24,10 +24,11 @@ public class EmailVerificationService {
     public void sendVerificationEmail(User user) {
         String token = UUID.randomUUID().toString();
         user.setVerificationToken(token);
-        pendingUsers.put(token, user); // ⛔ Do not save to DB here!
+        user.setEnabled(false); // Disabled by default
+        userRepository.save(user); // Save with token
 
         String subject = "Verify your email";
-        String message = "Click to verify: http://localhost:8081/auth/verify?token=" + token;
+        String message = "Your verification token is: " + token; // 👈 OR include URL if needed
 
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setTo(user.getEmail());
@@ -37,13 +38,15 @@ public class EmailVerificationService {
     }
 
     public boolean verifyToken(String token) {
-        User user = pendingUsers.remove(token);
-        if (user != null) {
+        Optional<User> optionalUser = userRepository.findByVerificationToken(token);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
             user.setEnabled(true);
-            user.setVerificationToken(null);
-            userRepository.save(user); // ✅ Save only after verification
+            user.setVerificationToken(null); // clear token
+            userRepository.save(user);
             return true;
         }
         return false;
     }
+
 }

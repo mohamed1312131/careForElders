@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../../../services/user.service'; // Service to handle backend API calls
 import { ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr'; // For displaying notifications
-import { PhotoService } from '../../../../services/photo.service'; // Your PhotoService
+import { PhotoService } from '../../../../services/photo.service';
+import {MatCheckboxChange} from "@angular/material/checkbox"; // Your PhotoService
 
 @Component({
   selector: 'app-userinfo',
@@ -28,16 +29,18 @@ export class UserinfoComponent implements OnInit {
   ngOnInit(): void {
     // Initialize the form
     this.userForm = this.fb.group({
-      id: [{ value: '', disabled: true }], // non-editable
-      firstName: ['', [Validators.minLength(2), Validators.maxLength(50)]],
-      lastName: ['', [Validators.minLength(2), Validators.maxLength(50)]],
-      email: ['', [Validators.email, Validators.minLength(5), Validators.maxLength(255)]],
+      id: [{ value: '', disabled: true }],
+      firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
+      email: ['', [Validators.required, Validators.email, Validators.minLength(5), Validators.maxLength(255)]],
       password: ['', [Validators.minLength(8), Validators.maxLength(100)]],
       birthDate: [''],
-      profileImage: ['', [Validators.pattern(/\.(jpeg|jpg|png|gif)$/i)]],
+      profileImage: [''],
       phoneNumber: ['', [Validators.pattern(/^\+?[0-9]{8}$/)]],
-      role: ['', [Validators.minLength(3), Validators.maxLength(50)]],
+      role: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      twoFactorEnabled: []
     });
+
 
     // Get the user ID from the URL or other sources
     this.userId = this.route.snapshot.paramMap.get('id') || '';
@@ -100,26 +103,40 @@ export class UserinfoComponent implements OnInit {
         updatedData[key] = currentValue;
       }
     }
-
+console.log(updatedData);
     return updatedData;
   }
 
   // Update user data
   onUpdate(): void {
+    console.log('Updating user data...');
+    console.log('Form data:', this.userForm.getRawValue());
     if (this.userForm.valid) {
+      console.log("onUpdate() function is running"); // Check if this logs
+      try {
+        console.log("Attempting to show toast...");
+        this.toastr.success("Test toast message");
+        console.log("Toast called successfully (but did it show?)");
+      } catch (error) {
+        console.error("Toast error:", error); // Should catch any errors
+      }
+      console.log('Form is valid');
       const changedFields = this.getChangedFields();
-
+      console.log('Changed fields:', changedFields);
       if (Object.keys(changedFields).length === 0) {
         this.toastr.info('No changes detected.', 'Nothing to Save');
+        console.log('No changes detected');
         return;
       }
 
       this.isLoading = true;
-
+      console.log('Updating user...',changedFields);
       this.userService.updateUser(this.userId, changedFields).subscribe({
         next: () => {
+
           this.toastr.success('User information updated successfully.', 'Success ✅');
           this.originalUserData = { ...this.originalUserData, ...changedFields };
+
           this.isLoading = false;
         },
         error: (error) => {
@@ -144,5 +161,21 @@ export class UserinfoComponent implements OnInit {
       }
     }
     this.toastr.error('Please resolve the errors in the form.', 'Validation Error');
+  }
+  onToggle2FA(event: MatCheckboxChange): void {
+    const enable = event.checked;
+
+    const action = enable ? 'enable' : 'disable';
+    const confirmMessage = `Are you sure you want to ${action} Two-Factor Authentication?`;
+
+    const userConfirmed = confirm(confirmMessage); // Basic browser confirm
+
+    if (userConfirmed) {
+      this.userForm.patchValue({twoFactorEnabled: enable});
+    } else {
+      // Revert the checkbox to the previous value
+      event.source.checked = !enable;
+    }
+
   }
 }

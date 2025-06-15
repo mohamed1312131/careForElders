@@ -2,19 +2,31 @@ server:
   port: 8089
 
 spring:
+  task:
+    scheduling:
+      pool:
+        size: 1
   application:
     name: event-service
   data:
-
     mongodb:
-      # Use this while running with Docker Compose
-      # uri: mongodb://mongodb:27017/eventdb
       uri: mongodb://localhost:27017/eventdb
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: aziz88303@gmail.com
+    password: raau fypw kwoq erca
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-
 user-service:
-  base-url: http://user-service/api/users
+  base-url: http://localhost:8081

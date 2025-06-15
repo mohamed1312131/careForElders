@@ -3,11 +3,14 @@ package com.care4elders.event.controller;
 import com.care4elders.event.DTO.EventDTO;
 import com.care4elders.event.entity.Event;
 import com.care4elders.event.service.EventService;
+import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -58,9 +61,24 @@ public class EventController {
         return ResponseEntity.ok(eventService.removeParticipant(eventId, userId));
     }
     @PostMapping("/{eventId}/register/{userId}")
-    public ResponseEntity<Event> registerForEvent(
+    public ResponseEntity<?> registerForEvent(
             @PathVariable String eventId,
             @PathVariable String userId) {
-        return ResponseEntity.ok(eventService.registerForEvent(eventId, userId));
+        try {
+            return ResponseEntity.ok(eventService.registerForEvent(eventId, userId));
+        } catch (MessagingException | IOException | WriterException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error processing registration: " + e.getMessage());
+        }
+    }
+    @PostMapping("/{eventId}/send-reminder")
+    public ResponseEntity<String> sendReminder(@PathVariable String eventId) {
+        try {
+            eventService.sendManualReminder(eventId);
+            return ResponseEntity.ok("Reminders sent successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending reminders: " + e.getMessage());
+        }
     }
 }

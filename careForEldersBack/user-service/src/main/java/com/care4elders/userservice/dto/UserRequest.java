@@ -31,4 +31,12 @@ public class UserRequest {
 
     private String profileImage;
     private Role role;
+    private Boolean  twoFactorEnabled;
+
+    // Add these new fields
+    private String emergencyContactName;
+    private String emergencyContactPhone;
+
+    @Email(message = "Invalid emergency contact email format")
+    private String emergencyContactEmail;
 }

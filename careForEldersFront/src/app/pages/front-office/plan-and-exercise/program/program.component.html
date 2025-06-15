@@ -1,46 +1,117 @@
-<!-- program.component.html -->
 <div class="workout-screen">
   <div class="workout-header">
     <div class="header-info">
-      <span class="duration">{{ dayExercises?.totalDuration }} mins</span>
+      <span class="duration">{{ dayExercises?.totalDuration | number:'1.0-0' }} mins</span>
       <span class="separator">•</span>
       <span class="count">{{ dayExercises?.exercises?.length }} Workouts</span>
     </div>
-    <a *ngIf="dayExercises?.status === 'COMPLETED'" class="edit-link">
-      Edit &gt;
+    <a *ngIf="dayExercises?.status === 'COMPLETED'" class="edit-link" (click)="editWorkout()">
+      Edit <mat-icon class="edit-icon">chevron_right</mat-icon>
     </a>
   </div>
 
-  <ul class="workout-list">
-    <li class="workout-item" *ngFor="let exercise of dayExercises?.exercises">
-      <div class="item-icon">
-        <img [src]="exercise.imageUrl" 
-             class="exercise-image"
-             alt="Exercise illustration">
+  <mat-accordion class="workout-accordion" multi="true" *ngIf="dayExercises?.exercises?.length; else noExercises">
+    <mat-expansion-panel *ngFor="let exercise of dayExercises?.exercises; let i = index"
+                         class="workout-expansion-panel"
+                         [ngClass]="{'active-exercise-panel': exercise.isActive}"
+                         (opened)="exercise.expanded = true"
+                         (closed)="exercise.expanded = false">
+
+      <mat-expansion-panel-header class="workout-panel-header">
+        <mat-panel-title class="panel-title">
+          <div class="item-icon-container">
+            <!-- FIXED: Uncommented the image -->
+            <img [src]="exercise.imageUrl || 'assets/placeholder-exercise.png'" 
+                 class="exercise-image-thumbnail"
+                 alt="{{ exercise.name }} thumbnail"
+                 (error)="onImageError($event)"
+                 *ngIf="exercise.imageUrl">
+          </div> 
+          <span class="exercise-name">{{ exercise.name }}</span>
+        </mat-panel-title>
+        <mat-panel-description class="panel-description">
+          {{ exercise.durationMinutes | number:'1.0-0' }} min
+          <mat-icon class="expand-indicator">{{ exercise.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="exercise-details-content">
+        <div class="detail-item" *ngIf="exercise.recommendedRepetitions">
+          <mat-icon class="detail-icon">fitness_center</mat-icon>
+          <strong>Reps:</strong> {{ exercise.recommendedRepetitions }}
+        </div>
+        <div class="detail-item" *ngIf="exercise.difficultyLevel">
+          <mat-icon class="detail-icon">speed</mat-icon>
+          <strong>Difficulty:</strong>
+          <span class="difficulty-tag {{exercise.difficultyLevel | lowercase}}">
+            {{ exercise.difficultyLevel }}
+          </span>
+        </div>
+        <div class="detail-item" *ngIf="exercise.equipmentNeeded">
+          <mat-icon class="detail-icon">construction</mat-icon> 
+          <strong>Equipment:</strong> {{ exercise.equipmentNeeded }}
+        </div>
+
+        <!-- FIXED: Updated video handling for direct video files -->
+        <div class="video-container" *ngIf="exercise.videoUrl">
+          <!-- For embeddable URLs (YouTube/Vimeo) -->
+          <iframe *ngIf="isEmbeddableVideo(exercise.videoUrl)" 
+                  width="100%" height="315"
+                  [src]="getSafeVideoUrl(exercise.videoUrl)"
+                  title="{{ exercise.name }} video"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen>
+          </iframe>
+          
+          <!-- For direct video files (like Cloudinary) -->
+          <video *ngIf="!isEmbeddableVideo(exercise.videoUrl)" 
+                 width="100%" 
+                 height="315" 
+                 controls
+                 [poster]="exercise.imageUrl"
+                 preload="metadata">
+            <source [src]="exercise.videoUrl" type="video/mp4">
+            <p>Your browser doesn't support HTML5 video. 
+               <a [href]="exercise.videoUrl">Download the video</a> instead.</p>
+          </video>
+        </div>
+        
+        <div *ngIf="!exercise.videoUrl" class="no-video-placeholder">
+          <mat-icon>videocam_off</mat-icon>
+          <span>No video guide available for this exercise.</span>
+        </div>
       </div>
-      <div class="item-details">
-        <span class="item-name">{{ exercise.name }}</span>
-        <span class="item-duration">
-          {{ exercise.durationMinutes }} minutes
-        </span>
-      </div>
-      <div class="item-actions">
-        <button class="action-button">ℹ️</button>
-      </div>
-    </li>
-  </ul>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <ng-template #noExercises>
+    <div class="no-exercises-message">
+      <mat-icon class="empty-icon">sentiment_dissatisfied</mat-icon>
+      <p>No workouts scheduled for this day.</p>
+      <p class="sub-message">Check back later or contact support if you believe this is an error.</p>
+    </div>
+  </ng-template>
 
   <div class="workout-footer">
-    <button class="start-button" 
+   <!-- <button mat-stroked-button color="primary"
+            class="action-button"
             (click)="completeDay()"
             *ngIf="dayExercises?.status === 'IN_PROGRESS'">
-      Complete Day
-    </button>
-    
-    <button class="start-button" 
+      <mat-icon>check_circle_outline</mat-icon> Mark as Completed
+    </button> -->
+
+    <button mat-flat-button color="accent"
+            class="action-button start-workout-button"
             (click)="startWorkout()"
-            *ngIf="dayExercises?.status !== 'COMPLETED'">
+            *ngIf="dayExercises?.exercises?.length && dayExercises?.status !== 'COMPLETED'">
+      <mat-icon>play_circle_filled</mat-icon>
       {{ dayExercises?.status === 'IN_PROGRESS' ? 'Continue Workout' : 'Start Workout' }}
     </button>
+  </div>
+
+  <div *ngIf="isWorkoutActive" class="active-workout-indicator">
+    <p>Workout in progress...</p>
+    <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
   </div>
 </div>
