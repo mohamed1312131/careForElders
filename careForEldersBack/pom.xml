@@ -107,6 +107,7 @@
                     <configuration>
                         <excludes>
                             <exclude>
+                                <version>1.18.32</version>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
                             </exclude>

@@ -4,6 +4,7 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
 
+
       <profile name="Annotation profile for care4elders" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -34,6 +35,8 @@
       </profile>
 
  ebe25a6 (change)
+
+ 5ef8240 ( event management and reminder for the events , notification part is done)
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -41,11 +44,59 @@
 
 
         <module name="patientBill" />
+
         <module name="blogForum" />
         <module name="nutrition" />
         <module name="paramedicalCare" />
  ebe25a6 (change)
+
+        <module name="config-server" />
+        <module name="nutrition" />
+        <module name="paramedicalCare" />
+        <module name="api-gateway" />
+        <module name="blogForum" />
+        <module name="nutrition-service" />
+ 5ef8240 ( event management and reminder for the events , notification part is done)
         <module name="service-registry" />
+      </profile>
+      <profile name="Annotation profile for care4elders" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="medicalRecord" />
+        <module name="appointmentAvailability" />
+        <module name="chat" />
+        <module name="planAndExercise" />
+      </profile>
+      <profile name="Annotation profile for event" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
+        </processorPath>
+        <module name="event" />
+      </profile>
+      <profile name="Annotation profile for notification" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
+        </processorPath>
+        <module name="notification" />
+      </profile>
+      <profile name="Annotation profile for subscription" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="subscription" />
       </profile>
       <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -56,6 +107,7 @@
         </processorPath>
         <module name="user-service" />
       </profile>
+
 
       <profile name="Annotation profile for chat" enabled="true">
 
@@ -75,6 +127,8 @@
  ebe25a6 (change)
         <module name="chat" />
       </profile>
+
+ 5ef8240 ( event management and reminder for the events , notification part is done)
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
@@ -86,7 +140,10 @@
 
 
 
+
  ebe25a6 (change)
+
+ 5ef8240 ( event management and reminder for the events , notification part is done)
       <module name="config-server" options="-parameters" />
       <module name="event" options="-parameters" />
       <module name="medicalRecord" options="-parameters" />

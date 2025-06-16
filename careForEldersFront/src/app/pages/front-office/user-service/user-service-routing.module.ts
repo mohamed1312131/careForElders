@@ -19,6 +19,7 @@ import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/a
 
 
 
+
  ebe25a6 (change)
 import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
 import { UserServicesComponent } from '../paramedical-care/user-services/user-services.component';
@@ -44,6 +45,16 @@ import { ProfessionalDetailComponent } from '../paramedical-care/professional-de
 import { ProfessionalFormComponent } from '../paramedical-care/professional-form/professional-form.component';
 import { ProfessionalListComponent } from '../paramedical-care/professional-list/professional-list.component';
 import {RoleGuard} from "../../../guards/role.guard";
+
+import {PatientBillFormComponent} from "../patient-bill/patient-bill-form/patient-bill-form.component";
+import {PatientBillPaymentComponent} from "../patient-bill/patient-bill-payment/patient-bill-payment.component";
+import {PatientBillHistoryComponent} from "../patient-bill/patient-bill-history/patient-bill-history.component";
+import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
+import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
+import { UnauthorizedComponent } from '../subscription/unauthorized/unauthorized.component';
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
+import { SubscriptionGuard } from '../subscription/subscriptionguard';
+ 5ef8240 ( event management and reminder for the events , notification part is done)
 
  ebe25a6 (change)
 
