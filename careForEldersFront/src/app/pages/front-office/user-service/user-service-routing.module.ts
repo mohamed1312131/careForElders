@@ -25,7 +25,9 @@ import {PatientBillPaymentComponent} from "../patient-bill/patient-bill-payment/
 import {PatientBillHistoryComponent} from "../patient-bill/patient-bill-history/patient-bill-history.component";
 import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
 import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
-import {RoleGuard} from "../../../guards/role.guard";
+import { UnauthorizedComponent } from '../subscription/unauthorized/unauthorized.component';
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
+import { SubscriptionGuard } from '../subscription/subscriptionguard';
 
 
 

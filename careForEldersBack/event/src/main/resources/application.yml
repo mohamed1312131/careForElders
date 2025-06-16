@@ -2,12 +2,31 @@ server:
   port: 8089
 
 spring:
+  task:
+    scheduling:
+      pool:
+        size: 1
   application:
-    name: event
+    name: event-service
   data:
-    uri: mongodb://mongodb:27017/event
+    mongodb:
+      uri: mongodb://localhost:27017/eventdb
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: aziz88303@gmail.com
+    password: raau fypw kwoq erca
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
+
+user-service:
+  base-url: http://localhost:8081
