@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/notifications")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true")
 public class NotificationController {
 
     @Autowired

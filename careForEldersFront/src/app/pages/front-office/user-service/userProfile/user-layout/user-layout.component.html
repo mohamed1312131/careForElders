@@ -9,52 +9,46 @@
 
     <ul>
       <li>
-      <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
-      <ul *ngIf="isPlanMenuOpen">
-        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
-        <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
-         <li><a routerLink="/user/userProfile/plan/userprogram" routerLinkActive="active">My plan</a></li>
-         <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
-      </ul>
-    </li>
-      <ul>
-        <li>
-          <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isPlanMenuOpen }">Nutrition</a>
-          <ul *ngIf="inNutritionmenu">
+        <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }">Plan</a>
+        <a (click)="togglePlanMenu()" [ngClass]="{ active: isPlanMenuOpen }" routerLink="/events">Events</a>
 
-            <li><a routerLink="/user/userProfile/nutrition/admin-dashboard" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
-            <li><a routerLink="/user/userProfile/nutrition/list" routerLinkActive="active">Nutrition Plans List</a></li>
-            <li><a routerLink="/user/userProfile/nutrition/plan-generator" routerLinkActive="active">Nutrition Plan Generator</a></li>
-          </ul>
-        </li>
-      </ul>
-      <ul>
-        <li>
-          <a (click)="toggleParamedicalMenu()" [ngClass]="{ active: isParamedicalMenuOpen }">Paramedical Care</a>
-          <ul *ngIf="inParamedicalMenu">
-            <li><a routerLink="/user/userProfile/paramedical-care/professional-list" routerLinkActive="active">Professional List</a></li>
-            <li><a routerLink="/user/userProfile/paramedical-care/appointment" routerLinkActive="active">Appointments</a></li>
-            <li><a routerLink="/user/userProfile/paramedical-care/paramedical-map" routerLinkActive="active">Paramedical Map</a></li>
+        <ul *ngIf="isPlanMenuOpen">
+          <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/add-program" routerLinkActive="active">Add Program</a></li>
+          <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/list" routerLinkActive="active">Plan List</a></li>
 
-            <li><a  routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
-            <li><a  routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
- ebe25a6 (change)
-          </ul>
-        </li>
-      </ul>
-      <ul>
-        <li>
-          <a (click)="toggleMedicalRecordMenu()" [ngClass]="{ active: isPMedicalRecordMenuOpen }">Medical Record</a>
-          <ul *ngIf="inMedicalRecordmenu">
-            <li><a  routerLink="/user/userProfile/medicalRecord/medicalrecordlist" routerLinkActive="active">Medical Records List </a></li>
-            <li>
-              <a [routerLink]="['/user/userProfile/medicalRecord/medicalrecord', userId]" routerLinkActive="active">
-                Medical Record
-              </a>
-            </li>
-          </ul>
-        </li>
-      </ul>
+          <li><a routerLink="/user/userProfile/plan/userprogram" routerLinkActive="active">My plan</a></li>
+          <li><a *ngIf="isDoctor" routerLink="/user/userProfile/plan/addExercise" routerLinkActive="active">addExercises</a></li>
+        </ul>
+      </li>
+      <li>
+        <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isNutritionMenuOpen }">Nutrition</a>
+        <ul *ngIf="inNutritionmenu">
+          <li><a routerLink="/user/userProfile/nutrition/admin-dashboard" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+          <li><a routerLink="/user/userProfile/nutrition/list" routerLinkActive="active">Nutrition Plans List</a></li>
+          <li><a routerLink="/user/userProfile/nutrition/plan-generator" routerLinkActive="active">Nutrition Plan Generator</a></li>
+        </ul>
+      </li>
+      <li>
+        <a (click)="toggleParamedicalMenu()" [ngClass]="{ active: isParamedicalMenuOpen }">Paramedical Care</a>
+        <ul *ngIf="inParamedicalMenu">
+          <li><a routerLink="/user/userProfile/paramedical-care/professional-list" routerLinkActive="active">Professional List</a></li>
+          <li><a routerLink="/user/userProfile/paramedical-care/appointment" routerLinkActive="active">Appointments</a></li>
+          <li><a routerLink="/user/userProfile/paramedical-care/paramedical-map" routerLinkActive="active">Paramedical Map</a></li>
+          <li><a routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+          <li><a routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
+        </ul>
+      </li>
+      <li>
+        <a (click)="toggleMedicalRecordMenu()" [ngClass]="{ active: isPMedicalRecordMenuOpen }">Medical Record</a>
+        <ul *ngIf="inMedicalRecordmenu">
+          <li><a routerLink="/user/userProfile/medicalRecord/medicalrecordlist" routerLinkActive="active">Medical Records List </a></li>
+          <li>
+            <a [routerLink]="['/user/userProfile/medicalRecord/medicalrecord', userId]" routerLinkActive="active">
+              Medical Record
+            </a>
+          </li>
+        </ul>
+      </li>
       <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
@@ -63,7 +57,7 @@
       <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
       <li><a routerLink="userServices" routerLinkActive="active">Services</a></li>
       <li><a routerLink="UserRequests" routerLinkActive="active">UserRequests</a></li>
-            <li><a routerLink="SoignantRequests" routerLinkActive="active">SoignantRequests</a></li>
+      <li><a routerLink="SoignantRequests" routerLinkActive="active">SoignantRequests</a></li>
       <li><a routerLink="Abonnement" routerLinkActive="active">Abonnement</a></li>
       <li><a routerLink="post" routerLinkActive="active">Community Forum</a></li>
       <li><a [routerLink]="['/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
@@ -74,16 +68,16 @@
   <main>
     <header>
       <div class="breadcrumbs">
-  <a routerLink="/">Home</a>
-  <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
-    <span>&nbsp;&gt;&nbsp;</span>
-    <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
-    <span *ngIf="last">{{ crumb.label }}</span>
-  </ng-container>
-</div>
+        <a routerLink="/">Home</a>
+        <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+          <span>&nbsp;&gt;&nbsp;</span>
+          <a *ngIf="!last" [routerLink]="crumb.url">{{ crumb.label }}</a>
+          <span *ngIf="last">{{ crumb.label }}</span>
+        </ng-container>
+      </div>
       <h1 class="title">{{ currentTitle }}</h1>
 
-     <!-- <nav class="nav-tabs">
+      <!-- <nav class="nav-tabs">
         <a routerLink="/deals/pipeline" routerLinkActive="active">
           Deals <span>14</span>
         </a>
@@ -96,5 +90,6 @@
       </nav> -->
     </header>
 
-    <div class="router-content-area"><router-outlet></router-outlet></div> </main>
+    <div class="router-content-area"><router-outlet></router-outlet></div>
+  </main>
 </div>
