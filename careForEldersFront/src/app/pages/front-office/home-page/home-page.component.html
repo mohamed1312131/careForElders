@@ -64,7 +64,7 @@
 										<a class="page-scroll" href="#contact">Contact</a>
 									</li>
 									<!-- Inside your navbar, add this before the account dropdown -->
-									<li class="nav-item" *ngIf="isLoggedIn && userRole === 'USER'"> <a
+									<li class="nav-item" > <a
 											class="nav-link position-relative" (click)="toggleNotifications()">
 											<i class="lni lni-alarm"></i>
 											<span *ngIf="unreadCount > 0"

@@ -36,11 +36,31 @@ userRole: string | null = null;
     }
   }
 
-  checkLoginStatus(): void {
-    this.isLoggedIn = !!localStorage.getItem('token');
-    this.userId = localStorage.getItem('user_id');
-        this.userRole = localStorage.getItem('role'); 
+checkLoginStatus(): void {
+  this.isLoggedIn = !!localStorage.getItem('token');
+  
+  // Get the user object from localStorage
+  const userString = localStorage.getItem('user');
+  if (userString) {
+    try {
+      const user = JSON.parse(userString);
+      // Get user ID from the user object
+      this.userId = user.id || null;
+      // Check both 'role' and 'roles' to be safe
+      this.userRole = user.role || user.roles || null;
+      
+      console.log('User ID:', this.userId); // For debugging
+      console.log('User Role:', this.userRole); // For debugging
+    } catch (e) {
+      console.error('Error parsing user data:', e);
+      this.userId = null;
+      this.userRole = null;
+    }
+  } else {
+    this.userId = null;
+    this.userRole = null;
   }
+}
 
   setupNotificationPolling(): void {
     this.notificationSub = this.notificationService.startPolling(this.userId || '').subscribe({

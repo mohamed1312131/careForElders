@@ -177,53 +177,54 @@ onUpdateSubmit(): void {
     return;
   }
 
-  // Get the current state of selected participants
   const currentParticipants = this.selectedParticipantsForUpdate;
   const originalParticipants = this.currentEvent.participantIds;
 
-  // Prepare the event data
   const eventData: EventDTO = {
     ...this.updateEventForm.value,
     participantIds: currentParticipants
   };
 
-  // First update the event details
-  this.eventService.updateEvent(this.currentEvent.id!, eventData)
-    .subscribe({
-      next: (updatedEvent) => {
-        // Handle participant changes
-        const participantsToAdd = currentParticipants.filter(
-          id => !originalParticipants.includes(id)
-        );
-        const participantsToRemove = originalParticipants.filter(
-          id => !currentParticipants.includes(id)
-        );
+  this.eventService.updateEvent(this.currentEvent.id!, eventData).subscribe({
+    next: (updatedEvent) => {
+      const participantsToAdd = currentParticipants.filter(
+        id => !originalParticipants.includes(id)
+      );
+      const participantsToRemove = originalParticipants.filter(
+        id => !currentParticipants.includes(id)
+      );
 
-        // Execute add/remove operations
-        const addOperations = participantsToAdd.map(userId => 
-          this.eventService.addParticipant(updatedEvent.id!, userId)
-        );
-        const removeOperations = participantsToRemove.map(userId =>
-          this.eventService.removeParticipant(updatedEvent.id!, userId)
-        );
+      const addOperations = participantsToAdd.map(userId => 
+        this.eventService.addParticipant(updatedEvent.id!, userId)
+      );
+      const removeOperations = participantsToRemove.map(userId =>
+        this.eventService.removeParticipant(updatedEvent.id!, userId)
+      );
 
-        // Wait for all operations to complete
-        forkJoin([...addOperations, ...removeOperations]).subscribe({
-          next: () => {
-            this.loadEvents();
-            this.closeModal();
-          },
-          error: (err) => {
-            console.error('Error updating participants:', err);
-            this.loadEvents(); // Still refresh even if participant updates failed
-            this.closeModal();
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Error updating event:', err);
+      // If no participant changes needed, just close and reload
+      if (addOperations.length === 0 && removeOperations.length === 0) {
+        this.loadEvents();
+        this.closeModal();
+        return;
       }
-    });
+
+      forkJoin([...addOperations, ...removeOperations]).subscribe({
+        next: () => {
+          this.loadEvents();
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error('Error updating participants:', err);
+          this.loadEvents();
+          this.closeModal();
+        }
+      });
+    },
+    error: (err) => {
+      console.error('Error updating event:', err);
+      this.closeModal(); // Close modal even if there's an error
+    }
+  });
 }
 private formatDateForInput(date: Date): string {
   const pad = (num: number) => num.toString().padStart(2, '0');

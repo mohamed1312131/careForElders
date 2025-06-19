@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,8 +33,10 @@ public class NotificationService {
     @Autowired
     private JavaMailSender mailSender;
 
-    // Send notifications every 5 minutes
-    @Scheduled(fixedRate = 5 * 60 * 1000)
+    // Send notifications every 30 seconds
+    @Scheduled(fixedRate =  30 * 1000)
+// Send notifications every 2 minutes
+   // @Scheduled(fixedRate = 60 * 60 * 1000)
     public void sendActivityCheckNotifications() {
         try {
             List<String> allUserIds = userServiceClient.getAllUserIds();
@@ -74,7 +77,7 @@ public class NotificationService {
         newNotification.setUserId(userId);
         newNotification.setMessage("Please confirm you're OK within 3 minutes");
         newNotification.setSentTime(LocalDateTime.now());
-        newNotification.setResponseDeadline(LocalDateTime.now().plusMinutes(3));
+        newNotification.setResponseDeadline(LocalDateTime.now().plusMinutes(1));
         notificationRepository.save(newNotification);
         System.out.println("Created new notification for user: " + userId);
     }
@@ -151,13 +154,17 @@ public class NotificationService {
 
             String locationInfo = "";
             if (notification.getLatitude() != null && notification.getLongitude() != null) {
+                // Format coordinates with periods instead of commas
+                String formattedLat = String.format(Locale.US, "%.6f", notification.getLatitude());
+                String formattedLng = String.format(Locale.US, "%.6f", notification.getLongitude());
+
                 locationInfo = String.format(
                         "\n\nLast known location (at %s):\n" +
-                                "https://maps.google.com/?q=%f,%f\n" +
+                                "https://maps.google.com/?q=%s,%s\n" +
                                 "Accuracy: %.2f meters",
                         notification.getLocationTimestamp(),
-                        notification.getLatitude(),
-                        notification.getLongitude(),
+                        formattedLat,  // Now uses proper decimal format
+                        formattedLng,  // Now uses proper decimal format
                         notification.getAccuracy()
                 );
             }
@@ -174,12 +181,10 @@ public class NotificationService {
             ));
 
             mailSender.send(message);
-            System.out.println("Emergency email sent to: " + user.getEmergencyContactEmail());
         } catch (Exception e) {
             System.err.println("Failed to send emergency email: " + e.getMessage());
         }
     }
-
     public List<Notification> getUserNotifications(String userId) {
         return notificationRepository.findByUserIdAndActiveTrue(userId);
     }
