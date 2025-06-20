@@ -3,6 +3,10 @@
   <p>{{ data.message }}</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onNoClick()">Cancel</button>
-  <button mat-raised-button color="warn" (click)="onYesClick()">Confirm</button>
+  <button mat-button (click)="onCancel()">
+    {{ data.cancelText || 'Cancel' }}
+  </button>
+  <button mat-raised-button color="warn" (click)="onConfirm()">
+    {{ data.confirmText || 'Confirm' }}
+  </button>
 </mat-dialog-actions>

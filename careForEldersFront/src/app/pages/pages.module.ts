@@ -6,7 +6,6 @@ import { MaterialModule } from '../material.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { NgApexchartsModule } from 'ng-apexcharts';
 // icons
-
 import { TablerIconsModule } from 'angular-tabler-icons';
 import * as TablerIcons from 'angular-tabler-icons/icons';
 import { AppDashboardComponent } from './dashboard/dashboard.component';
@@ -14,6 +13,8 @@ import {ConfirmDialogComponent} from "./front-office/user-service/user/confirm-d
 import {UserDialogComponent} from "./front-office/user-service/user/user-dialog/user-dialog.component";
 import { MatChipsModule } from '@angular/material/chips';
 import {MatDialogModule} from "@angular/material/dialog";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {ToastrModule} from "ngx-toastr";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
@@ -34,7 +35,7 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatTableModule} from "@angular/material/table";
 import {MatListModule} from "@angular/material/list";
 import {MatIconModule} from "@angular/material/icon";
-import { UserLayoutComponent } from './front-office/user-service/userProfile/user-layout/user-layout.component';
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 @NgModule({
   declarations: [AppDashboardComponent,
     UserDialogComponent,
@@ -50,6 +51,7 @@ import { UserLayoutComponent } from './front-office/user-service/userProfile/use
     ReactiveFormsModule,
     MatChipsModule,
     MatDialogModule,
+    BrowserAnimationsModule,
     MatSidenavModule,
     MatToolbarModule,
     MatIconModule,
@@ -72,8 +74,8 @@ import { UserLayoutComponent } from './front-office/user-service/userProfile/use
     MatExpansionModule,
     MatChipsModule,
     MatProgressSpinnerModule,
-  
-    
+    CommonModule,
+    MatSnackBarModule
 
   ],
   exports: [TablerIconsModule],

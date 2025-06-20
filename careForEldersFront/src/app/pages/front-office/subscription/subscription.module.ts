@@ -3,13 +3,10 @@ import { CommonModule } from '@angular/common';
 
 import { SubscriptionRoutingModule } from './subscription-routing.module';
 import { AbonnementTypeComponent } from './abonnement-type/abonnement-type.component';
-import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 
 
 @NgModule({
-  declarations: [AbonnementTypeComponent,
-    UnauthorizedComponent,
-  ],
+  declarations: [AbonnementTypeComponent],
   imports: [
     CommonModule,
     SubscriptionRoutingModule

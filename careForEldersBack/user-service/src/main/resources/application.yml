@@ -38,7 +38,7 @@ eureka:
 
 twilio:
   account_sid: ACcd31372ca9e785d6a1d9015aa7bab5b9
-  auth_token: ee0de6a63bc957059b9e2928f30411aa
+  auth_token: 9101629a5e87ecb0e817f1b365c851a3
   phone_number: "+15674065065"
 
 security:

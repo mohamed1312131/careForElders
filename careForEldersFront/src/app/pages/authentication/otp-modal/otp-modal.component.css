@@ -1,0 +1,109 @@
+.otp-modal-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: #f2f4f7;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  max-width: 420px;
+  width: 100%;
+  margin: auto;
+  overflow: hidden;
+}
+
+.otp-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px 25px 35px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+
+.otp-content h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.otp-content p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.otp-input-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.otp-input {
+  width: 48px;
+  height: 56px;
+  font-size: 22px;
+  text-align: center;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  transition: all 0.25s ease-in-out;
+}
+
+.otp-input:focus {
+  border-color: #3f51b5;
+  box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.2);
+  outline: none;
+}
+
+.otp-input.error {
+  border-color: #e53935;
+  background-color: rgba(229, 57, 53, 0.05);
+}
+
+.error {
+  color: #e53935;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+button[mat-flat-button] {
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 500;
+  width: 100%;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+button[mat-flat-button]:hover {
+  background-color: #32408f;
+}
+
+button[mat-flat-button]:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.otp-countdown {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #888;
+}
+
+@media (max-width: 480px) {
+  .otp-input {
+    width: 42px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .otp-content {
+    padding: 20px;
+  }
+}

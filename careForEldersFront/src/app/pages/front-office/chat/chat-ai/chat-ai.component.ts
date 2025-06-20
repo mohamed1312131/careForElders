@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Chat, ChatService, ChatMessage } from '../ChatService';
-import { WebSocketService } from '../WebSocketService';
+import { Component, OnInit } from '@angular/core';
+import { Chat, ChatService, Message } from '../ChatService';
+
 
 @Component({
   selector: 'app-chat-ai',
@@ -13,19 +13,13 @@ export class ChatAIComponent implements OnInit {
   newMessage: string = '';
   isLoading = false;
 
-  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-
-  constructor(
-    private chatService: ChatService,
-    private wsService: WebSocketService
-  ) {}
+  constructor(private chatService: ChatService) {}
 
   ngOnInit(): void {
     this.userId = localStorage.getItem('user_id');
-    console.log('[INIT] User ID:', this.userId);
-
     if (!this.userId) {
       console.warn('No user ID found in localStorage');
+      // You might want to add redirect logic here
       return;
     }
   }
@@ -33,66 +27,31 @@ export class ChatAIComponent implements OnInit {
   startNewChat(): void {
     if (!this.userId) return;
 
-    console.log('[CHAT] Creating new chat for user:', this.userId);
     this.chatService.createNewChat(this.userId).subscribe(chat => {
       this.chat = chat;
-      console.log('[CHAT] New chat created:', chat);
-
-      this.wsService.subscribeToChat(chat.id, (message: ChatMessage) => {
-        console.log('[WS] New message received via WebSocket:', message);
-
-        this.chat?.messages.push(message);
-        if (message.sender === 'AI') {
-          console.log('[WS] AI responded, stopping loader');
-          this.isLoading = false;
-        }
-
-        this.scrollToBottom();
-      });
     });
   }
 
   sendMessage(): void {
     if (!this.chat || !this.newMessage.trim()) return;
 
-    const message: ChatMessage = {
-      sender: 'PATIENT', // match backend
-      content: this.newMessage.trim(),
-      timestamp: new Date().toISOString()
-    };
-
-    console.log('[SEND] User message:', message);
-
-    this.chat.messages.push(message);
-    this.newMessage = '';
+    const prompt = this.newMessage.trim();
     this.isLoading = true;
 
-    this.scrollToBottom();
-
-    // Send message content only
-    this.wsService.sendMessage(this.chat.id, message.content);
-    console.log('[WS] Message sent to WebSocket:', message.content);
+    this.chatService.sendMessage(this.chat.id, prompt).subscribe(updatedChat => {
+      this.chat = updatedChat;
+      this.newMessage = '';
+      this.isLoading = false;
+    }, () => {
+      this.isLoading = false;
+    });
   }
 
-  scrollToBottom(): void {
-    setTimeout(() => {
-      if (this.scrollContainer) {
-        const el = this.scrollContainer.nativeElement;
-        el.scrollTop = el.scrollHeight;
-        console.log('[UI] Scrolled to bottom');
-      }
-    }, 100);
+  isPatientMessage(message: Message): boolean {
+    return message.sender === 'patient';
   }
 
-  isPatientMessage(message: ChatMessage): boolean {
-    const isPatient = message.sender === 'PATIENT';
-    console.log('[CHECK] isPatientMessage:', message, isPatient);
-    return isPatient;
-  }
-
-  isAIMessage(message: ChatMessage): boolean {
-    const isAI = message.sender === 'AI';
-    console.log('[CHECK] isAIMessage:', message, isAI);
-    return isAI;
+  isAIMessage(message: Message): boolean {
+    return message.sender === 'ai';
   }
 }

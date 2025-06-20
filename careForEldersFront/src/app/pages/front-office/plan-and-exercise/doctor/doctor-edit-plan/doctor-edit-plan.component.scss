@@ -1,342 +1,51 @@
-@use '@angular/material' as mat;
-$primary-color: #1976d2; // Example blue
-$accent-color: #e91e63;  // Example pink
-$warn-color: #f44336;    // Example red
-
-$border-radius-base: 4px;
-$padding-base: 16px;
-$padding-large: 24px;
-
-.doctor-edit-plan-dialog {
+.dialog-container {
+  min-width: 500px; // Adjust as needed
+  max-width: 800px; // Adjust as needed
+  max-height: 90vh; // Ensure dialog doesn't get too tall
   display: flex;
   flex-direction: column;
-  max-height: 95vh; // Ensure dialog doesn't get too tall
-  width: 100%; // Will be controlled by dialog.open config
-
-  .dialog-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $padding-base $padding-large;
-    border-bottom: 1px solid rgba(0,0,0,0.12);
-
-    .main-title {
-      margin: 0;
-      font-size: 1.5rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      .title-icon {
-        margin-right: 10px;
-        color: $primary-color;
-      }
-    }
-    .close-button {
-      // Defaults are fine, can add custom color if needed
-    }
-  }
-
-.dialog-content {
-  padding: 0;
-  flex-grow: 1;
-  overflow-y: auto;
-  overflow-x: auto; /* Already present, ensures overall horizontal scroll */
-  position: relative;
-  max-width: 100%;
 }
 
-  .loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.85);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    p {
-      margin-top: $padding-base;
-      font-size: 1.1rem;
-    }
-  }
+mat-dialog-content {
+  flex-grow: 1; // Allows content to take available space
+  overflow-y: auto; // Scroll content if it overflows
+}
 
-  .content-wrapper {
-    // Styles for when content is not loading
-  }
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 200px; /* Ensure spinner is visible */
+}
 
-  .tab-icon {
-    margin-right: 8px;
-  }
+.tab-content-padding {
+  padding: 20px;
+}
 
-  .tab-panel-content {
-    padding: $padding-large;
-    overflow-x: auto;
-  }
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
 
-  .program-details-form {
-    display: grid;
-    gap: $padding-base;
-    .form-row {
-      display: flex;
-      flex-wrap: nowrap; /* Crucial to prevent wrapping and force horizontal layout */
-      overflow-x: auto;  /* Ensures horizontal scroll for this specific row of form fields */
-      gap: 16px; /* Your $padding-base */
-      padding-bottom: 16px; /* Your $padding-base */
-      min-width: 700px; // Adjust as needed for your form/table width
-      width: max-content; 
-    }
-    mat-form-field {
-   min-width: 250px; /* Essential: Ensures form fields have a minimum width before triggering scroll */
-  flex: 0 0 auto;  /* Already present: Prevents fields from shrinking */
-    }
-    .mat-mdc-form-field-icon-suffix { // Target Material 15+
-        display: flex;
-        align-items: center;
-    }
-    .option-icon {
-        margin-right: 8px;
-        vertical-align: middle;
-    }
-  }
-
-  .patient-assignment-section {
-    margin-bottom: $padding-large;
-    .section-subtitle {
-      font-size: 1.2rem;
-      font-weight: 500;
-      margin-bottom: $padding-base;
-      display: flex;
-      align-items: center;
-      mat-icon {
-        margin-right: 8px;
-        color: $primary-color;
-      }
-    }
-    .assigned-patients-chips {
-      .mat-mdc-chip-set { // Target Material 15+
-        flex-wrap: wrap;
-      }
-      mat-chip {
-        margin: 4px;
-      }
-    }
-    .assign-select {
-      width: 100%;
-      margin-bottom: $padding-base;
-    }
-    .assign-button {
-      margin-bottom: $padding-base;
-    }
-    .assign-progress {
-      margin-top: 8px;
-    }
-  }
-
-  .empty-state-text, .empty-state-days p {
-    color: rgba(0,0,0,0.6);
-    margin: $padding-base 0;
-    text-align: center;
-  }
-  .empty-state-days {
-    padding: $padding-large;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    .empty-state-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-        margin-bottom: $padding-base;
-        color: rgba(0,0,0,0.3);
-    }
-  }
-
-
-  .add-day-button {
-    margin-bottom: $padding-base;
-  }
-
-  .days-accordion {
-
-
-    .day-expansion-panel {
-      margin-bottom: 8px;
-      border-radius: $border-radius-base;
-      &:first-child {
-        border-top-left-radius: $border-radius-base;
-        border-top-right-radius: $border-radius-base;
-      }
-       &:last-child {
-        border-bottom-left-radius: $border-radius-base;
-        border-bottom-right-radius: $border-radius-base;
-      }
-    }
-    .day-panel-header {
-      // background-color: rgba(0,0,0,0.03); // Subtle background for header
-    }
-    .day-panel-title-content {
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-      width: 100%; // Allow day-actions to be positioned correctly
-      .day-icon {
-        margin-right: 12px;
-        color: $primary-color;
-      }
-      .rest-day-chip {
-        margin-left: auto;
-        padding: 4px 10px;
-        border-radius: 16px;
-        background-color: $primary-color;
-        color: accent-color;
-        font-size: 0.8rem;
+.assigned-patients-section, .assign-new-patients-section {
+    margin-bottom: 20px;
+    h3 {
+        margin-bottom: 10px;
+        font-size: 1.1em;
         font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        .chip-icon {
-            font-size: 16px;
-            width: 16px;
-            height: 16px;
-            margin-right: 6px;
-        }
-      }
     }
-    .day-actions {
-        margin-left: auto; // Push actions to the right
-        display: flex;
-        align-items: center;
-    }
-
-    .day-details-content {
-      padding: $padding-base;
-      .rest-day-info {
-          display: flex;
-          align-items: center;
-          color: rgba(0,0,0,0.7);
-          padding: $padding-base;
-          background-color: rgba(0,0,0,0.02);
-          border-radius: $border-radius-base;
-          mat-icon {
-              margin-right: 8px;
-          }
-      }
-      .day-info-grid {
-        display: flex;
-        gap: $padding-large;
-        margin-bottom: $padding-base;
-        flex-wrap: wrap;
-        .info-item {
-          display: flex;
-          align-items: center;
-          font-size: 0.95rem;
-          mat-icon { margin-right: 8px; }
-          span { font-weight: 500; }
-        }
-      }
-      .day-text-section {
-        margin-bottom: $padding-base;
-        h4 {
-          font-size: 1rem;
-          font-weight: 500;
-          margin-bottom: 8px;
-          display: flex;
-          align-items: center;
-          mat-icon { margin-right: 8px; font-size: 20px; }
-        }
-        .formatted-text {
-          white-space: pre-wrap; // Preserve line breaks and spaces
-          background-color: rgba(0,0,0,0.03);
-          padding: $padding-base / 2;
-          border-radius: $border-radius-base;
-          font-size: 0.9rem;
-        }
-      }
-      .exercises-title {
-        font-size: 1.1rem;
-        font-weight: 500;
-        margin: $padding-large 0 $padding-base 0;
-         display: flex;
-         align-items: center;
-         mat-icon { margin-right: 8px; }
-      }
-      .exercise-cards-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: $padding-base;
-      }
-      .exercise-card-item {
-        .exercise-img {
-          height: 160px;
-          object-fit: cover;
-        }
-        .exercise-img-placeholder {
-            height: 160px;
-            background-color: rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            mat-icon {
-                font-size: 48px;
-                color: rgba(0,0,0,0.3);
-            }
-        }
-        mat-card-header { padding-bottom: 8px; }
-        .exercise-desc { font-size: 0.85rem; color: rgba(0,0,0,0.7); }
-        .duration-chip {
-            font-size: 0.8rem;
-            padding: 4px 8px;
-            border-radius: $border-radius-base;
-            background-color: rgba(0,0,0,0.05);
-            display: inline-flex;
-            align-items: center;
-            mat-icon { font-size: 16px; margin-right: 4px;}
-        }
-      }
-      .no-exercises-text {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: $padding-base;
-        color: rgba(0,0,0,0.5);
-        mat-icon { margin-right: 8px; }
-      }
-    }
-  }
-
-  .dialog-main-actions {
-    padding: $padding-base $padding-large;
-    border-top: 1px solid rgba(0,0,0,0.12);
-    background-color: #fff; // Ensure actions are on a solid background
-    .save-button mat-icon { margin-right: 8px; }
-  }
-  .save-progress-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
+}
+mat-chip-list {
+    margin-bottom: 10px;
 }
 
-// Custom panel for mat-select to handle icons within options better
-::ng-deep .custom-select-panel {
-  .mat-mdc-option .mat-icon { // Target Material 15+
-    margin-right: 10px;
-    font-size: 18px; // Adjust icon size in dropdown
-    vertical-align: middle;
-  }
+mat-divider {
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
-@media (max-width: 900px) {
-  .tab-panel-content {
-    padding: $padding-base;
-    overflow-x: auto;
-  }
-  .program-details-form {
-    min-width: 600px; // Reduce min-width for smaller screens
-  }
+mat-progress-bar {
+    margin-top: 10px;
 }

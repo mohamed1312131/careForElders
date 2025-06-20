@@ -43,7 +43,7 @@
         [hourSegments]="2"
         [dayStartHour]="8"
         [dayEndHour]="20"
-       (eventClicked)="eventClicked($event)"
+       
       ></mwl-calendar-day-view>
 
       <mwl-calendar-week-view
@@ -53,14 +53,14 @@
         [hourSegments]="2"
         [dayStartHour]="8"
         [dayEndHour]="20"
-        (eventClicked)="eventClicked($event)"
+        
       ></mwl-calendar-week-view>
 
       <mwl-calendar-month-view
         *ngSwitchCase="CalendarView.Month"
         [viewDate]="viewDate"
         [events]="events"
-        (eventClicked)="eventClicked($event)"
+        
       ></mwl-calendar-month-view>
     </div>
 

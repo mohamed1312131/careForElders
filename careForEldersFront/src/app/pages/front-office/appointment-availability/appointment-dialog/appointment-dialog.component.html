@@ -1,4 +1,22 @@
-<div *ngIf="loading">LOADING TEST</div>
-<app-loading *ngIf="loading"></app-loading>
-<div *ngIf="loading">LOADING TEST</div>
-<div>HELLO FROM APPOINTMENT DIALOG</div>
+<p>appointment-dialog works!</p>
+<h2 mat-dialog-title>Book Appointment</h2>
+    <div mat-dialog-content>
+      <p><strong>Doctor:</strong> {{ data.doctor.firstName }} {{ data.doctor.lastName }}</p>
+      <p><strong>Specialty:</strong> {{ data.doctor.specialty }}</p>
+      <p><strong>Date:</strong> {{ data.startTime | date:'fullDate' }}</p>
+      <p><strong>Time:</strong> {{ data.startTime | date:'shortTime' }} - {{ data.endTime | date:'shortTime' }}</p>
+      
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Patient Name</mat-label>
+        <input matInput [(ngModel)]="patientName">
+      </mat-form-field>
+      
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Notes</mat-label>
+        <textarea matInput [(ngModel)]="notes"></textarea>
+      </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-button color="primary" (click)="onBook()">Book Appointment</button>
+    </div>

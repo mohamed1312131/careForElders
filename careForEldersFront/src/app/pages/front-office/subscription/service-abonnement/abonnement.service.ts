@@ -16,7 +16,7 @@ export class AbonnementService {
   }
 
   assignDefaultPlan(userId: string): Observable<any> {
-  return this.http.post(`${this.apiUrl}/assign-default/${userId}`, {});
+    return this.http.post(`${this.apiUrl}/assign-default/${userId}`, {});
   }
 
   subscribeUser(userId: string, planId: string): Observable<any> {
@@ -24,6 +24,6 @@ export class AbonnementService {
   }
 
   getCurrentSubscription(userId: string): Observable<any> {
-  return this.http.get(`${this.apiUrl}/current/${userId}`);
+    return this.http.get(`${this.apiUrl}/current/${userId}`);
   }
 }

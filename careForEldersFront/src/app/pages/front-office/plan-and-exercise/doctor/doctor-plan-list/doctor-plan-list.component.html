@@ -1,100 +1,102 @@
-<div class="doctor-plan-list-container">
-  <div class="header-controls">
-    <h1 class="component-title">My Therapy Programs</h1>
-    <button mat-raised-button color="primary" (click)="createNewProgram()">
-      <mat-icon>add_circle_outline</mat-icon>
-      Create New Program
-    </button>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<mat-form-field>
+  <mat-label>Filter Programs</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="Search..." #input>
+</mat-form-field>
+
+<div class="mat-elevation-z8">
+  <div class="loading-shade" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
   </div>
 
-  <mat-form-field appearance="outline" class="filter-input">
-    <mat-label>Filter Programs</mat-label>
-    <input matInput (keyup)="applyFilter($event)" placeholder="Search by name, category, status..." #input>
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
+  <table mat-table [dataSource]="dataSource" matSort *ngIf="!isLoading">
+    
 
-  <div class="table-wrapper mat-elevation-z8">
-    <div class="loading-shade" *ngIf="isLoading">
-      <mat-spinner color="primary"></mat-spinner>
-      <p>Loading programs...</p>
-    </div>
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+      <td mat-cell *matCellDef="let program">{{ program.name }}</td>
+    </ng-container>
 
-    <table mat-table [dataSource]="dataSource" matSort aria-label="Therapy Programs" *ngIf="!isLoading">
+    <!-- Category Column -->
+    <ng-container matColumnDef="category">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+      <td mat-cell *matCellDef="let program">{{ program.category }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Name</th>
-        <td mat-cell *matCellDef="let program" data-label="Name">{{ program.name }}</td>
-      </ng-container>
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let program">
+        <mat-chip [color]="program.status === 'PUBLISHED' ? 'primary' : 'warn'">
+          {{ program.status }}
+        </mat-chip>
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="category">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Category</th>
-        <td mat-cell *matCellDef="let program" data-label="Category">{{ program.category }}</td>
-      </ng-container>
+    <!-- Duration Weeks Column -->
+    <ng-container matColumnDef="durationWeeks">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Duration (Weeks)</th>
+      <td mat-cell *matCellDef="let program">{{ program.durationWeeks }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Status</th>
-        <td mat-cell *matCellDef="let program" data-label="Status">
-          <mat-chip [color]="getChipColor(program.status)" selected>
-            {{ program.status | titlecase }}
-          </mat-chip>
-        </td>
-      </ng-container>
+    <!-- Number of Days Column -->
+    <ng-container matColumnDef="numberOfDays">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Days</th>
+      <td mat-cell *matCellDef="let program">{{ program.numberOfDays }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="durationWeeks">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col" class="right-align-header">Duration</th>
-        <td mat-cell *matCellDef="let program" data-label="Duration (Weeks)" class="right-align-cell">{{ program.durationWeeks }} wks</td>
-      </ng-container>
+    <!-- Number of Exercises Column -->
+    <ng-container matColumnDef="numberOfExercises">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Exercises</th>
+      <td mat-cell *matCellDef="let program">{{ program.numberOfExercises }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="numberOfDays">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col" class="right-align-header">Days</th>
-        <td mat-cell *matCellDef="let program" data-label="Days" class="right-align-cell">{{ program.numberOfDays }}</td>
-      </ng-container>
+    <!-- Number of Patients Column -->
+    <ng-container matColumnDef="numberOfPatients">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Patients</th>
+      <td mat-cell *matCellDef="let program">{{ program.numberOfPatients }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="numberOfExercises">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col" class="right-align-header">Exercises</th>
-        <td mat-cell *matCellDef="let program" data-label="Exercises" class="right-align-cell">{{ program.numberOfExercises }}</td>
-      </ng-container>
+    <!-- Total Duration Column -->
+    <ng-container matColumnDef="totalDuration">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Total Duration</th>
+      <td mat-cell *matCellDef="let program">
+        {{ program.totalDuration  }}  <!-- Add a duration pipe if needed -->
+      </td>
+    </ng-container>
 
-      <ng-container matColumnDef="totalDuration">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col" class="right-align-header">Total Est. Time</th>
-        <td mat-cell *matCellDef="let program" data-label="Total Est. Time" class="right-align-cell">
-          {{ formatTotalDuration(program.totalDuration) }}
-        </td>
-      </ng-container>
+    <!-- Created At Column -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Created</th>
+      <td mat-cell *matCellDef="let program">{{ program.createdAt | date }}</td>
+    </ng-container>
 
-      <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Created</th>
-        <td mat-cell *matCellDef="let program" data-label="Created">{{ program.createdAt | date:'mediumDate' }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef scope="col" class="actions-header">Actions</th>
-        <td mat-cell *matCellDef="let program" class="actions-cell" data-label="Actions">
-          <button mat-icon-button matTooltip="View Info" (click)="openInfo(program)" aria-label="View program details">
-            <mat-icon>visibility</mat-icon> </button>
-          <button mat-icon-button color="primary" matTooltip="Edit Program" (click)="editProgram(program)" aria-label="Edit program">
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let program">
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button mat-icon-button matTooltip="View Info" (click)="openInfo(program)">
+            <mat-icon>info</mat-icon>
+          </button>
+          <button mat-icon-button matTooltip="Edit" (click)="editProgram(program)">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" matTooltip="Delete Program" (click)="deleteProgram(program.id)" aria-label="Delete program">
-            <mat-icon>delete_outline</mat-icon> </button>
-        </td>
-      </ng-container>
+          <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteProgram(program.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
+    </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-      <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
-          <mat-icon class="no-data-icon">search_off</mat-icon>
-          <p>No programs found matching "{{input.value}}"</p>
-          <p *ngIf="!input.value">Try creating a new program or adjust your search.</p>
-        </td>
-      </tr>
-    </table>
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell" colspan="11">No programs found "{{input.value}}"</td>
+    </tr>
+  </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"
-                   showFirstLastButtons
-                   aria-label="Select page of programs">
-    </mat-paginator>
-  </div>
+  <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
 </div>

@@ -1,17 +1,12 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 
 import { BlogForumRoutingModule } from './blog-forum-routing.module';
 import { PostListComponent } from './post-list/post-list.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { PostFormComponent } from './post-form/post-form.component';
 import { ConfirmDialogComponent } from "./confirm-dialog/confirm-dialog.component";
-
-// Services
-import { PostService } from './post.service';
-import { CommentService } from './comment.service';
 
 // Angular Material Imports
 import { MatButtonModule } from '@angular/material/button';
@@ -30,30 +25,23 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { SpeechRecognitionComponent } from './speech-recognition/speech-recognition.component';
-import { SpeechRecognitionService } from './speech-recognition/speech-recognition.service';
-
-
-
 @NgModule({
   declarations: [
     PostListComponent, 
     PostDetailComponent, 
     PostFormComponent, 
-    ConfirmDialogComponent,
-    SpeechRecognitionComponent
+    ConfirmDialogComponent
   ],
   imports: [
     CommonModule,
-    FormsModule,
+    FormsModule,  // Add this if not already in AppModule
     ReactiveFormsModule,
-    HttpClientModule,
     BlogForumRoutingModule,
     
     // Angular Material modules
     MatButtonModule,
     MatCardModule,
-    MatChipsModule,
+    MatChipsModule,  // Only need to import once
     MatDialogModule,
     MatDividerModule,
     MatFormFieldModule,
@@ -66,12 +54,6 @@ import { SpeechRecognitionService } from './speech-recognition/speech-recognitio
     MatSlideToggleModule,
     MatTooltipModule,
     MatSnackBarModule,
-    
-  ],
-  providers: [
-    PostService,
-    CommentService,
-    SpeechRecognitionService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

@@ -1,15 +1,15 @@
 import { Injectable } from "@angular/core"
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http"
-import { catchError, type Observable, of, tap, map } from "rxjs"
-//import { environment } from "src/environments/environment"
+import {  HttpClient, HttpHeaders, HttpParams } from "@angular/common/http"
+import { catchError, type Observable, of, tap } from "rxjs"
+import { environment } from "src/environments/environment"
 
 @Injectable({
   providedIn: "root",
 })
 export class PatientBillService {
   // Update the API URL to match your backend
-  private apiUrl = `http://localhost:8085/api/bills`
-  private paymentApiUrl = `http://localhost:8085/api/payments`
+  private apiUrl = `${environment.apiUrl}/bills`
+  private paymentApiUrl = `${environment.apiUrl}/payments`
 
   constructor(private http: HttpClient) {
     console.log("PatientBillService initialized with API URL:", this.apiUrl)
@@ -30,29 +30,16 @@ export class PatientBillService {
   getAllBills(): Observable<any[]> {
     console.log("Fetching all bills from:", this.apiUrl)
     return this.http.get<any[]>(this.apiUrl).pipe(
-      map((bills) => bills.map((bill) => this.transformBillData(bill))),
-      tap((bills) => console.log("Fetched and transformed bills:", bills.length)),
+      tap((_) => console.log("Fetched bills")),
       catchError(this.handleError<any[]>("getAllBills", [])),
     )
-  }
-
-  // ==================== NEW METHOD: GET BILLS BY SERVICE TYPE ====================
-  getBillsByServiceType(serviceType: string): Observable<any[]> {
-    const url = `${this.apiUrl}/service-type/${serviceType}`;
-    console.log(`Fetching bills for service type ${serviceType} from:`, url);
-    return this.http.get<any[]>(url).pipe(
-      map((bills) => bills.map((bill) => this.transformBillData(bill))),
-      tap((bills) => console.log(`Fetched ${bills.length} bills for service type=${serviceType}`)),
-      catchError(this.handleError<any[]>(`getBillsByServiceType serviceType=${serviceType}`, [])),
-    );
   }
 
   getBillsByPatientId(patientId: number): Observable<any[]> {
     const url = `${this.apiUrl}/patient/${patientId}`
     console.log(`Fetching bills for patient ${patientId} from:`, url)
     return this.http.get<any[]>(url).pipe(
-      map((bills) => bills.map((bill) => this.transformBillData(bill))),
-      tap((bills) => console.log(`Fetched ${bills.length} bills for patient id=${patientId}`)),
+      tap((_) => console.log(`Fetched bills for patient id=${patientId}`)),
       catchError(this.handleError<any[]>(`getBillsByPatientId id=${patientId}`, [])),
     )
   }
@@ -61,8 +48,7 @@ export class PatientBillService {
     const url = `${this.apiUrl}/${id}`
     console.log(`Fetching bill ${id} from:`, url)
     return this.http.get<any>(url).pipe(
-      map((bill) => this.transformBillData(bill)),
-      tap((bill) => console.log(`Fetched and transformed bill id=${id}:`, bill)),
+      tap((_) => console.log(`Fetched bill id=${id}`)),
       catchError(this.handleError<any>(`getBillById id=${id}`)),
     )
   }
@@ -86,17 +72,12 @@ export class PatientBillService {
       balanceAmount: bill.balanceAmount || bill.totalAmount,
       // Use status directly instead of paymentStatus to match backend field name
       status: bill.status || bill.paymentStatus,
-      serviceType: bill.serviceType || "DOCTOR_CARE", // Ensure service type is included
       items: bill.items.map((item: any) => ({
-        id: item.id, // Include ID for existing items
-        serviceType: item.serviceType || bill.serviceType || "DOCTOR_CARE",
+        id: item.id,
         description: item.description,
-        //serviceCode: item.serviceCode || this.generateServiceCode(item.description),
-        //category: item.category || this.getCategoryForServiceType(item.serviceType || bill.serviceType),
-        quantity: Number(item.quantity),
-        unitPrice: Number(item.unitPrice),
-        unit: item.unit || "Session",
-        //serviceDate: this.item.serviceDate,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        serviceDate: item.serviceDate || bill.billDate, // Use item service date if available
       })),
       notes: bill.notes || "",
     }
@@ -105,7 +86,6 @@ export class PatientBillService {
 
     // Make sure to return the HTTP request
     return this.http.post<any>(this.apiUrl, formattedBill, this.httpOptions).pipe(
-      map((newBill) => this.transformBillData(newBill)),
       tap((newBill: any) => console.log(`Created bill w/ id=${newBill.id}`)),
       catchError(this.handleError<any>("createBill")),
     )
@@ -130,21 +110,18 @@ export class PatientBillService {
       balanceAmount: bill.balanceAmount || bill.totalAmount,
       // Use status directly instead of paymentStatus to match backend field name
       status: bill.status || bill.paymentStatus,
-      serviceType: bill.serviceType || "DOCTOR_CARE", // Ensure service type is included
       items: bill.items.map((item: any) => ({
         id: item.id,
         description: item.description,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        serviceType: item.serviceType || bill.serviceType || "DOCTOR_CARE",
         serviceDate: item.serviceDate || bill.billDate, // Use item service date if available
       })),
       notes: bill.notes || "",
     }
 
     return this.http.put<any>(url, formattedBill, this.httpOptions).pipe(
-      map((updatedBill) => this.transformBillData(updatedBill)),
-      tap((updatedBill) => console.log(`Updated bill id=${id}:`, updatedBill)),
+      tap((_) => console.log(`Updated bill id=${id}`)),
       catchError(this.handleError<any>("updateBill")),
     )
   }
@@ -169,101 +146,6 @@ export class PatientBillService {
         tap((_) => console.log(`Generated PDF for bill id=${id}`)),
         catchError(this.handleError<Blob>("generatePdf")),
       )
-  }
-
-  // ==================== DATA TRANSFORMATION METHODS ====================
-
-  /**
-   * Transform bill data from backend format to frontend format
-   * Ensures consistent data structure and handles missing fields
-   */
-  private transformBillData(bill: any): any {
-    if (!bill) return bill;
-
-    // Ensure serviceType is properly set
-    let serviceType = bill.serviceType;
-    
-    // If serviceType is missing, try to derive it from items
-    if (!serviceType || serviceType === 'N/A') {
-      if (bill.items && bill.items.length > 0) {
-        // Use the service type from the first item
-        serviceType = bill.items[0].serviceType || 'DOCTOR_CARE';
-      } else {
-        serviceType = 'DOCTOR_CARE'; // Default fallback
-      }
-    }
-
-    return {
-      ...bill,
-      serviceType: serviceType,
-      // Ensure other required fields have defaults
-      status: bill.status || 'PENDING',
-      paidAmount: bill.paidAmount || 0,
-      balanceAmount: bill.balanceAmount || bill.totalAmount || 0,
-      patientEmail: bill.patientEmail || '',
-      patientPhone: bill.patientPhone || '',
-      notes: bill.notes || '',
-      items: bill.items ? bill.items.map((item: any) => ({
-        ...item,
-        serviceType: item.serviceType || serviceType,
-        unit: item.unit || 'Session'
-      })) : []
-    };
-  }
-
-  /**
-   * Get display name for service type
-   */
-  getServiceTypeDisplay(serviceType: string): string {
-    if (!serviceType || serviceType === 'N/A') return 'N/A';
-
-    switch (serviceType.toUpperCase()) {
-      case 'DOCTOR_CARE':
-        return 'Doctor Care';
-      case 'PARA_MEDICAL_SERVICES':
-        return 'Para Medical';
-      case 'SUBSCRIPTION':
-        return 'Subscription';
-      default:
-        return serviceType.replace(/_/g, ' ').toLowerCase()
-          .replace(/\b\w/g, l => l.toUpperCase());
-    }
-  }
-
-  /**
-   * Get icon for service type
-   */
-  getServiceTypeIcon(serviceType: string): string {
-    if (!serviceType || serviceType === 'N/A') return 'help_outline';
-
-    switch (serviceType.toUpperCase()) {
-      case 'DOCTOR_CARE':
-        return 'medical_services';
-      case 'PARA_MEDICAL_SERVICES':
-        return 'healing';
-      case 'SUBSCRIPTION':
-        return 'card_membership';
-      default:
-        return 'receipt';
-    }
-  }
-
-  /**
-   * Get color for service type
-   */
-  getServiceTypeColor(serviceType: string): string {
-    if (!serviceType || serviceType === 'N/A') return '#9e9e9e';
-
-    switch (serviceType.toUpperCase()) {
-      case 'DOCTOR_CARE':
-        return '#2196F3';
-      case 'PARA_MEDICAL_SERVICES':
-        return '#4CAF50';
-      case 'SUBSCRIPTION':
-        return '#FF9800';
-      default:
-        return '#9e9e9e';
-    }
   }
 
   // ==================== PAYMENT MANAGEMENT METHODS ====================

@@ -14,16 +14,13 @@ export class AppointementService {
   return this.http.get('http://localhost:8083/reservations/getAllUsers');
 }
 getDoctorById(doctorId: string): Observable<any> {
-  return this.http.get<any>(`http://localhost:8083/api/reservations/doctors/${doctorId}`);
+  return this.http.get<any>(`http://localhost:8083/reservations/getUser/${doctorId}`);
 }
 getAllDoctors(): Observable<any>{
-  return this.http.get('http://localhost:8083/api/reservations/doctors');
+  return this.http.get('http://localhost:8083/reservations/getAllDoctors');
 }
 getReservationsByUserId(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8083/api/reservations/user/${userId}`);
+    return this.http.get<any[]>(`http://localhost:8083/reservations/user/${userId}`);
   }
 
-getReservationsByDoctorId(doctorId: string):Observable<any[]> {
-  return this.http.get<any[]>(`http://localhost:8083/api/reservations/doctor/${doctorId}`);
-}
 }
