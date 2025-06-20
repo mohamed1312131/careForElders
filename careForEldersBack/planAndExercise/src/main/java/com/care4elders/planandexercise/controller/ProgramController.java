@@ -170,6 +170,7 @@ public class ProgramController {
     public List<UserDTO> getUnassignedPatients(
             @PathVariable String programId
     ) {
+        System.out.println("rougeee");
         return programService.getUnassignedPatients(programId);
     }
     @GetMapping("/recommendations")

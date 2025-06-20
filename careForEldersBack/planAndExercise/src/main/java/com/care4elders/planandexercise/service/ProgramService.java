@@ -735,14 +735,17 @@ public class ProgramService {
     }
 
     public List<UserDTO> getUnassignedPatients(String programId) {
+        System.out.println("okk");
         // Step 1: Get assigned patient IDs for the program
         List<PatientProgramAssignment> assignments = assignmentRepository.findByProgramId(programId);
         Set<String> assignedPatientIds = assignments.stream()
                 .map(PatientProgramAssignment::getPatientId)
                 .collect(Collectors.toSet());
 
+                System.out.println("ok");
         // Step 2: Get all patients from user-service
         List<UserDTO> allPatients = getAllPatientsFromUserService();
+        System.out.println(allPatients);
 
         // Step 3: Filter out assigned patients
         return allPatients.stream()
@@ -757,11 +760,12 @@ public class ProgramService {
                     new ParameterizedTypeReference<List<UserDTO>>() {};
 
             ResponseEntity<List<UserDTO>> response = restTemplate.exchange(
-                    "http://user-service/users?role=NORMAL_USER",
+                    "http://user-service/users?role=USER",
                     HttpMethod.GET,
                     null,
                     responseType
             );
+            System.out.println(response);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 return response.getBody();
