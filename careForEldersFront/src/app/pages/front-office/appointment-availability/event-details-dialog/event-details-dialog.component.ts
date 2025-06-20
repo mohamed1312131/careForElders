@@ -29,7 +29,7 @@ export class EventDetailsDialogComponent {
   }
 
   onUpdate(): void {
-<<<<<<< Updated upstream
+
     console.log('Update clicked for:', this.data.meta);
     // Save the reservation meta to localStorage
     localStorage.setItem('reservationToUpdate', JSON.stringify(this.reservationMeta));
@@ -37,14 +37,14 @@ export class EventDetailsDialogComponent {
     this.router.navigate(['/user/userProfile/doctor/', this.reservationMeta.data.doctorId], {
       queryParams: { update: 'true' }
     });
-=======
+
   // Use data.meta instead of reservationMeta since that's where your data is stored
   const reservationData = this.data.meta?.data;
   
   if (!reservationData) {
     console.error('No reservation data available for update');
     return;
->>>>>>> Stashed changes
+
   }
 
   console.log('Update clicked for:', this.data.meta);
@@ -80,14 +80,12 @@ bookSlot(slot: any): void {
     console.log('Booking slot:', slot);
     // You can add more logic here (API call, feedback, etc.)
   }
-<<<<<<< Updated upstream
 
-=======
 isPastEvent(endDate: Date | undefined | string): boolean {
   if (!endDate) return true; // Treat missing date as past
   const date = new Date(endDate);
   return date < new Date();
 }
->>>>>>> Stashed changes
+
 
 }

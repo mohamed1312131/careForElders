@@ -21,13 +21,13 @@
     </div>
     <div class="detail-row">
       <span class="detail-label">Meeting Link:</span>
-<<<<<<< Updated upstream
+
       <span class="detail-value">{{ data.meta?.meetingLink || 'N/A' }}</span>
     </div>
     <div class="detail-row">
       <span class="detail-label">Type:</span>
       <span class="detail-value">{{ data.meta?.data?.reservationType }}</span>
-=======
+
       <a *ngIf="data.meta?.meetingLink" [href]="data.meta?.meetingLink" target="_blank" class="meeting-link">
         {{ data.meta?.meetingLink }}
       </a>
@@ -40,7 +40,7 @@
     <div class="detail-row" *ngIf="data.meta?.data?.location">
       <span class="detail-label">Location:</span>
       <span class="detail-value">{{ data.meta?.data?.location }}</span>
->>>>>>> Stashed changes
+
     </div>
   </div>
 
@@ -61,11 +61,12 @@
       </button>
       <button mat-flat-button color="primary" class="book-button"
               *ngIf="!data.meta?.isBooked"
-<<<<<<< Updated upstream
+
+      
               (click)="bookSlot(data.meta.data)">
-=======
+
               (click)="bookSlot(data.meta?.data)">
->>>>>>> Stashed changes
+
         <mat-icon>event_available</mat-icon>
         Book Slot
       </button>
@@ -73,7 +74,7 @@
   </div>
 </mat-dialog-content>
 
-<<<<<<< Updated upstream
+
 <div class="call-action" *ngIf="data.meta?.meetingLink && !data.meta?.isPast">
   <button mat-stroked-button color="primary" class="video-call-button" (click)="startCall(data.meta.meetingLink)">
     <mat-icon>video_call</mat-icon>
@@ -97,7 +98,7 @@
     Go to Payments
   </button>
 </mat-dialog-actions>
-=======
+
 <!-- Actions for Upcoming Events -->
 <ng-container *ngIf="!isPastEvent(data.end)">
   <!-- Video Call Button (only for upcoming online reservations) -->
@@ -139,4 +140,4 @@
     </button>
   </mat-dialog-actions>
 </ng-container>
->>>>>>> Stashed changes
+
