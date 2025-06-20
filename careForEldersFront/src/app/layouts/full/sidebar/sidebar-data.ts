@@ -25,6 +25,60 @@ export const navItems: NavItem[] = [
     route: '/user/medicalRecord',
   },
   {
+    navCap: 'Nutrition',
+  },
+  {
+    displayName: 'Nutrition Admin Dashboard',
+    iconName: 'aperture',
+    route: '/user/userProfile/nutrition/admin-dashboard',
+  },
+  {
+    displayName: 'Nutrition Plans List',
+    iconName: 'aperture',
+    route: '/user/userProfile/nutrition/list',
+  },
+  {
+    displayName: 'Nutrition Plan Generator',
+    iconName: 'aperture',
+    route: '/user/userProfile/nutrition/plan-generator',
+  },
+  {
+    navCap: 'Paramedical Care',
+  },
+  {
+    displayName: 'Paramedical Care',
+    iconName: 'user-heart',
+    route: '/user/userProfile/paramedical-care',
+    children: [
+      {
+        displayName: 'Dashboard',
+        iconName: 'layout-dashboard',
+        route: '/user/userProfile/paramedical-care',
+      },
+      {
+        displayName: 'Professional List',
+        iconName: 'users',
+        route: '/user/userProfile/paramedical-care/professional-list',
+      },
+      {
+        displayName: 'Appointments',
+        iconName: 'calendar-event',
+        route: '/user/userProfile/paramedical-care/appointment',
+      },
+      {
+        displayName: 'Find Nearby Professionals',
+        iconName: 'map-pin',
+        route: '/user/userProfile/paramedical-care/nearby-professionals',
+      },
+      {
+        displayName: 'Paramedical Map',
+        iconName: 'map',
+        route: '/user/userProfile/paramedical-care/paramedical-map',
+      }
+    ]
+  },
+
+  {
     navCap: 'Ui Components',
   },
   {

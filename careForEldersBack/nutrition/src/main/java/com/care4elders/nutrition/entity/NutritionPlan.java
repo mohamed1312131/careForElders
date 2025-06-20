@@ -37,6 +37,17 @@ public class NutritionPlan {
     private Integer dislikes;
     private List<Map<String, Object>> comments;
 
+    // --- Added fields for meal plan details ---
+    private String meal;
+    private String description;
+    private Integer calories;
+    private String mealTime;
+    private String notes;
+    private String recommendedAgeGroup;
+    private String pictureUrl;
+    private java.util.List<String> ingredients;
+    // --- End added fields ---
+
     private MealSchedule mealSchedule;
     private Integer planDuration; // in days
     private Integer targetCalories; // daily target calories

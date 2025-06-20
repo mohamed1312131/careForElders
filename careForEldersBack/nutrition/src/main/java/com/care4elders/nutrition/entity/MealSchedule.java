@@ -16,6 +16,15 @@ public class MealSchedule {
     private String dinnerTime;
     private List<String> snackTimes;
 
+    public String getBreakfastTime() { return breakfastTime; }
+    public void setBreakfastTime(String breakfastTime) { this.breakfastTime = breakfastTime; }
+    public String getLunchTime() { return lunchTime; }
+    public void setLunchTime(String lunchTime) { this.lunchTime = lunchTime; }
+    public String getDinnerTime() { return dinnerTime; }
+    public void setDinnerTime(String dinnerTime) { this.dinnerTime = dinnerTime; }
+    public List<String> getSnackTimes() { return snackTimes; }
+    public void setSnackTimes(List<String> snackTimes) { this.snackTimes = snackTimes; }
+
     // ================================
     // UTILITY METHODS ONLY
     // ================================

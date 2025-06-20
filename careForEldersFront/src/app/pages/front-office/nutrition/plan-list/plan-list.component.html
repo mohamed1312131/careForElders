@@ -17,6 +17,30 @@
             <span class="badge bg-primary">{{plan.mealTime}}</span>
             <span class="text-muted">{{plan.calories}} calories</span>
           </div>
+          <ul class="mt-2 small">
+            <li><strong>User ID:</strong> {{plan.userId}}</li>
+            <li><strong>User Email:</strong> {{plan.userEmail}}</li>
+            <li><strong>Medical Conditions:</strong> {{plan.medicalConditions}}</li>
+            <li><strong>Dietary Preferences:</strong> {{plan.dietaryPreferences}}</li>
+            <li><strong>Allergies:</strong> {{plan.allergies}}</li>
+            <li><strong>AI Generated Plan:</strong> {{plan.aiGeneratedPlan}}</li>
+            <li><strong>Content:</strong> {{plan.content}}</li>
+            <li><strong>Notes:</strong> {{plan.notes}}</li>
+            <li><strong>Recommended Age Group:</strong> {{plan.recommendedAgeGroup}}</li>
+            <li><strong>Ingredients:</strong> {{plan.ingredients && plan.ingredients.length ? plan.ingredients.join(', ') : '-'}}</li>
+            <li><strong>Plan Duration:</strong> {{plan.planDuration}}</li>
+            <li><strong>Target Calories:</strong> {{plan.targetCalories}}</li>
+            <li><strong>Meal Schedule:</strong> {{plan.mealSchedule | json}}</li>
+            <li><strong>Email Reminders Enabled:</strong> {{plan.emailRemindersEnabled}}</li>
+            <li><strong>Active:</strong> {{plan.active}}</li>
+            <li><strong>Comments:</strong> {{plan.comments.length}}</li>
+            <li><strong>Likes:</strong> {{plan.likes}}</li>
+            <li><strong>Dislikes:</strong> {{plan.dislikes}}</li>
+            <li><strong>Created At:</strong> {{plan.createdAt | date:'short'}}</li>
+            <li><strong>Updated At:</strong> {{plan.updatedAt | date:'short'}}</li>
+            <li><strong>Last Reminder Sent:</strong> {{plan.lastReminderSent}}</li>
+            <li><strong>Picture URL:</strong> {{plan.pictureUrl}}</li>
+          </ul>
         </div>
 
         <div class="card-footer bg-transparent">
@@ -31,12 +55,16 @@
             </div>
 
                 <button
-                  [routerLink]="['/plans', plan.id]"
-                  class="btn btn-sm btn-outline-primary"
-                  (click)="viewPlanDetails(plan.id)">
+                  *ngIf="plan.id"
+                  [routerLink]="['/plan/nutrition/details', plan.id]"
+                  class="btn btn-sm btn-outline-primary">
                   View Details
                 </button>
 
+          </div>
+          <div class="mt-2 small text-muted">
+            <div *ngIf="plan.createdAt">Created: {{plan.createdAt | date:'short'}}</div>
+            <div *ngIf="plan.updatedAt">Updated: {{plan.updatedAt | date:'short'}}</div>
           </div>
         </div>
       </div>

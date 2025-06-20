@@ -12,15 +12,30 @@
         <div class="card-body">
           <h5 class="card-title">Nutrition Information</h5>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <strong>Calories:</strong> {{plan.calories}}
-            </li>
-            <li class="list-group-item">
-              <strong>Meal Time:</strong> {{plan.mealTime}}
-            </li>
-            <li class="list-group-item">
-              <strong>Recommended Age Group:</strong> {{plan.recommendedAgeGroup}}
-            </li>
+            <li class="list-group-item"><strong>Calories:</strong> {{plan.calories}}</li>
+            <li class="list-group-item"><strong>Meal Time:</strong> {{plan.mealTime}}</li>
+            <li class="list-group-item"><strong>Recommended Age Group:</strong> {{plan.recommendedAgeGroup}}</li>
+            <li class="list-group-item"><strong>User ID:</strong> {{plan.userId}}</li>
+            <li class="list-group-item"><strong>User Email:</strong> {{plan.userEmail}}</li>
+            <li class="list-group-item"><strong>Medical Conditions:</strong> {{plan.medicalConditions}}</li>
+            <li class="list-group-item"><strong>Dietary Preferences:</strong> {{plan.dietaryPreferences}}</li>
+            <li class="list-group-item"><strong>Allergies:</strong> {{plan.allergies}}</li>
+            <li class="list-group-item"><strong>AI Generated Plan:</strong> {{plan.aiGeneratedPlan}}</li>
+            <li class="list-group-item"><strong>Content:</strong> {{plan.content}}</li>
+            <li class="list-group-item"><strong>Notes:</strong> {{plan.notes}}</li>
+            <li class="list-group-item"><strong>Ingredients:</strong> {{plan.ingredients && plan.ingredients.length ? plan.ingredients.join(', ') : '-'}}</li>
+            <li class="list-group-item"><strong>Plan Duration:</strong> {{plan.planDuration}}</li>
+            <li class="list-group-item"><strong>Target Calories:</strong> {{plan.targetCalories}}</li>
+            <li class="list-group-item"><strong>Meal Schedule:</strong> {{plan.mealSchedule | json}}</li>
+            <li class="list-group-item"><strong>Email Reminders Enabled:</strong> {{plan.emailRemindersEnabled}}</li>
+            <li class="list-group-item"><strong>Active:</strong> {{plan.active}}</li>
+            <li class="list-group-item"><strong>Comments:</strong> {{plan.comments.length}}</li>
+            <li class="list-group-item"><strong>Likes:</strong> {{plan.likes}}</li>
+            <li class="list-group-item"><strong>Dislikes:</strong> {{plan.dislikes}}</li>
+            <li class="list-group-item" *ngIf="plan.createdAt"><strong>Created At:</strong> {{plan.createdAt | date:'short'}}</li>
+            <li class="list-group-item" *ngIf="plan.updatedAt"><strong>Updated At:</strong> {{plan.updatedAt | date:'short'}}</li>
+            <li class="list-group-item"><strong>Last Reminder Sent:</strong> {{plan.lastReminderSent}}</li>
+            <li class="list-group-item"><strong>Picture URL:</strong> {{plan.pictureUrl}}</li>
           </ul>
         </div>
       </div>
@@ -69,7 +84,9 @@
 
           <div *ngIf="plan.comments && plan.comments.length; else noComments">
             <div class="mb-2 p-2 border rounded" *ngFor="let comment of plan.comments">
-              <p class="mb-0">{{comment}}</p>
+              <p class="mb-0">{{comment.comment}}</p>
+              <small class="text-muted" *ngIf="comment.userId">By: {{comment.userId}}</small>
+              <small class="text-muted float-end" *ngIf="comment.createdAt">{{comment.createdAt | date:'short'}}</small>
             </div>
           </div>
           <ng-template #noComments>

@@ -1,6 +1,6 @@
 package com.care4elders.nutrition.service;
 
-import com.care4elders.nutrition.DTO.NutritionPlanDTO;
+import com.care4elders.nutrition.dto.NutritionPlanDTO;
 import com.care4elders.nutrition.entity.NutritionPlan;
 import com.care4elders.nutrition.entity.MealSchedule;
 
@@ -50,7 +50,7 @@ public interface NutritionPlanService {
     // AI-POWERED OPERATIONS
     // ================================
 
-    NutritionPlanDTO generateMonthlyPlan(String userId, String medicalConditions, String userEmail);
+    NutritionPlanDTO generateMonthlyPlan(String userId, java.util.List<String> medicalConditions, String userEmail);
     NutritionPlanDTO regeneratePlan(String id);
 
     // ================================

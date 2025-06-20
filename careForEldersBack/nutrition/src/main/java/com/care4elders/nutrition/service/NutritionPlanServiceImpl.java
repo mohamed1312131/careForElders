@@ -1,6 +1,6 @@
 package com.care4elders.nutrition.service;
 
-import com.care4elders.nutrition.DTO.NutritionPlanDTO;
+import com.care4elders.nutrition.dto.NutritionPlanDTO;
 import com.care4elders.nutrition.entity.NutritionPlan;
 import com.care4elders.nutrition.entity.MealSchedule;
 import com.care4elders.nutrition.repository.NutritionPlanRepository;
@@ -196,18 +196,19 @@ public class NutritionPlanServiceImpl implements NutritionPlanService {
     }
 
     @Override
-    public NutritionPlanDTO generateMonthlyPlan(String userId, String medicalConditions, String userEmail) {
+    public NutritionPlanDTO generateMonthlyPlan(String userId, java.util.List<String> medicalConditions, String userEmail) {
         try {
             log.info("Generating monthly nutrition plan for user: {}", userId);
 
             // Generate AI-powered plan
-            String aiGeneratedPlan = huggingFaceService.generateNutritionPlan(medicalConditions);
+            String medicalConditionsStr = String.join(",", medicalConditions);
+        String aiGeneratedPlan = huggingFaceService.generateNutritionPlan(medicalConditionsStr);
 
             // Create nutrition plan entity
             NutritionPlan plan = new NutritionPlan();
             plan.setUserId(userId);
             plan.setUserEmail(userEmail);
-            plan.setMedicalConditions(medicalConditions);
+            plan.setMedicalConditions(medicalConditionsStr);
             plan.setAiGeneratedPlan(aiGeneratedPlan);
             plan.setCreatedAt(LocalDateTime.now());
             plan.setUpdatedAt(LocalDateTime.now());
@@ -291,6 +292,16 @@ public class NutritionPlanServiceImpl implements NutritionPlanService {
         dto.setPlanDuration(plan.getPlanDuration());
         dto.setTargetCalories(plan.getTargetCalories());
 
+        // Map new meal fields
+        dto.setMeal(plan.getMeal());
+        dto.setDescription(plan.getDescription());
+        dto.setCalories(plan.getCalories());
+        dto.setMealTime(plan.getMealTime());
+        dto.setNotes(plan.getNotes());
+        dto.setRecommendedAgeGroup(plan.getRecommendedAgeGroup());
+        dto.setPictureUrl(plan.getPictureUrl());
+        dto.setIngredients(plan.getIngredients());
+
         // Set content for backward compatibility
         if (plan.getAiGeneratedPlan() != null) {
             dto.setContent(plan.getAiGeneratedPlan());
@@ -321,13 +332,28 @@ public class NutritionPlanServiceImpl implements NutritionPlanService {
         plan.setPlanDuration(dto.getPlanDuration());
         plan.setTargetCalories(dto.getTargetCalories());
 
+        // Map new meal fields
+        plan.setMeal(dto.getMeal());
+        plan.setDescription(dto.getDescription());
+        plan.setCalories(dto.getCalories());
+        plan.setMealTime(dto.getMealTime());
+        plan.setNotes(dto.getNotes());
+        plan.setRecommendedAgeGroup(dto.getRecommendedAgeGroup());
+        plan.setPictureUrl(dto.getPictureUrl());
+        plan.setIngredients(dto.getIngredients());
+
         if (dto.getContent() != null && plan.getAiGeneratedPlan() == null) {
             plan.setAiGeneratedPlan(dto.getContent());
         }
-
         return plan;
     }
 
+    // ================================
+
+    /**
+     * Update an existing NutritionPlan entity from a NutritionPlanDTO.
+     * Only updates fields that are not null in the DTO.
+     */
     private void updateEntityFromDTO(NutritionPlan entity, NutritionPlanDTO dto) {
         if (dto.getUserEmail() != null) entity.setUserEmail(dto.getUserEmail());
         if (dto.getMedicalConditions() != null) entity.setMedicalConditions(dto.getMedicalConditions());
@@ -335,23 +361,24 @@ public class NutritionPlanServiceImpl implements NutritionPlanService {
         if (dto.getAllergies() != null) entity.setAllergies(dto.getAllergies());
         if (dto.getAiGeneratedPlan() != null) entity.setAiGeneratedPlan(dto.getAiGeneratedPlan());
         if (dto.getContent() != null && dto.getAiGeneratedPlan() == null) entity.setAiGeneratedPlan(dto.getContent());
-
-        entity.setActive(dto.isActive());
-        entity.setEmailRemindersEnabled(dto.isEmailRemindersEnabled());
-
         if (dto.getMealSchedule() != null) entity.setMealSchedule(dto.getMealSchedule());
         if (dto.getPlanDuration() != null) entity.setPlanDuration(dto.getPlanDuration());
         if (dto.getTargetCalories() != null) entity.setTargetCalories(dto.getTargetCalories());
-
         if (dto.getLikes() != null) entity.setLikes(dto.getLikes());
         if (dto.getDislikes() != null) entity.setDislikes(dto.getDislikes());
         if (dto.getComments() != null) entity.setComments(dto.getComments());
+        // Meal fields
+        if (dto.getMeal() != null) entity.setMeal(dto.getMeal());
+        if (dto.getDescription() != null) entity.setDescription(dto.getDescription());
+        if (dto.getCalories() != null) entity.setCalories(dto.getCalories());
+        if (dto.getMealTime() != null) entity.setMealTime(dto.getMealTime());
+        if (dto.getNotes() != null) entity.setNotes(dto.getNotes());
+        if (dto.getRecommendedAgeGroup() != null) entity.setRecommendedAgeGroup(dto.getRecommendedAgeGroup());
+        if (dto.getPictureUrl() != null) entity.setPictureUrl(dto.getPictureUrl());
+        if (dto.getIngredients() != null) entity.setIngredients(dto.getIngredients());
+        entity.setActive(dto.isActive());
+        entity.setEmailRemindersEnabled(dto.isEmailRemindersEnabled());
     }
-    // Add these methods to your existing NutritionPlanServiceImpl class:
-
-// ================================
-// USER-SPECIFIC QUERIES
-// ================================
 
     @Override
     public List<NutritionPlanDTO> getNutritionPlansByUserId(String userId, int page, int size) {

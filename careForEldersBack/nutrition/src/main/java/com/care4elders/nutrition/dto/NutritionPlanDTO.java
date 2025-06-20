@@ -1,4 +1,4 @@
-package com.care4elders.nutrition.DTO;
+package com.care4elders.nutrition.dto;
 
 import com.care4elders.nutrition.entity.MealSchedule;
 import jakarta.validation.constraints.Max;
@@ -41,6 +41,42 @@ public class NutritionPlanDTO {
     private List<Map<String, Object>> comments = new ArrayList<>();
 
     private MealSchedule mealSchedule;
+
+    // --- Added fields for meal plan details ---
+    private String meal;
+    private String description;
+    private Integer calories;
+    private String mealTime;
+    private String notes;
+    private String recommendedAgeGroup;
+    private String pictureUrl;
+    private java.util.List<String> ingredients;
+    // --- End added fields ---
+
+    // Getters and setters for meal plan details
+    public String getMeal() { return meal; }
+    public void setMeal(String meal) { this.meal = meal; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public Integer getCalories() { return calories; }
+    public void setCalories(Integer calories) { this.calories = calories; }
+
+    public String getMealTime() { return mealTime; }
+    public void setMealTime(String mealTime) { this.mealTime = mealTime; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public String getRecommendedAgeGroup() { return recommendedAgeGroup; }
+    public void setRecommendedAgeGroup(String recommendedAgeGroup) { this.recommendedAgeGroup = recommendedAgeGroup; }
+
+    public String getPictureUrl() { return pictureUrl; }
+    public void setPictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
+
+    public java.util.List<String> getIngredients() { return ingredients; }
+    public void setIngredients(java.util.List<String> ingredients) { this.ingredients = ingredients; }
 
     @Min(value = 1, message = "Plan duration must be at least 1 day")
     @Max(value = 365, message = "Plan duration cannot exceed 365 days")

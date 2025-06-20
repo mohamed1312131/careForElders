@@ -60,6 +60,10 @@ import {PlanListComponent} from "./pages/front-office/nutrition/plan-list/plan-l
 import {PlanDetailsComponent} from "./pages/front-office/nutrition/plan-details/plan-details.component";
 import {AdminDashboardComponent} from "./pages/front-office/nutrition/admin-dashboard/admin-dashboard.component";
 import { CommonModule } from "@angular/common"
+import {
+
+} from "./pages/front-office/paramedical-care/appointment-form/appointment-form.component";
+import { NutritionPlanGeneratorComponent } from "./pages/front-office/nutrition/nutrition-plan-generator/nutrition-plan-generator.component"
 
 @NgModule({
   declarations: [
@@ -79,6 +83,8 @@ import { CommonModule } from "@angular/common"
     PlanListComponent,
     PlanDetailsComponent,
     AdminDashboardComponent,
+    NutritionPlanGeneratorComponent,
+
   ],
   imports: [
     CommonModule,
@@ -117,7 +123,7 @@ import { CommonModule } from "@angular/common"
     MatChipsModule,
     MatBadgeModule,
     MatTabsModule,
-  
+
   ],
   exports: [TablerIconsModule],
   bootstrap: [AppComponent],

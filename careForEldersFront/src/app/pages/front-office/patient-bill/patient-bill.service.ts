@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core"
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http"
-import { catchError, type Observable, of, tap, map } from "rxjs"
+import { catchError, Observable, of, tap, map } from "rxjs"
 //import { environment } from "src/environments/environment"
 
 @Injectable({
@@ -175,7 +175,7 @@ export class PatientBillService {
 
     // Ensure serviceType is properly set
     let serviceType = bill.serviceType;
-    
+
     // If serviceType is missing, try to derive it from items
     if (!serviceType || serviceType === 'N/A') {
       if (bill.items && bill.items.length > 0) {

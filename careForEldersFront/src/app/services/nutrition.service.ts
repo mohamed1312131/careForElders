@@ -7,7 +7,8 @@ import { NutritionPlan } from '../models/nutrition-plan.model';
   providedIn: 'root'
 })
 export class NutritionService {
-  private apiUrl = 'http://localhost:8087/api/nutrition';
+  // Use relative path for proxy compatibility
+  private apiUrl = '/api/nutrition-plans';
 
   constructor(private http: HttpClient) { }
 

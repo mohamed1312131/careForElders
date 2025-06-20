@@ -13,6 +13,15 @@
         </processorPath>
         <module name="appointmentAvailability" />
       </profile>
+      <profile name="Annotation profile for paramedicalCare" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
+        <module name="paramedicalCare" />
+      </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
@@ -26,6 +35,7 @@
       <module name="medicalRecord" options="-parameters" />
       <module name="notification" options="-parameters" />
       <module name="nutrition" options="-parameters" />
+      <module name="nutrition-service" options="-parameters" />
       <module name="paramedicalCare" options="-parameters" />
       <module name="patientBill" options="-parameters" />
       <module name="planAndExercise" options="-parameters" />

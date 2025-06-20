@@ -1,5 +1,5 @@
 import { NgModule } from "@angular/core"
-import { RouterModule, type Routes } from "@angular/router"
+import { RouterModule, Routes } from "@angular/router"
 import { PatientBillListComponent } from "./patient-bill-list/patient-bill-list.component"
 import { PatientBillFormComponent } from "./patient-bill-form/patient-bill-form.component"
 import { PatientBillPaymentComponent } from "./patient-bill-payment/patient-bill-payment.component"
@@ -36,8 +36,8 @@ const routes: Routes = [
   },
   {
    path: "history/:id", component: PatientBillHistoryComponent },
-  
-  
+
+
 ]
 
 @NgModule({

@@ -3,9 +3,7 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { UserinfoComponent } from './user-service/userinfo/userinfo.component';
 import {MedicalRecordComponent} from "./medical-record/medical-record/medical-record.component";
 import { PatientBillFormComponent } from './patient-bill/patient-bill-form/patient-bill-form.component';
-import {PlanListComponent} from "./nutrition/plan-list/plan-list.component";
-import {PlanDetailsComponent} from "./nutrition/plan-details/plan-details.component";
-import {AdminDashboardComponent} from "./nutrition/admin-dashboard/admin-dashboard.component";
+
 import {UsersComponent} from "./user-service/user/user.component";
 import {MedicalRecordListComponent} from "./medical-record/medical-records-list/medical-records-list.component";
 import { PostListComponent } from './blog-forum/post-list/post-list.component';
@@ -38,8 +36,15 @@ export const FrontOfficeRoutes: Routes = [
     data: { preload: true }
   },
   {
+    path: 'paramedical-care',
+    loadChildren: () => import('./paramedical-care/paramedical-care.module').then(m => m.ParamedicalCareModule),
+    data: { preload: true }
+  },
+
+
+  {
     path: "post",
-    component:PostListComponent,  }, 
+    component:PostListComponent,  },
   {
     path: 'abonnement',
     loadChildren: () =>
@@ -71,17 +76,8 @@ export const FrontOfficeRoutes: Routes = [
     component:MedicalRecordComponent,
   },
   {
-    path:'nutritionplanlist',
-    component:PlanListComponent,
-  },
-  {
-    path:'nutritionplandetails/:id',
-    component:PlanDetailsComponent ,
-  },
-  {
-
-    path:'nutritionplainadmin',
-    component:AdminDashboardComponent,
+    path: 'nutrition',
+    loadChildren: () => import('./nutrition/nutrition.module').then(m => m.NutritionModule)
   },
   {
     path:'medicalrecordlist',
@@ -98,7 +94,7 @@ export const FrontOfficeRoutes: Routes = [
     // Remove the component property here
   },
 */
-  
+
 
 
 ];

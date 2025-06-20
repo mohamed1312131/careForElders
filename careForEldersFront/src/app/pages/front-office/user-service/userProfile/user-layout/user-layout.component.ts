@@ -15,6 +15,8 @@ export class UserLayoutComponent implements OnInit {
   isPMedicalRecordMenuOpen = false;
   inNutritionmenu = false;
   inMedicalRecordmenu = false;
+  isParamedicalMenuOpen = false;
+  inParamedicalMenu = false;
   isDealsMenuOpen = false;
   currentTitle = 'Pipeline';
   user: any = null;
@@ -65,6 +67,9 @@ togglePlanMenu(): void {
 
   toggleNutritionMenu() :void {
     this.inNutritionmenu = !this.inNutritionmenu;
+  }
+  toggleParamedicalMenu() :void {
+    this.inParamedicalMenu = !this.inParamedicalMenu;
   }
   toggleMedicalRecordMenu() :void {
     this.inMedicalRecordmenu = !this.inMedicalRecordmenu;

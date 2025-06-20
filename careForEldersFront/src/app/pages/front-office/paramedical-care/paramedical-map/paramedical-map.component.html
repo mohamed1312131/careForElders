@@ -1,0 +1,176 @@
+<div class="map-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="search-panel">
+      <h3>Recherche de professionnels</h3>
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="form-group">
+          <label for="search-location">Localisation</label>
+          <input type="text" id="search-location" formControlName="location" class="form-control" placeholder="Entrez une adresse">
+        </div>
+        <div class="form-group">
+          <label for="search-specialty">Spécialité</label>
+          <input type="text" id="search-specialty" formControlName="specialty" class="form-control" placeholder="Ex: Physiothérapie">
+        </div>
+        <div class="form-group">
+          <label for="search-radius">Rayon de recherche (km)</label>
+          <input type="number" id="search-radius" formControlName="radius" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="searchForm.invalid || loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+          Rechercher
+        </button>
+        <button type="button" class="btn btn-secondary ml-2" (click)="getCurrentLocation()">
+          Ma position
+        </button>
+      </form>
+    </div>
+
+    <div class="results-panel">
+      <div class="d-flex justify-content-between align-items-center">
+        <h3>Résultats</h3>
+        <button class="btn btn-sm btn-success" (click)="openAddModal()">
+          Ajouter un professionnel
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="text-center my-3">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+
+      <div *ngIf="!loading && filteredProfessionals.length === 0" class="alert alert-info">
+        Aucun professionnel trouvé. Veuillez modifier vos critères de recherche.
+      </div>
+
+      <div class="professional-list">
+        <div *ngFor="let professional of filteredProfessionals"
+             class="professional-card"
+             [class.active]="selectedProfessional?.id === professional.id"
+             (click)="selectProfessional(professional)">
+          <h5>{{ professional.name }}</h5>
+          <p class="specialty">{{ professional.specialty }}</p>
+          <p class="contact">{{ professional.contactInfo }}</p>
+          <p *ngIf="professional.distance !== undefined" class="distance">
+            Distance: {{ professional.distance }} km
+          </p>
+          <div class="actions">
+            <button class="btn btn-sm btn-primary" (click)="openAppointmentModal(professional)">
+              Prendre RDV
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteProfessional(professional)">
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div id="map" class="map"></div>
+
+  <!-- Add Professional Modal -->
+  <div class="modal" [class.show]="showAddModal" [style.display]="showAddModal ? 'block' : 'none'">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ajouter un professionnel</h5>
+          <button type="button" class="close" (click)="closeAddModal()">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="professionalForm">
+            <div class="form-group">
+              <label for="professional-name">Nom</label>
+              <input type="text" id="professional-name" formControlName="name" class="form-control">
+              <div *ngIf="professionalForm.get('name')?.invalid && professionalForm.get('name')?.touched" class="text-danger">
+                Le nom est requis (min 2 caractères)
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="professional-specialty">Spécialité</label>
+              <input type="text" id="professional-specialty" formControlName="specialty" class="form-control">
+              <div *ngIf="professionalForm.get('specialty')?.invalid && professionalForm.get('specialty')?.touched" class="text-danger">
+                La spécialité est requise (min 2 caractères)
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="professional-contact">Informations de contact</label>
+              <textarea id="professional-contact" formControlName="contactInfo" class="form-control" rows="3"></textarea>
+              <div *ngIf="professionalForm.get('contactInfo')?.invalid && professionalForm.get('contactInfo')?.touched" class="text-danger">
+                Les informations de contact sont requises (min 5 caractères)
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="professional-address">Adresse</label>
+              <input type="text" id="professional-address" formControlName="address" class="form-control">
+              <small class="form-text text-muted">L'adresse sera utilisée pour géocoder la position sur la carte</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeAddModal()">Annuler</button>
+          <button type="button" class="btn btn-primary" [disabled]="professionalForm.invalid" (click)="onAddProfessional()">
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appointment Modal -->
+  <div class="modal" [class.show]="showAppointmentModal" [style.display]="showAppointmentModal ? 'block' : 'none'">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Prendre rendez-vous avec {{ selectedProfessional?.name }}</h5>
+          <button type="button" class="close" (click)="closeAppointmentModal()">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="appointmentForm">
+            <div class="form-group">
+              <label for="appointment-elder">ID du patient</label>
+              <input type="text" id="appointment-elder" formControlName="elderId" class="form-control">
+              <div *ngIf="appointmentForm.get('elderId')?.invalid && appointmentForm.get('elderId')?.touched" class="text-danger">
+                L'ID du patient est requis
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="appointment-time">Date et heure du rendez-vous</label>
+              <input type="datetime-local" id="appointment-time" formControlName="appointmentTime" class="form-control">
+              <div *ngIf="appointmentForm.get('appointmentTime')?.invalid && appointmentForm.get('appointmentTime')?.touched" class="text-danger">
+                La date et l'heure sont requises
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="appointment-location">Lieu</label>
+              <input type="text" id="appointment-location" formControlName="location" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="appointment-notes">Notes</label>
+              <textarea id="appointment-notes" formControlName="notes" class="form-control" rows="3"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeAppointmentModal()">Annuler</button>
+          <button type="button" class="btn btn-primary" [disabled]="appointmentForm.invalid" (click)="onBookAppointment()">
+            Confirmer le rendez-vous
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal backdrop -->
+  <div class="modal-backdrop"
+       [style.display]="showAddModal || showAppointmentModal ? 'block' : 'none'"
+       (click)="showAddModal ? closeAddModal() : closeAppointmentModal()"></div>
+</div>

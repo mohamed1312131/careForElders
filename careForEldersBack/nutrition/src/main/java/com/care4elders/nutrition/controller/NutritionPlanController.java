@@ -1,6 +1,6 @@
 package com.care4elders.nutrition.controller;
 
-import com.care4elders.nutrition.DTO.NutritionPlanDTO;
+import com.care4elders.nutrition.dto.NutritionPlanDTO;
 import com.care4elders.nutrition.entity.MealSchedule;
 import com.care4elders.nutrition.service.NutritionPlanService;
 import jakarta.validation.Valid;
@@ -19,6 +19,15 @@ import java.util.Map;
 @Slf4j
 @CrossOrigin(origins = "*")
 public class NutritionPlanController {
+
+    /**
+     * Health check endpoint
+     */
+    @GetMapping("/health")
+    public String health() {
+        return "OK";
+    }
+
 
     private final NutritionPlanService nutritionPlanService;
 
@@ -46,9 +55,9 @@ public class NutritionPlanController {
      */
     @GetMapping
     public ResponseEntity<List<NutritionPlanDTO>> getAllNutritionPlans(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sortBy", defaultValue = "createdAt") String sortBy) {
         try {
             log.info("Fetching all nutrition plans - page: {}, size: {}, sortBy: {}", page, size, sortBy);
             List<NutritionPlanDTO> plans = nutritionPlanService.getAllNutritionPlans(page, size, sortBy);
@@ -228,17 +237,31 @@ public class NutritionPlanController {
      * Generate monthly nutrition plan using AI
      */
     @PostMapping("/generate")
-    public ResponseEntity<NutritionPlanDTO> generateMonthlyPlan(
-            @RequestParam String userId,
-            @RequestParam String medicalConditions,
-            @RequestParam String userEmail) {
+    public ResponseEntity<Object> generateMonthlyPlan(
+            @RequestBody com.care4elders.nutrition.dto.GeneratePlanRequest request) {
         try {
-            log.info("Generating monthly nutrition plan for user: {}", userId);
-            NutritionPlanDTO generatedPlan = nutritionPlanService.generateMonthlyPlan(userId, medicalConditions, userEmail);
-            return ResponseEntity.status(HttpStatus.CREATED).body(generatedPlan);
+            log.info("Generating monthly nutrition plan for user: {}", request.getUserId());
+            NutritionPlanDTO generatedPlan = nutritionPlanService.generateMonthlyPlan(request.getUserId(), request.getMedicalConditions(), request.getUserEmail());
+            boolean success = generatedPlan != null && generatedPlan.getAiGeneratedPlan() != null && !generatedPlan.getAiGeneratedPlan().isEmpty();
+            String message = success ? "Nutrition plan generated successfully." : "Failed to generate nutrition plan.";
+            String nutritionPlan = generatedPlan != null ? generatedPlan.getAiGeneratedPlan() : null;
+            String generatedAt = generatedPlan != null && generatedPlan.getCreatedAt() != null ? generatedPlan.getCreatedAt().toString() : null;
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "success", success,
+                "nutritionPlan", nutritionPlan,
+                "message", message,
+                "generatedAt", generatedAt,
+                "planId", generatedPlan != null ? generatedPlan.getId() : null
+            ));
         } catch (Exception e) {
-            log.error("Error generating monthly nutrition plan for user: {}", userId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("Error generating monthly nutrition plan for user: {}", request.getUserId(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "success", false,
+                "nutritionPlan", null,
+                "message", "Failed to generate nutrition plan due to server error.",
+                "generatedAt", null,
+                "planId", null
+            ));
         }
     }
 

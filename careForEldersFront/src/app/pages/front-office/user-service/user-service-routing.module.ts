@@ -31,6 +31,13 @@ import { UnauthorizedComponent } from '../subscription/unauthorized/unauthorized
 import { SubscriptionGuard } from '../subscription/subscriptionguard';
 import { MedicalRecordComponent } from '../medical-record/medical-record/medical-record.component';
 import { MedicalRecordListComponent } from '../medical-record/medical-records-list/medical-records-list.component';
+import { AppointmentFormComponent } from '../paramedical-care/appointment-form/appointment-form.component';
+import { AppointmentsComponent } from '../paramedical-care/appointments/appointments.component';
+import { NearbyProfessionalsComponent } from '../paramedical-care/nearby-professionals/nearby-professionals.component';
+import { ParamedicalMapComponent } from '../paramedical-care/paramedical-map/paramedical-map.component';
+import { ProfessionalDetailComponent } from '../paramedical-care/professional-detail/professional-detail.component';
+import { ProfessionalFormComponent } from '../paramedical-care/professional-form/professional-form.component';
+import { ProfessionalListComponent } from '../paramedical-care/professional-list/professional-list.component';
 
 const routes: Routes = [
   {
@@ -41,6 +48,10 @@ const routes: Routes = [
     path: 'userProfile',
     component: UserLayoutComponent,
     children: [
+      {
+        path: 'nutrition',
+        loadChildren: () => import('../nutrition/nutrition.module').then(m => m.NutritionModule),
+      },
       // Basic Plan Features (available to all)
       { path: 'search', component: SearchDoctorComponent },
       { path: 'doctor/:id', component: DoctorDetailsComponent },
@@ -135,16 +146,6 @@ const routes: Routes = [
           { path: 'addExercise', component: AddExerciseComponent }
         ]
       },
-      {
-        path: 'nutrition',
-        canActivate: [SubscriptionGuard],
-        data: { modules: 'nutrition' },
-        children: [
-          { path: 'nutritionplanlist', component: PlanListComponent },
-          { path: 'nutritionplandetails/:id', component: PlanDetailsComponent },
-          { path: 'nutritionplainadmin', component: AdminDashboardComponent }
-        ]
-      },
       {path:'medicalRecord',
         children: [
           {
@@ -156,6 +157,59 @@ const routes: Routes = [
             component:MedicalRecordComponent ,
           },
         ]},
+        // nutrition 
+        {path:'nutrition',
+          children: [
+            {
+              path:'admin-dashboard',
+              component:AdminDashboardComponent,
+            },
+            {
+              path:'plan-details',
+              component:PlanDetailsComponent ,
+            },
+            {
+              path:'plan-list',
+              component:PlanListComponent ,
+            }
+          ]},
+          
+  
+          // Paramedical
+          {path:'paramedical-care',
+          children: [
+            {
+              path:'appointment-form',
+              component:AppointmentFormComponent,
+            },
+            {
+              path:'appointment',
+              component:AppointmentsComponent ,
+            },
+            {
+              path:'nearby-professionals',
+              component:NearbyProfessionalsComponent ,
+            },
+            {
+              path:'paramedical-map',
+              component:ParamedicalMapComponent ,
+            },
+            {
+              path:'professional-detail',
+              component:ProfessionalDetailComponent ,
+            },
+            {
+              path:'professional-form',
+              component:ProfessionalFormComponent ,
+            },
+            {
+              path:'professional-list',
+              component:ProfessionalListComponent ,
+            }
+          ]},
+  
+  
+  
       // Gold Plan Features
       
       { 

@@ -1,0 +1,63 @@
+<div class="appointment-form-wrapper mt-3">
+  <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="elderId" class="form-label">Elder ID *</label>
+      <input
+        type="text"
+        id="elderId"
+        formControlName="elderId"
+        class="form-control"
+        [class.is-invalid]="appointmentForm.get('elderId')?.invalid && appointmentForm.get('elderId')?.touched"
+      >
+      <div class="invalid-feedback" *ngIf="appointmentForm.get('elderId')?.errors?.['required']">
+        Elder ID is required
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="appointmentTime" class="form-label">Appointment Date & Time *</label>
+      <input
+        type="datetime-local"
+        id="appointmentTime"
+        formControlName="appointmentTime"
+        class="form-control"
+        [class.is-invalid]="appointmentForm.get('appointmentTime')?.invalid && appointmentForm.get('appointmentTime')?.touched"
+      >
+      <div class="invalid-feedback" *ngIf="appointmentForm.get('appointmentTime')?.errors?.['required']">
+        Appointment time is required
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input
+        type="text"
+        id="location"
+        formControlName="location"
+        class="form-control"
+        placeholder="Where will the appointment take place?"
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="notes" class="form-label">Notes</label>
+      <textarea
+        id="notes"
+        formControlName="notes"
+        class="form-control"
+        rows="3"
+        placeholder="Any additional information or special requirements"
+      ></textarea>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary w-100"
+      [disabled]="appointmentForm.invalid || submitting"
+    >
+      <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" *ngIf="submitting"></span>
+      Schedule Appointment
+    </button>
+  </form>
+</div>
+

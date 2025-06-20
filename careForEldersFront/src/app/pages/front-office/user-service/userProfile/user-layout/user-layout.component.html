@@ -21,8 +21,19 @@
         <li>
           <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isPlanMenuOpen }">Nutrition</a>
           <ul *ngIf="inNutritionmenu">
-            <li><a  routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
-            <li><a  routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
+            <li><a routerLink="/user/userProfile/nutrition/admin-dashboard" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+            <li><a routerLink="/user/userProfile/nutrition/list" routerLinkActive="active">Nutrition Plans List</a></li>
+            <li><a routerLink="/user/userProfile/nutrition/plan-generator" routerLinkActive="active">Nutrition Plan Generator</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <a (click)="toggleParamedicalMenu()" [ngClass]="{ active: isParamedicalMenuOpen }">Paramedical Care</a>
+          <ul *ngIf="inParamedicalMenu">
+            <li><a routerLink="/user/userProfile/paramedical-care/professional-list" routerLinkActive="active">Professional List</a></li>
+            <li><a routerLink="/user/userProfile/paramedical-care/appointment" routerLinkActive="active">Appointments</a></li>
+            <li><a routerLink="/user/userProfile/paramedical-care/paramedical-map" routerLinkActive="active">Paramedical Map</a></li>
           </ul>
         </li>
       </ul>

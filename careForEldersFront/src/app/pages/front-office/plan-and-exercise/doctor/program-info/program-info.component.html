@@ -106,7 +106,7 @@
                         </mat-list-item>
                         <mat-list-item *ngIf="exercise.equipmentNeeded && exercise.equipmentNeeded.length > 0">
                           <mat-icon matListItemIcon>fitness_center</mat-icon>
-                          Equipment: {{ exercise.equipmentNeeded?.join(', ') || 'None' }}
+                          Equipment: {{ exercise.equipmentNeeded.join(', ') || 'None' }}
                         </mat-list-item>
                          <mat-list-item *ngIf="exercise.videoTutorialUrl && !exercise.safeVideoUrl">
                            <mat-icon matListItemIcon>videocam</mat-icon>

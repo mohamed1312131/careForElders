@@ -1,0 +1,169 @@
+<div class="container">
+    <div class="header">
+      <mat-icon class="header-icon">restaurant</mat-icon>
+      <h1>Hugging Face Nutrition Planner</h1>
+      <p>Generate AI-powered nutrition plans using Hugging Face models</p>
+    </div>
+  
+    <div class="content-grid">
+      <!-- Simple Form -->
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>person</mat-icon>
+            Patient Information
+          </mat-card-title>
+          <mat-card-subtitle>
+            Provide patient profile and medical conditions for AI generation
+          </mat-card-subtitle>
+        </mat-card-header>
+  
+        <mat-card-content>
+          <form [formGroup]="nutritionForm" (ngSubmit)="onSubmit()">
+            <!-- User Profile -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Patient Profile Description</mat-label>
+              <textarea 
+                matInput 
+                formControlName="userProfile"
+                placeholder="Describe the patient's general health, lifestyle, preferences, and any relevant background information..."
+                rows="5">
+              </textarea>
+              <mat-error *ngIf="userProfileControl?.hasError('required')">
+                Patient profile is required
+              </mat-error>
+              <mat-error *ngIf="userProfileControl?.hasError('minlength')">
+                Please provide more detailed information (minimum 10 characters)
+              </mat-error>
+            </mat-form-field>
+  
+            <!-- Medical Conditions -->
+            <div class="section">
+              <h3>Medical Conditions *</h3>
+
+            <!-- Dietary Preferences -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Dietary Preferences</mat-label>
+              <input matInput formControlName="dietaryPreferences" placeholder="e.g. Vegetarian, Low Sodium, Gluten-Free">
+            </mat-form-field>
+
+            <!-- Allergies -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Allergies</mat-label>
+              <input matInput formControlName="allergies" placeholder="e.g. Peanuts, Dairy, Shellfish">
+            </mat-form-field>
+
+            <!-- Target Calories -->
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Target Calories</mat-label>
+              <input matInput type="number" formControlName="targetCalories" min="0" placeholder="e.g. 1800">
+            </mat-form-field>
+
+            <!-- Plan Duration -->
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Plan Duration (days)</mat-label>
+              <input matInput type="number" formControlName="planDuration" min="1" placeholder="e.g. 30">
+            </mat-form-field>
+
+            <!-- Email Reminders -->
+            <mat-slide-toggle formControlName="emailReminders" color="primary">
+              Enable Email Reminders
+            </mat-slide-toggle>
+
+            <!-- Snack Times -->
+            <div class="section">
+              <h3>Snack Times</h3>
+              <div formArrayName="snackTimes">
+                <div *ngFor="let snackCtrl of snackTimesArray.controls; let i = index" class="snack-time-row">
+                  <mat-form-field appearance="outline" class="snack-time-field">
+                    <mat-label>Snack Time {{ i + 1 }}</mat-label>
+                    <input matInput type="time" [formControlName]="i">
+                  </mat-form-field>
+                  <button mat-icon-button color="warn" (click)="removeSnackTime(i)" type="button">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+                <button mat-stroked-button color="accent" (click)="addSnackTime()" type="button">
+                  <mat-icon>add</mat-icon> Add Snack Time
+                </button>
+              </div>
+            </div>
+              <p class="section-description">Select all applicable medical conditions for AI-powered recommendations</p>
+              <div class="checkbox-grid">
+                <mat-checkbox 
+                  *ngFor="let condition of medicalConditionOptions"
+                  [checked]="isConditionSelected(condition)"
+                  (change)="onMedicalConditionChange(condition, $event.checked)">
+                  {{ condition }}
+                </mat-checkbox>
+              </div>
+              <div class="error-message" *ngIf="medicalConditionsArray.length === 0 && nutritionForm.touched">
+                Please select at least one medical condition
+              </div>
+            </div>
+  
+            <!-- Action Buttons -->
+            <div class="button-group">
+              <button 
+                mat-raised-button 
+                color="primary" 
+                type="submit"
+                [disabled]="isLoading"
+                class="generate-button">
+                <mat-icon *ngIf="!isLoading">smart_toy</mat-icon>
+                <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+                {{ isLoading ? 'Generating with Hugging Face AI...' : 'Generate with Hugging Face AI' }}
+              </button>
+  
+              <button 
+                mat-stroked-button 
+                type="button"
+                (click)="clearForm()"
+                [disabled]="isLoading">
+                <mat-icon>clear</mat-icon>
+                Clear Form
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Generated Plan Display -->
+      <mat-card class="plan-card">
+        <mat-card-header>
+          <mat-card-title class="plan-title">
+            <span>🤗 Hugging Face Generated Plan</span>
+            <button 
+              *ngIf="nutritionPlan" 
+              mat-icon-button 
+              (click)="downloadPlan()"
+              matTooltip="Download Plan">
+              <mat-icon>download</mat-icon>
+            </button>
+          </mat-card-title>
+          <mat-card-subtitle>
+            AI-generated nutrition plan powered by Hugging Face models
+          </mat-card-subtitle>
+        </mat-card-header>
+  
+        <mat-card-content>
+          <div *ngIf="nutritionPlan; else emptyState" class="plan-content">
+            <pre>{{ nutritionPlan }}</pre>
+          </div>
+  
+          <ng-template #emptyState>
+            <div class="empty-state">
+              <mat-icon>smart_toy</mat-icon>
+              <h3>Ready for AI Generation</h3>
+              <p>Fill out the patient information and click "Generate with Hugging Face AI" to create a personalized nutrition plan.</p>
+              <div class="ai-info">
+                <mat-icon>info</mat-icon>
+                <span>Powered by Hugging Face DialoGPT-large model</span>
+              </div>
+            </div>
+          </ng-template>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  

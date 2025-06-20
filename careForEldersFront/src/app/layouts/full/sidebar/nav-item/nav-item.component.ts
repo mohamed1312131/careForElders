@@ -27,9 +27,12 @@ export class AppNavItemComponent implements OnChanges {
 
   onItemSelected(item: NavItem) {
     if (!item.children || !item.children.length) {
-      this.router.navigate([item.route]);
+      if (item.route && item.route.startsWith('/user/userProfile/nutrition/')) {
+        this.router.navigateByUrl(item.route);
+      } else {
+        this.router.navigate([item.route]);
+      }
     }
-
     // scroll
     document.querySelector('.page-wrapper')?.scroll({
       top: 0,

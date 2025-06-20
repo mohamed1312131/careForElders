@@ -24,6 +24,10 @@ export class PlanDetailsComponent implements OnInit {
     if (id) {
       this.nutritionService.getPlanById(id).subscribe({
         next: (plan) => {
+          // Ensure comments is an array of objects, not strings
+          if (plan && Array.isArray(plan.comments)) {
+            plan.comments = plan.comments.map(c => typeof c === 'string' ? { comment: c } : c);
+          }
           this.plan = plan;
           this.loading = false;
         },
@@ -58,9 +62,12 @@ export class PlanDetailsComponent implements OnInit {
 
   addComment(): void {
     if (!this.plan || !this.newComment.trim()) return;
-
     this.nutritionService.addComment(this.plan.id, this.newComment).subscribe({
       next: (updatedPlan) => {
+        // Ensure comments is always array of objects
+        if (updatedPlan && Array.isArray(updatedPlan.comments)) {
+          updatedPlan.comments = updatedPlan.comments.map(c => typeof c === 'string' ? { comment: c } : c);
+        }
         this.plan = updatedPlan;
         this.newComment = '';
         this.showCommentForm = false;

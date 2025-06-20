@@ -22,6 +22,7 @@ export class PlanListComponent implements OnInit {
   loadPlans(): void {
     this.nutritionService.getAllPlans().subscribe({
       next: (plans) => {
+        console.log('Fetched plans:', plans); // Debug log
         this.plans = plans;
         this.filteredPlans = [...plans];
       },
