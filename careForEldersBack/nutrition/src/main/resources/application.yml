@@ -24,7 +24,7 @@ eureka:
 
 huggingface:
   api:
-    token: PLACEHOLDER # ✅ FIX 2: Remove 'Bearer' prefix
+    token: hf_token_change_here # ✅ FIX 2: Remove 'Bearer' prefix
     # ✅ REQUIRED: Mail configuration for JavaMailSender bean
     mail:
       host: smtp.gmail.com
