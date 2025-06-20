@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   service-registry:
-    build: ./service-registry
-    container_name: service-registry
+    image: azizlachkar/service-registry:latest
     ports:
       - "8761:8761"
     networks:
@@ -11,56 +10,46 @@ services:
     restart: always
 
   api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
+    image: azizlachkar/api-gateway:latest
     ports:
       - "8080:8080"
-    networks:
-      - microservices-network
     depends_on:
       - service-registry
+    networks:
+      - microservices-network
     restart: always
 
   user-service:
-    build: ./user-service
-    container_name: user-service
+    image: azizlachkar/user-service:latest
     ports:
       - "8081:8081"
-    networks:
-      - microservices-network
     depends_on:
       - service-registry
+    networks:
+      - microservices-network
     restart: always
     environment:
       - MONGO_URI=mongodb://mongodb:27017/userdb
       - JWT_SECRET=mysecretkeymysecretkeymysecretkey!
-
-      # ✅ Gmail credentials (App Password)
       - MAIL_USERNAME=aziz88303@gmail.com
       - MAIL_PASSWORD=raaufypwkwoqerca
-
-      # ✅ Twilio credentials (real values)
       - TWILIO_ACCOUNT_SID=ACcd31372ca9e785d6a1d9015aa7bab5b9
       - TWILIO_AUTH_TOKEN=9101629a5e87ecb0e817f1b365c851a3
       - TWILIO_PHONE_NUMBER=+15674065065
-
-      # ✅ Google OAuth2
       - GOOGLE_CLIENT_ID=514678328805-t37tceg3kfq3q5vjr56gnv689dn74rmm.apps.googleusercontent.com
       - GOOGLE_CLIENT_SECRET=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
-
-      # ✅ Facebook OAuth2 (these were not set in your Docker config)
       - FACEBOOK_CLIENT_ID=YOUR_FB_CLIENT_ID
       - FACEBOOK_CLIENT_SECRET=YOUR_FB_CLIENT_SECRET
+
   plan-and-exercise:
-    build: ./planAndExercise
-    container_name: plan-and-exercise
+    image: azizlachkar/plan-and-exercise:latest
     ports:
       - "8091:8091"
-    networks:
-      - microservices-network
     depends_on:
       - service-registry
       - mongodb
+    networks:
+      - microservices-network
     restart: always
     environment:
       - MONGO_URI=mongodb://mongodb:27017/planAndExercise
@@ -68,7 +57,6 @@ services:
 
   mongodb:
     image: mongo:latest
-    container_name: mongodb
     ports:
       - "27017:27017"
     volumes:

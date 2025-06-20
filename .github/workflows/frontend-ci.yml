@@ -38,34 +38,69 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Configure Maven to use Nexus
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOF > ~/.m2/settings.xml
+          <settings>
+            <servers>
+              <server>
+                <id>nexus</id>
+                <username>${{ secrets.NEXUS_USERNAME }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
+              </server>
+            </servers>
+            <mirrors>
+              <mirror>
+                <id>nexus</id>
+                <mirrorOf>*</mirrorOf>
+                <url>${{ secrets.NEXUS_URL }}/repository/maven-public/</url>
+              </mirror>
+            </mirrors>
+          </settings>
+          EOF
+
       - name: Build Backend Services (Maven)
         working-directory: careForEldersBack
         run: mvn clean install -pl user-service,planAndExercise,service-registry,api-gateway -am -DskipTests
 
-
-      - name: Docker Login
+      # ========== DOCKER LOGIN ==========
+      - name: Docker Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # --- Push All Docker Images ---
-      - name: Push Frontend Image
+      - name: Docker Login to Nexus
+        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login ${{ secrets.NEXUS_URL }}:5000 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
+
+      # ========== PUSH DOCKER IMAGES ==========
+      ## FRONTEND
+      - name: Push Frontend Image to DockerHub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/carefrontend
 
+      ## BACKEND: DockerHub and Nexus
       - name: Build + Push user-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service ./careForEldersBack/user-service
           docker push ${{ secrets.DOCKER_USERNAME }}/user-service
+          docker tag ${{ secrets.DOCKER_USERNAME }}/user-service ${{ secrets.NEXUS_URL }}:5000/user-service
+          docker push ${{ secrets.NEXUS_URL }}:5000/user-service
 
       - name: Build + Push planAndExercise
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise ./careForEldersBack/planAndExercise
           docker push ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise
+          docker tag ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise ${{ secrets.NEXUS_URL }}:5000/plan-and-exercise
+          docker push ${{ secrets.NEXUS_URL }}:5000/plan-and-exercise
 
       - name: Build + Push api-gateway
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/api-gateway ./careForEldersBack/api-gateway
           docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway
+          docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway ${{ secrets.NEXUS_URL }}:5000/api-gateway
+          docker push ${{ secrets.NEXUS_URL }}:5000/api-gateway
 
       - name: Build + Push service-registry
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/service-registry ./careForEldersBack/service-registry
           docker push ${{ secrets.DOCKER_USERNAME }}/service-registry
+          docker tag ${{ secrets.DOCKER_USERNAME }}/service-registry ${{ secrets.NEXUS_URL }}:5000/service-registry
+          docker push ${{ secrets.NEXUS_URL }}:5000/service-registry
