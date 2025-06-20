@@ -15,7 +15,7 @@ public class OtpService {
     public String generateAndSendOtp(String phoneNumber, SmsService smsService) {
         String otp = String.format("%06d", new Random().nextInt(999999));
         otpStorage.put(phoneNumber, otp);
-        smsService.sendSms(phoneNumber, "Your OTP is: " + otp);
+       // smsService.sendSms(phoneNumber, "Your OTP is: " + otp);
         return otp;
     }
 

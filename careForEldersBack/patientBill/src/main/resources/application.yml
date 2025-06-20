@@ -6,6 +6,11 @@ spring:
     name: patientBill
   data:
     uri: mongodb://localhost:27017/patientbill
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    time-zone: UTC
 
 # use this while running with locally
 eureka:
