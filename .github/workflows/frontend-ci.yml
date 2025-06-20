@@ -38,23 +38,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Configure Maven to use Nexus
+      - name: Configure Maven to use Maven Central
         run: |
           mkdir -p ~/.m2
           cat <<EOF > ~/.m2/settings.xml
           <settings>
-            <servers>
-              <server>
-                <id>nexus</id>
-                <username>${{ secrets.NEXUS_USERNAME }}</username>
-                <password>${{ secrets.NEXUS_PASSWORD }}</password>
-              </server>
-            </servers>
             <mirrors>
               <mirror>
-                <id>nexus</id>
+                <id>central</id>
                 <mirrorOf>*</mirrorOf>
-                <url>${{ secrets.NEXUS_URL }}/repository/maven-public/</url>
+                <url>https://repo.maven.apache.org/maven2/</url>
               </mirror>
             </mirrors>
           </settings>
