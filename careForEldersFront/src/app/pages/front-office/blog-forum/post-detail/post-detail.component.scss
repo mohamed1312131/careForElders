@@ -516,6 +516,7 @@
   }
 }
 
+<<<<<<< HEAD
 // Enhanced transcript container styles
 .transcript-container {
   margin: 16px 0;
@@ -584,19 +585,17 @@
 }
 
 // Enhance the loading-comments class
+=======
+>>>>>>> 452112002552d9dcee910613e1f41011dfcc4891
 .loading-comments {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  padding: 20px;
   
   span {
-    margin-left: 12px;
+    margin-left: 8px;
     color: #6c757d;
-    font-weight: 500;
   }
 }
 

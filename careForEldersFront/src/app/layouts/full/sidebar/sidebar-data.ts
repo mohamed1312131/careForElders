@@ -30,7 +30,17 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Badge',
     iconName: 'rosette',
-    route: '/ui-components/badge',
+    route: 'admin/ui-components/badge',
+  },
+  {
+    displayName: 'Reservation',
+    iconName: 'rosette',
+    route: '/admin/ui-components/Reservation',
+  },
+  {
+    displayName: 'Abonnement',
+    iconName: 'rosette',
+    route: '/admin/ui-components/Abonnement',
   },
   {
     displayName: 'Chips',
@@ -45,7 +55,7 @@ export const navItems: NavItem[] = [
   {
     displayName: 'Menu',
     iconName: 'layout-navbar-expand',
-    route: '/ui-components/menu',
+    route: 'admin/ui-components/menu',
   },
   {
     displayName: 'Tooltips',

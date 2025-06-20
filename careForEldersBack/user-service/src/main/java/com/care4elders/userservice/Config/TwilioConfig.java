@@ -1,6 +1,6 @@
 package com.care4elders.userservice.Config;
 
-import com.twilio.Twilio;
+//import com.twilio.Twilio;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

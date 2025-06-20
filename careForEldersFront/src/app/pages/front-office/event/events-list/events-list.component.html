@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+</head>
+
+<body >
+  
+<div class="events-container" >
+
+    <div class="header-container">
+      <div class="header-content">
+        <h1 class="page-title" >Events Management</h1>
+        <button (click)="openCreateModal()" class="primary-button" *ngIf="!isLoading && !error" >
+          <i class="fas fa-plus"></i> Add New Event
+        </button>
+        <!-- Create Event Modal -->
+        <div *ngIf="showCreateModal" class="modal-overlay">
+          <div class="modal-container">
+            <div class="modal-header">
+              <h2>Create New Event</h2>
+              <button (click)="closeModal()" class="close-button">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+                <div class="form-group">
+                  <label for="title">Event Title</label>
+                  <input id="title" type="text" formControlName="title" required>
+                  <div *ngIf="eventForm.get('title')?.errors && eventForm.get('title')?.touched" class="error-message">
+                    <span *ngIf="eventForm.get('title')?.errors?.['required']">Title is required</span>
+                    <span *ngIf="eventForm.get('title')?.errors?.['minlength']">
+                      Title must be at least 3 characters
+                    </span>
+                    <span *ngIf="eventForm.get('title')?.errors?.['maxlength']">
+                      Title cannot exceed 100 characters
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="date">Date & Time</label>
+                  <input id="date" type="datetime-local" formControlName="date" required>
+                  <div *ngIf="eventForm.get('date')?.errors && eventForm.get('date')?.touched" class="error-message">
+                    <span *ngIf="eventForm.get('date')?.errors?.['required']">Date is required</span>
+                    <span *ngIf="eventForm.get('date')?.errors?.['pastDate']">
+                      Event date must be in the future
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="location">Location</label>
+                  <input id="location" type="text" formControlName="location" required>
+                  <div *ngIf="eventForm.get('location')?.errors && eventForm.get('location')?.touched"
+                    class="error-message">
+                    <span *ngIf="eventForm.get('location')?.errors?.['required']">Location is required</span>
+                    <span *ngIf="eventForm.get('location')?.errors?.['minlength']">
+                      Location must be at least 3 characters
+                    </span>
+                    <span *ngIf="eventForm.get('location')?.errors?.['maxlength']">
+                      Location cannot exceed 100 characters
+                    </span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="description">Description</label>
+                  <textarea id="description" formControlName="description" rows="3"></textarea>
+                  <div *ngIf="eventForm.get('description')?.errors" class="error-message">
+                    <span *ngIf="eventForm.get('description')?.errors?.['maxlength']">
+                      Description cannot exceed 500 characters
+                    </span>
+                  </div>
+                  <div class="character-counter">
+                    {{ eventForm.get('description')?.value?.length || 0 }}/500
+                  </div>
+                </div>
+
+
+                <div class="form-group">
+                  <mat-label>Select Participants</mat-label>
+                  <mat-select multiple [(ngModel)]="selectedParticipants" formControlName="participants">
+                    <mat-option *ngFor="let user of allUsers" [value]="user.id">
+                      {{ user.name }}
+                    </mat-option>
+                  </mat-select>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button" (click)="closeModal()" class="cancel-button">Cancel</button>
+                  <button type="submit" class="primary-button" [disabled]="eventForm.invalid">Create Event</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="spinner-container">
+        <div class="spinner"></div>
+        <p>Loading events...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <div class="error-content">
+        <div class="error-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="error-message">
+          <h3>Something went wrong</h3>
+          <p>{{ error }}</p>
+        </div>
+        <button (click)="loadEvents()" class="primary-button">
+          <i class="fas fa-sync-alt"></i> Try Again
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !error && events.length === 0" class="empty-state">
+      <div class="empty-content">
+        <div class="empty-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <h3>No Events Found</h3>
+        <p>There are currently no events scheduled.</p>
+
+        <button (click)="openCreateModal()" class="primary-button" *ngIf="!isLoading && !error" >
+          <i class="fas fa-plus"></i> Create Your First Event
+        </button>
+      </div>
+    </div>
+
+    <!-- Events Grid -->
+    <div *ngIf="!isLoading && !error && events.length > 0" class="events-grid">
+      <div *ngFor="let event of events" class="event-card">
+        <div class="card-header">
+          <div class="event-badge">
+            <span>{{ event.participantIds.length || 0 }}</span>
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="event-title">
+            <h3>{{ event.title }}</h3>
+            <div class="event-actions">
+              <button (click)="openUpdateModal(event)" class="icon-button edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button (click)="deleteEvent(event.id!)" class="icon-button delete">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="event-details">
+            <div class="detail-item">
+              <i class="fas fa-calendar-day"></i>
+              <span>{{ formatDate(event.date) }}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{ event.location }}</span>
+            </div>
+          </div>
+
+          <div class="event-description">
+            <p>{{ event.description }}</p>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <a (click)="openDetailsModal(event)" class="view-details">
+            View Details <i class="fas fa-chevron-right"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- Details Modal -->
+  <div *ngIf="showDetailsModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-container">
+          <h2 class="modal-title">{{ currentEvent?.title }}</h2>
+
+        </div>
+        <button (click)="closeModal()" class="close-button">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="currentEvent">
+        <div class="event-details-grid">
+          <!-- Date -->
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-calendar-day"></i>
+            </div>
+            <div class="detail-content">
+              <h3 class="detail-label">Date & Time</h3>
+              <p class="detail-value">{{ formatDate(currentEvent.date) }}</p>
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div class="detail-card">
+            <div class="detail-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="detail-content">
+              <h3 class="detail-label">Location</h3>
+              <p class="detail-value">{{ currentEvent.location }}</p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="detail-card full-width">
+            <div class="detail-icon">
+              <i class="fas fa-align-left"></i>
+            </div>
+            <div class="detail-content">
+              <h3 class="detail-label">Description</h3>
+              <p class="detail-value">{{ currentEvent.description }}</p>
+            </div>
+          </div>
+
+          <!-- Participants -->
+          <div class="detail-card full-width">
+            <div class="detail-icon">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="detail-content">
+              <h3 class="detail-label">Participants ({{ currentEvent.participantIds.length }})</h3>
+              <div class="participants-list">
+                <div *ngFor="let participantId of currentEvent.participantIds" class="participant-item">
+                  <div class="participant-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="participant-info">
+                    <span class="participant-name">{{ getUserName(participantId) }}</span>
+                    <span class="participant-role">{{ getUserById(participantId)?.role || 'Participant' }}</span>
+                  </div>
+                </div>
+                <div *ngIf="currentEvent.participantIds.length === 0" class="no-participants">
+                  No participants registered yet
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button (click)="closeModal()" class="close-btn">
+          <i class="fas fa-times"></i> Close
+        </button>
+
+      </div>
+    </div>
+  </div>
+  <!-- Update Event Modal -->
+  <div *ngIf="showUpdateModal" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h2>Update Event</h2>
+        <button (click)="closeModal()" class="close-button">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+<form [formGroup]="updateEventForm" (ngSubmit)="onUpdateSubmit()">
+  <div class="form-group">
+    <label for="update-title">Event Title</label>
+    <input id="update-title" type="text" formControlName="title" required>
+    <div *ngIf="updateEventForm.get('title')?.errors && updateEventForm.get('title')?.touched" class="error-message">
+      <span *ngIf="updateEventForm.get('title')?.errors?.['required']">Title is required</span>
+      <span *ngIf="updateEventForm.get('title')?.errors?.['minlength']">
+        Title must be at least 3 characters
+      </span>
+      <span *ngIf="updateEventForm.get('title')?.errors?.['maxlength']">
+        Title cannot exceed 100 characters
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="update-date">Date & Time</label>
+    <input id="update-date" type="datetime-local" formControlName="date" required>
+    <div *ngIf="updateEventForm.get('date')?.errors && updateEventForm.get('date')?.touched" class="error-message">
+      <span *ngIf="updateEventForm.get('date')?.errors?.['required']">Date is required</span>
+      <span *ngIf="updateEventForm.get('date')?.errors?.['pastDate']">
+        Event date must be in the future
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="update-location">Location</label>
+    <input id="update-location" type="text" formControlName="location" required>
+    <div *ngIf="updateEventForm.get('location')?.errors && updateEventForm.get('location')?.touched" class="error-message">
+      <span *ngIf="updateEventForm.get('location')?.errors?.['required']">Location is required</span>
+      <span *ngIf="updateEventForm.get('location')?.errors?.['minlength']">
+        Location must be at least 3 characters
+      </span>
+      <span *ngIf="updateEventForm.get('location')?.errors?.['maxlength']">
+        Location cannot exceed 100 characters
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="update-description">Description</label>
+    <textarea id="update-description" formControlName="description" rows="3"></textarea>
+    <div *ngIf="updateEventForm.get('description')?.errors" class="error-message">
+      <span *ngIf="updateEventForm.get('description')?.errors?.['maxlength']">
+        Description cannot exceed 500 characters
+      </span>
+    </div>
+    <div class="character-counter">
+      {{ updateEventForm.get('description')?.value?.length || 0 }}/500
+    </div>
+  </div>
+
+  <div class="form-group">
+    <mat-label>Select Participants</mat-label>
+    <mat-select multiple [(value)]="selectedParticipantsForUpdate"
+      (selectionChange)="onParticipantSelectionChange($event)">
+      <mat-option *ngFor="let user of allUsers" [value]="user.id">
+        {{ user.name }} ({{ user.role }})
+      </mat-option>
+    </mat-select>
+    <div *ngIf="updateEventForm.get('participants')?.errors" class="error-message">
+      <span *ngIf="updateEventForm.get('participants')?.errors?.['required']">
+        At least one participant is required
+      </span>
+    </div>
+  </div>
+  
+  <div class="modal-footer">
+    <button type="button" (click)="closeModal()" class="cancel-button">Cancel</button>
+    <button type="submit" class="primary-button" >Update Event</button>
+  </div>
+</form>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

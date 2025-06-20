@@ -48,34 +48,20 @@ export class ProgramService {
     );
   }
   startDay(assignmentId: string, dayNumber: number, userId: string): Observable<any> {
-  const headers = new HttpHeaders().set('X-User-ID', userId);
-  return this.http.post(
-    `${this.apiUrl2}/${assignmentId}/start-day/${dayNumber}`,
-    {}, // empty body
-    { headers }
-  );
-}
-  createProgram(programDto: any, imageFile: File | null, doctorId: string): Observable<any> {
-  const formData = new FormData();
-  
-  // Append program data as JSON blob
-  formData.append('program', new Blob([JSON.stringify(programDto)], {
-    type: 'application/json'
-  }));
-  
-  // Append image file if exists
-  if (imageFile) {
-    formData.append('image', imageFile);
+    const headers = new HttpHeaders().set('X-User-ID', userId);
+    return this.http.post(
+      `${this.apiUrl2}/${assignmentId}/start-day`,
+      { dayNumber },
+      { headers }
+    );
   }
-  
-  const headers = new HttpHeaders().set('X-User-ID', doctorId);
-  
-  return this.http.post<any>(
-    `${this.apiUrl}/create`,
-    formData,
-    { headers }
-  );
-}
+  createProgram(programDto: any, doctorId: string): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrl}/create`,
+      programDto,
+      { headers: new HttpHeaders().set('X-User-ID', doctorId) }
+    );
+  }
 
   getAllExercises(): Observable<any[]> {
     return this.http.get<any[]>(`${this.exerciseUrl}/getAllExercises`);
@@ -84,17 +70,9 @@ export class ProgramService {
     return this.http.get<any[]>(`${this.apiUrl}/getAllPrograms`);
   }
   
-deleteProgram(programId: string, doctorId: string): Observable<void> {
-  const headers = new HttpHeaders().set('X-User-ID', doctorId);
-  return this.http.delete<void>(`${this.apiUrl}/deleteById/${programId}`, { headers });
-}
-
-unassignProgramFromPatient(programId: string, patientId: string, doctorId: string): Observable<any> {
-  return this.http.delete(`${this.apiUrl}/programs/${programId}/patients/${patientId}`, {
-    headers: new HttpHeaders({ 'doctor-id': doctorId })
-  });
-}
-
+  deleteProgram(programId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/deleteById/${programId}`);
+  }
 
   getProgramDetails(programId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/getProgramDetails/${programId}`);
@@ -175,29 +153,6 @@ addDayToProgram(programId: string, dayData: any, doctorId: string): Observable<a
     `${this.apiUrl}/${programId}/days`,
     dayData,
     { headers }
-  );
-}
-getUnassignedPatientsForProgram(programId: string): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl}/${programId}/unassigned-patients`);
-}
-getRecommendedPrograms(userId: string): Observable<any[]> {
-  const headers = new HttpHeaders().set('X-User-ID', userId);
-  return this.http.get<any[]>(`${this.apiUrl}/recommendations`, { headers });
-}
-selfAssignProgram(programId: string, userId: string): Observable<any> {
-  const headers = new HttpHeaders().set('X-User-ID', userId);
-  return this.http.post<any>(
-    `${this.apiUrl2}/self-assign?programId=${programId}`,
-    {}, // empty body since we're using query param
-    { headers }
-  );
-}
-getProgramStatistics(programId: string): Observable<any> {
-  return this.http.get<any>(`${this.apiUrl}/${programId}/statistics`);
-}
-getPatientAssignmentDetails(programId: string, patientId: string): Observable<any> {
-  return this.http.get<any>(
-    `${this.apiUrl2}/program/${programId}/patient/${patientId}`
   );
 }
 }

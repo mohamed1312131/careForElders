@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserProgramInfoComponent } from './user-program-info.component';
+import { AbonnementAdminComponent } from './abonnement-admin.component';
 
-describe('UserProgramInfoComponent', () => {
-  let component: UserProgramInfoComponent;
-  let fixture: ComponentFixture<UserProgramInfoComponent>;
+describe('AbonnementAdminComponent', () => {
+  let component: AbonnementAdminComponent;
+  let fixture: ComponentFixture<AbonnementAdminComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserProgramInfoComponent]
+      imports: [AbonnementAdminComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(UserProgramInfoComponent);
+    fixture = TestBed.createComponent(AbonnementAdminComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

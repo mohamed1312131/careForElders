@@ -1,13 +1,5 @@
+<!-- user-pe.component.html -->
 <div class="workout-card" (click)="navigateToDetails()">
-  
-  <!-- Progress Bar -->
-  <div class="progress-bar-container">
-    <div 
-      class="progress-bar-fill" 
-      [style.width.%]="program.completionPercentage">
-    </div>
-  </div>
-
   <div class="card-content" [style.background-color]="'#D3D3D3'">
     <div class="card-info">
       <div class="difficulty">
@@ -24,11 +16,7 @@
     </div>
 
     <div class="card-image">
-      <img 
-        [src]="program.programImage || 'assets/default-workout.png'" 
-        alt="Workout illustration"
-        (error)="onImageError($event)"
-      >
+      <img src="assets/default-workout.png" alt="Workout illustration">
     </div>
   </div>
 </div>

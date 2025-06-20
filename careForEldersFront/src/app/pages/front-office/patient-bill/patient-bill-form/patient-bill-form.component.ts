@@ -16,8 +16,9 @@ export class PatientBillFormComponent implements OnInit {
   isEditMode = false;
   isViewMode = false;
   billId: string | null = null;
-  originalBillData: any = null;
+  originalBillData: any = null; // Store original bill data
   
+  // Updated to match backend status values
   paymentStatuses = [
     { value: "PAID", viewValue: "Paid" },
     { value: "PENDING", viewValue: "Pending" },
@@ -25,6 +26,7 @@ export class PatientBillFormComponent implements OnInit {
     { value: "CANCELLED", viewValue: "Cancelled" },
   ];
   
+  // Service types from BillItem.ServiceType enum
   serviceTypes = [
     { value: "DOCTOR_CARE", viewValue: "Doctor Care" },
     { value: "PARA_MEDICAL_SERVICES", viewValue: "Para Medical Services" },
@@ -57,18 +59,12 @@ export class PatientBillFormComponent implements OnInit {
     if ((this.isEditMode || this.isViewMode) && this.billId) {
       this.loadBillData(this.billId);
     } else {
-      // For new bills, set default items based on service type
-      this.handleServiceTypeChange();
+      // Add default items for new bill
+      this.addDefaultItems();
     }
 
-    // Apply form restrictions based on mode
-    this.applyFormRestrictions();
-
-    // Listen for service type changes in create mode
-    if (!this.isEditMode && !this.isViewMode) {
-      this.billForm.get('serviceType')?.valueChanges.subscribe(serviceType => {
-        this.handleServiceTypeChange(serviceType);
-      });
+    if (this.isViewMode) {
+      this.billForm.disable();
     }
 
     // Calculate initial amounts for any existing items
@@ -81,13 +77,13 @@ export class PatientBillFormComponent implements OnInit {
 
   createBillForm(): FormGroup {
     return this.fb.group({
-      id: [""],
+      id: [""], // Add ID field to track the bill
       billNumber: [""],
       patientId: ["", Validators.required],
       patientName: ["", Validators.required],
       patientEmail: [""],
       patientPhone: [""],
-      serviceType: ["DOCTOR_CARE", Validators.required],
+      serviceType: ["DOCTOR_CARE", Validators.required], // Default to DOCTOR_CARE
       billDate: [new Date(), Validators.required],
       dueDate: [new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)],
       totalAmount: [{ value: 0, disabled: true }],
@@ -101,7 +97,7 @@ export class PatientBillFormComponent implements OnInit {
 
   createItemFormGroup(): FormGroup {
     return this.fb.group({
-      id: [null],
+      id: [null], // For existing items, null for new items
       serviceType: ["", Validators.required],
       description: ["", Validators.required],
       serviceCode: [""],
@@ -114,32 +110,18 @@ export class PatientBillFormComponent implements OnInit {
     });
   }
 
-  // New method to handle service type changes
-  handleServiceTypeChange(serviceType?: string): void {
-    const currentServiceType = serviceType || this.billForm.get('serviceType')?.value;
-    
+  addDefaultItems(): void {
     // Clear existing items
     while (this.items.length) {
       this.items.removeAt(0);
     }
 
-    // Add default items based on service type
-    if (currentServiceType === 'DOCTOR_CARE') {
-      this.addDoctorCareDefaultItem();
-    }
-    // For PARA_MEDICAL_SERVICES and SUBSCRIPTION, don't add any default items
-    
-    console.log(`Service type changed to: ${currentServiceType}`);
-    console.log(`Items count after change: ${this.items.length}`);
-  }
-
-  // New method to add default item for Doctor Care
-  addDoctorCareDefaultItem(): void {
+    // Add consultation item
     const consultationItem = this.createItemFormGroup();
     consultationItem.patchValue({
       serviceType: "DOCTOR_CARE",
-      description: "Medical Consultation Services",
-      serviceCode: "MED-CONSULT-01",
+      description: "Doctor Consultation",
+      serviceCode: "CONSULT-01",
       category: "Doctor Care",
       quantity: 1,
       unitPrice: 80,
@@ -148,39 +130,10 @@ export class PatientBillFormComponent implements OnInit {
     });
     this.items.push(consultationItem);
 
+    // Calculate amounts
     setTimeout(() => {
       this.calculateItemAmount(0);
     }, 100);
-  }
-
-  // Updated method - now conditional based on service type
-  addDefaultItems(): void {
-    const serviceType = this.billForm.get('serviceType')?.value || 'DOCTOR_CARE';
-    this.handleServiceTypeChange(serviceType);
-  }
-
-  // New method to apply form restrictions based on mode
-  applyFormRestrictions(): void {
-    if (this.isViewMode) {
-      // In view mode, disable all fields
-      this.billForm.disable();
-    } else if (this.isEditMode) {
-      // In edit mode, disable all fields except items
-      this.disableAllFieldsExceptItems();
-    }
-  }
-
-  // New method to disable all fields except items
-  disableAllFieldsExceptItems(): void {
-    // Disable all main form fields
-    Object.keys(this.billForm.controls).forEach(key => {
-      if (key !== 'items') {
-        this.billForm.get(key)?.disable();
-      }
-    });
-
-    // Keep items enabled for editing
-    this.items.enable();
   }
 
   get items(): FormArray {
@@ -188,47 +141,19 @@ export class PatientBillFormComponent implements OnInit {
   }
 
   addItem(): void {
-    // Only allow adding items if not in view mode
-    if (this.isViewMode) {
-      return;
-    }
-
     console.log("Adding new item...");
     const serviceType = this.billForm.get("serviceType")?.value || "DOCTOR_CARE";
     const newItem = this.createItemFormGroup();
     
-    // Set default values based on service type
-    let defaultDescription = "";
-    let defaultServiceCode = this.generateServiceCode();
-    let defaultUnitPrice = 0;
-
-    switch (serviceType) {
-      case "DOCTOR_CARE":
-        defaultDescription = "Medical Consultation Services";
-        defaultServiceCode = "MED-CONSULT-" + this.generateServiceCode().split('-')[1];
-        defaultUnitPrice = 80;
-        break;
-      case "PARA_MEDICAL_SERVICES":
-        defaultDescription = "";
-        defaultUnitPrice = 0;
-        break;
-      case "SUBSCRIPTION":
-        defaultDescription = "";
-        defaultUnitPrice = 0;
-        break;
-      default:
-        defaultDescription = "";
-        defaultUnitPrice = 0;
-    }
-    
+    // Set default values for new item
     newItem.patchValue({
-      id: null,
+      id: null, // Explicitly set to null for new items
       serviceType: serviceType,
-      description: defaultDescription,
-      serviceCode: defaultServiceCode,
+      description: "",
+      serviceCode: this.generateServiceCode(),
       category: this.getDisplayNameForServiceType(serviceType),
       quantity: 1,
-      unitPrice: defaultUnitPrice,
+      unitPrice: 0,
       unit: "Session",
       serviceDate: new Date(),
     });
@@ -236,16 +161,12 @@ export class PatientBillFormComponent implements OnInit {
     this.items.push(newItem);
     console.log("New item added. Total items:", this.items.length);
     
+    // Focus on the new item's description field
     setTimeout(() => {
       const newIndex = this.items.length - 1;
-      this.calculateItemAmount(newIndex);
-      
-      // Focus on the new item's description field if it's empty
-      if (!defaultDescription) {
-        const descriptionInput = document.querySelector(`input[formControlName="description"]:nth-of-type(${newIndex + 1})`);
-        if (descriptionInput) {
-          (descriptionInput as HTMLElement).focus();
-        }
+      const descriptionInput = document.querySelector(`input[formControlName="description"]:nth-of-type(${newIndex + 1})`);
+      if (descriptionInput) {
+        (descriptionInput as HTMLElement).focus();
       }
     }, 100);
   }
@@ -261,11 +182,6 @@ export class PatientBillFormComponent implements OnInit {
   }
 
   removeItem(index: number): void {
-    // Only allow removing items if not in view mode
-    if (this.isViewMode) {
-      return;
-    }
-
     if (this.items.length > 1) {
       console.log(`Removing item at index ${index}`);
       this.items.removeAt(index);
@@ -299,10 +215,9 @@ export class PatientBillFormComponent implements OnInit {
       total += quantity * unitPrice;
     }
 
-    // Update total amount
     this.billForm.get("totalAmount")?.setValue(total, { emitEvent: false });
     
-    // Calculate balance amount (total - paid)
+    // Calculate balance amount
     const paidAmount = Number(this.billForm.get("paidAmount")?.value) || 0;
     const balanceAmount = total - paidAmount;
     this.billForm.get("balanceAmount")?.setValue(balanceAmount, { emitEvent: false });
@@ -315,17 +230,19 @@ export class PatientBillFormComponent implements OnInit {
     this.patientBillService.getBillById(id).subscribe({
       next: (bill) => {
         console.log("Loaded bill data:", bill);
-        this.originalBillData = { ...bill };
+        this.originalBillData = { ...bill }; // Store original data
         
+        // Clear existing items
         while (this.items.length) {
           this.items.removeAt(0);
         }
 
+        // Add items from the bill
         if (bill.items && bill.items.length > 0) {
           bill.items.forEach((item: any) => {
             const itemGroup = this.createItemFormGroup();
             itemGroup.patchValue({
-              id: item.id,
+              id: item.id, // Keep the original item ID
               serviceType: item.serviceType || "DOCTOR_CARE",
               description: item.description || "",
               serviceCode: item.serviceCode || this.generateServiceCode(),
@@ -339,12 +256,13 @@ export class PatientBillFormComponent implements OnInit {
             this.items.push(itemGroup);
           });
         } else {
-          // If no items exist, add default items based on service type
-          this.handleServiceTypeChange(bill.serviceType);
+          // Add default items if none exist
+          this.addDefaultItems();
         }
 
+        // Set bill data - preserve the original ID
         this.billForm.patchValue({
-          id: bill.id,
+          id: bill.id, // Preserve the original bill ID
           billNumber: bill.billNumber || "",
           patientId: bill.patientId || "",
           patientName: bill.patientName || "",
@@ -360,9 +278,7 @@ export class PatientBillFormComponent implements OnInit {
           totalAmount: bill.totalAmount || 0,
         });
 
-        // Apply form restrictions after loading data
-        this.applyFormRestrictions();
-
+        // Recalculate totals to ensure consistency
         setTimeout(() => {
           this.calculateTotals();
         }, 100);
@@ -382,11 +298,6 @@ export class PatientBillFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    // Don't allow submission in view mode
-    if (this.isViewMode) {
-      return;
-    }
-
     if (this.billForm.invalid) {
       this.markFormGroupTouched(this.billForm);
       this.snackBar.open("Please fix the validation errors before submitting", "Close", {
@@ -398,8 +309,10 @@ export class PatientBillFormComponent implements OnInit {
 
     this.isLoading = true;
 
+    // Prepare bill data
     const formValue = this.billForm.getRawValue();
     
+    // For updates, preserve the original bill ID and number
     const billData = {
       id: this.isEditMode ? (this.billId || this.originalBillData?.id) : undefined,
       billNumber: this.isEditMode ? (this.originalBillData?.billNumber || formValue.billNumber) : formValue.billNumber,
@@ -416,7 +329,7 @@ export class PatientBillFormComponent implements OnInit {
       status: formValue.status,
       notes: formValue.notes || "",
       items: formValue.items.map((item: any) => ({
-        id: item.id,
+        id: item.id, // Keep existing ID for updates, null for new items
         serviceType: item.serviceType,
         description: item.description,
         serviceCode: item.serviceCode || this.generateServiceCode(),
@@ -430,8 +343,11 @@ export class PatientBillFormComponent implements OnInit {
     };
 
     console.log("Submitting bill data:", billData);
+    console.log("Is Edit Mode:", this.isEditMode);
+    console.log("Bill ID:", this.billId);
 
     try {
+      // If in edit mode, update the bill
       if (this.isEditMode && this.billId) {
         this.patientBillService.updateBill(this.billId, billData).subscribe({
           next: (response) => {
@@ -449,6 +365,7 @@ export class PatientBillFormComponent implements OnInit {
           },
         });
       } else {
+        // Create new bill
         this.patientBillService.createBill(billData).subscribe({
           next: (response) => {
             console.log("Bill created successfully:", response);
@@ -491,16 +408,6 @@ export class PatientBillFormComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(["/user/userProfile/bill"]);
-  }
-
-  // Helper method to check if form should be editable
-  isFormEditable(): boolean {
-    return !this.isViewMode;
-  }
-
-  // Helper method to check if items should be editable
-  areItemsEditable(): boolean {
-    return !this.isViewMode;
   }
 
   private markFormGroupTouched(formGroup: FormGroup) {

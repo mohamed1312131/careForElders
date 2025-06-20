@@ -7,10 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="api-gateway" />
+        <module name="patientBill" />
         <module name="config-server" />
         <module name="nutrition" />
         <module name="paramedicalCare" />
+        <module name="api-gateway" />
+        <module name="blogForum" />
+        <module name="nutrition-service" />
         <module name="service-registry" />
       </profile>
       <profile name="Annotation profile for care4elders" enabled="true">
@@ -20,12 +23,10 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
-        <module name="patientBill" />
         <module name="notification" />
         <module name="chat" />
         <module name="planAndExercise" />
         <module name="medicalRecord" />
-        <module name="blogForum" />
         <module name="appointmentAvailability" />
         <module name="subscription" />
         <module name="user-service" />
@@ -44,6 +45,7 @@
       <module name="medicalRecord" options="-parameters" />
       <module name="notification" options="-parameters" />
       <module name="nutrition" options="-parameters" />
+      <module name="nutrition-service" options="-parameters" />
       <module name="paramedicalCare" options="-parameters" />
       <module name="patientBill" options="-parameters" />
       <module name="planAndExercise" options="-parameters" />

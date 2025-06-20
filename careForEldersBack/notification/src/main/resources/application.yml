@@ -2,12 +2,43 @@ server:
   port: 8088
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: lindabenrhaiem@gmail.com     # Use your email
+    password: kooq qrxl fbhw txpi    # Use your app password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   application:
-    name: notification
+    name: notification-service
   data:
-    uri: mongodb://mongodb:27017/notification
+    mongodb:
+      uri: mongodb://localhost:27017/notification
 
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
+
+user:
+  service:
+    url: http://localhost:8081
+
+notification:
+  response-timeout: 10 # minutes
+resilience4j:
+  circuitbreaker:
+    instances:
+      userService:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10

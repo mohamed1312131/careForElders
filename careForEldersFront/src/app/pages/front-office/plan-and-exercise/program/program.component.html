@@ -1,4 +1,4 @@
-<div class="workout-screen">
+<div class="workout-screen" >
   <div class="workout-header">
     <div class="header-info">
       <span class="duration">{{ dayExercises?.totalDuration | number:'1.0-0' }} mins</span>
@@ -20,13 +20,9 @@
       <mat-expansion-panel-header class="workout-panel-header">
         <mat-panel-title class="panel-title">
           <div class="item-icon-container">
-            <!-- FIXED: Uncommented the image -->
-            <img [src]="exercise.imageUrl || 'assets/placeholder-exercise.png'" 
-                 class="exercise-image-thumbnail"
+            <!--<img [src]="exercise.imageUrl || 'assets/placeholder-exercise.png'" class="exercise-image-thumbnail"
                  alt="{{ exercise.name }} thumbnail"
-                 (error)="onImageError($event)"
-                 *ngIf="exercise.imageUrl">
-          </div> 
+                 (error)="$event.target.src='assets/placeholder-exercise.png'">--> </div> 
           <span class="exercise-name">{{ exercise.name }}</span>
         </mat-panel-title>
         <mat-panel-description class="panel-description">
@@ -48,35 +44,18 @@
           </span>
         </div>
         <div class="detail-item" *ngIf="exercise.equipmentNeeded">
-          <mat-icon class="detail-icon">construction</mat-icon> 
-          <strong>Equipment:</strong> {{ exercise.equipmentNeeded }}
+            <mat-icon class="detail-icon">construction</mat-icon> <strong>Equipment:</strong> {{ exercise.equipmentNeeded }}
         </div>
 
-        <!-- FIXED: Updated video handling for direct video files -->
         <div class="video-container" *ngIf="exercise.videoUrl">
-          <!-- For embeddable URLs (YouTube/Vimeo) -->
-          <iframe *ngIf="isEmbeddableVideo(exercise.videoUrl)" 
-                  width="100%" height="315"
+          <iframe width="100%" height="315"
                   [src]="getSafeVideoUrl(exercise.videoUrl)"
                   title="{{ exercise.name }} video"
                   frameborder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowfullscreen>
           </iframe>
-          
-          <!-- For direct video files (like Cloudinary) -->
-          <video *ngIf="!isEmbeddableVideo(exercise.videoUrl)" 
-                 width="100%" 
-                 height="315" 
-                 controls
-                 [poster]="exercise.imageUrl"
-                 preload="metadata">
-            <source [src]="exercise.videoUrl" type="video/mp4">
-            <p>Your browser doesn't support HTML5 video. 
-               <a [href]="exercise.videoUrl">Download the video</a> instead.</p>
-          </video>
         </div>
-        
         <div *ngIf="!exercise.videoUrl" class="no-video-placeholder">
           <mat-icon>videocam_off</mat-icon>
           <span>No video guide available for this exercise.</span>
@@ -94,12 +73,12 @@
   </ng-template>
 
   <div class="workout-footer">
-   <!-- <button mat-stroked-button color="primary"
+    <button mat-stroked-button color="primary"
             class="action-button"
             (click)="completeDay()"
             *ngIf="dayExercises?.status === 'IN_PROGRESS'">
       <mat-icon>check_circle_outline</mat-icon> Mark as Completed
-    </button> -->
+    </button>
 
     <button mat-flat-button color="accent"
             class="action-button start-workout-button"
@@ -111,7 +90,7 @@
   </div>
 
   <div *ngIf="isWorkoutActive" class="active-workout-indicator">
-    <p>Workout in progress...</p>
-    <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
-  </div>
+      <p>Workout in progress...</p>
+      <mat-progress-bar mode="indeterminate" color="primary"></mat-progress-bar>
+      </div>
 </div>
