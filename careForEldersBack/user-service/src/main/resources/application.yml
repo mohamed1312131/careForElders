@@ -4,17 +4,14 @@ spring:
 
   data:
     mongodb:
-      # Use this while running with Docker Compose
-      # uri: mongodb://mongodb:27017/userdb
-
-      # Use this while running locally
-      uri: mongodb://localhost:27017/userdb
+      # Docker URI
+      uri: mongodb://mongodb:27017/userdb
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: aziz88303@gmail.com      # 🔐 use your real email
-    password: raau fypw kwoq erca    # 🔐 use an App Password (not Gmail password)
+    username: ${MAIL_USERNAME}         # defined in Docker env
+    password: ${MAIL_PASSWORD}         # use env for security
     properties:
       mail:
         smtp:
@@ -22,7 +19,6 @@ spring:
           starttls:
             enable: true
 
-  # Optional (best practice): externalize secret
   jwt:
     secret: ${JWT_SECRET:mysecretkeymysecretkeymysecretkey!}
 
@@ -32,27 +28,27 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://service-registry:8761/eureka/
   instance:
     prefer-ip-address: true
 
 twilio:
-  account_sid: ACcd31372ca9e785d6a1d9015aa7bab5b9
-  auth_token: 9101629a5e87ecb0e817f1b365c851a3
-  phone_number: "+15674065065"
+  account_sid: ${TWILIO_ACCOUNT_SID}
+  auth_token: ${TWILIO_AUTH_TOKEN}
+  phone_number: ${TWILIO_PHONE_NUMBER}
 
 security:
   oauth2:
     client:
       registration:
         google:
-          client-id: 514678328805-t37tceg3kfq3q5vjr56gnv689dn74rmm.apps.googleusercontent.com
-          client-secret: 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
+          client-id: ${GOOGLE_CLIENT_ID}
+          client-secret: ${GOOGLE_CLIENT_SECRET}
           scope: profile, email
           redirect-uri: "{baseUrl}/oauth2/callback/google"
         facebook:
-          client-id: YOUR_FB_CLIENT_ID
-          client-secret: YOUR_FB_CLIENT_SECRET
+          client-id: ${FACEBOOK_CLIENT_ID}
+          client-secret: ${FACEBOOK_CLIENT_SECRET}
           scope: public_profile,email
           redirect-uri: "{baseUrl}/oauth2/callback/facebook"
 
