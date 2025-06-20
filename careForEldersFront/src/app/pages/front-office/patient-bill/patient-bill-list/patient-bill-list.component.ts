@@ -19,6 +19,7 @@ export class PatientBillListComponent implements OnInit {
     "billDate",
     "dueDate",
     "totalAmount",
+    "balancedAmount",
     "status",
     "actions",
     "paymentActions",
@@ -115,6 +116,32 @@ export class PatientBillListComponent implements OnInit {
       style: "currency",
       currency: "USD",
     }).format(numericAmount)
+  }
+
+  calculateBalancedAmount(bill: any): number {
+    if (!bill || !bill.totalAmount) return 0;
+    
+    const totalAmount = typeof bill.totalAmount === "string" ? Number.parseFloat(bill.totalAmount) : bill.totalAmount;
+    const paidAmount = bill.paidAmount ? (typeof bill.paidAmount === "string" ? Number.parseFloat(bill.paidAmount) : bill.paidAmount) : 0;
+    
+    return Math.max(0, totalAmount - paidAmount);
+  }
+
+  formatBalancedAmount(bill: any): string {
+    const balancedAmount = this.calculateBalancedAmount(bill);
+    return this.formatCurrency(balancedAmount);
+  }
+
+  getBalancedAmountColor(bill: any): string {
+    const balancedAmount = this.calculateBalancedAmount(bill);
+    
+    if (balancedAmount === 0) {
+      return "var(--status-success)"; // Green for fully paid
+    } else if (bill.status && bill.status.toUpperCase() === "OVERDUE") {
+      return "var(--status-danger)"; // Red for overdue
+    } else {
+      return "var(--status-warning)"; // Orange for pending balance
+    }
   }
 
   getDisplayValue(value: any, defaultValue = "N/A"): string {

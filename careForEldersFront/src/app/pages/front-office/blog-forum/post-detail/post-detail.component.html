@@ -1,72 +1,592 @@
 <div class="post-detail-container">
-    <div class="loading-spinner" *ngIf="isLoading">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
-  
-    <div class="error-message" *ngIf="error">
-      <mat-icon>error_outline</mat-icon>
-      <p>{{ error }}</p>
-      <button mat-raised-button color="primary" routerLink="/blog-forum/post">
-        Back to Posts
+  <!-- Loading spinner -->
+  <div class="loading-spinner" *ngIf="isLoading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Post content -->
+  <div *ngIf="post && !isLoading">
+    <!-- Back button and title -->
+    <div class="post-header">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
       </button>
+      <h1>{{ post.title }}</h1>
     </div>
-  
-    <div class="post-content" *ngIf="post && !isLoading">
-      <div class="post-header">
-        <div class="back-button">
-          <button mat-icon-button routerLink="/blog-forum/post">
-            <mat-icon>arrow_back</mat-icon>
-          </button>
+
+    <div class="post-content">
+      <!-- Post metadata -->
+      <div class="post-meta">
+        <span class="author">Posted by {{ post.authorName }}</span>
+        <span class="date">{{ post.createdAt | date:'medium' }}</span>
+        <span class="views" *ngIf="post.viewCount">
+          <mat-icon>visibility</mat-icon> {{ post.viewCount }}
+        </span>
+        <span *ngIf="post.updatedAt && post.updatedAt !== post.createdAt" class="edited">
+          (Edited: {{ post.updatedAt | date:'medium' }})
+        </span>
+      </div>
+
+      <!-- Featured Image Section - Improved -->
+      <div class="post-featured-image" *ngIf="post.featuredImageUrl">
+        <div class="image-container">
+          <img 
+            [src]="post.featuredImageUrl" 
+            [alt]="post.imageAltText || 'Featured image for ' + post.title"
+            class="featured-image"
+            loading="lazy"
+          >
+          <div class="image-caption" *ngIf="post.imageCaption">
+            <p>{{ post.imageCaption }}</p>
+          </div>
         </div>
-        
-        <h1>{{ post.title }}</h1>
-        
-        <div class="post-meta">
-          <div class="author-info">
-            <mat-icon>person</mat-icon>
-            <span>{{ post.authorName }}</span>
-          </div>
-          
-          <div class="date-info">
-            <mat-icon>calendar_today</mat-icon>
-            <span>{{ post.createdAt | date:'medium' }}</span>
-            <span *ngIf="post.updatedAt">(Updated: {{ post.updatedAt | date:'medium' }})</span>
-          </div>
-          
-          <div class="view-info">
-            <mat-icon>visibility</mat-icon>
-            <span>{{ post.viewCount }} views</span>
+      </div>
+
+      <!-- Post body content -->
+      <div class="post-body">
+        <p>{{ post.content }}</p>
+      </div>
+
+      <!-- Additional Images Section -->
+      <div class="post-additional-images" *ngIf="post.additionalImages && post.additionalImages.length > 0">
+        <h3>
+          <mat-icon>photo_library</mat-icon>
+          Additional Images
+        </h3>
+        <div class="additional-images-grid">
+          <div 
+            class="additional-image-item" 
+            *ngFor="let image of post.additionalImages; let i = index"
+          >
+            <img 
+              [src]="image.url" 
+              [alt]="image.altText || 'Additional image ' + (i + 1)"
+              class="additional-image"
+              loading="lazy"
+              (click)="openImageModal(image, i)"
+            >
+            <div class="image-caption" *ngIf="image.caption">
+              <small>{{ image.caption }}</small>
+            </div>
           </div>
         </div>
-        
-        <div class="post-tags">
+      </div>
+
+      <!-- Post footer with tags and actions -->
+      <div class="post-footer">
+        <div class="post-tags" *ngIf="post.tags && post.tags.length > 0">
           <mat-chip-list>
-            <mat-chip *ngFor="let tag of post.tags" color="primary" selected>{{ tag }}</mat-chip>
+            <mat-chip *ngFor="let tag of post.tags">{{ tag }}</mat-chip>
           </mat-chip-list>
         </div>
-        
-        <div class="post-actions" *ngIf="isAuthor()">
-          <button mat-raised-button color="primary" (click)="editPost()">
-            <mat-icon>edit</mat-icon> Edit
-          </button>
-          <button mat-raised-button color="warn" (click)="deletePost()">
-            <mat-icon>delete</mat-icon> Delete
-          </button>
+
+        <div class="post-actions">
+          <div class="like-section">
+            <button mat-icon-button 
+                    (click)="likePost()" 
+                    [disabled]="isLikingPost"
+                    [attr.aria-label]="isPostLikedByUser() ? 'Unlike post' : 'Like post'">
+              <mat-icon [color]="isPostLikedByUser() ? 'warn' : 'primary'">
+                {{ isPostLikedByUser() ? 'favorite' : 'favorite_border' }}
+              </mat-icon>
+            </button>
+            <span>{{ post.likes.length || 0 }}</span>
+          </div>
+
+          <div class="comment-count">
+            <mat-icon>comment</mat-icon> {{ comments.length }}
+          </div>
+
+          <div class="edit-delete" >
+            <button mat-icon-button (click)="editPost()" aria-label="Edit post">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    (click)="deletePost()" 
+                    [disabled]="isDeletingPost"
+                    aria-label="Delete post"
+                    color="warn">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </div>
       </div>
-      
-      <mat-divider></mat-divider>
-      
-      <div class="post-body">
-        <p [innerHTML]="post.content"></p>
+    </div>
+
+    <!-- Comments section -->
+    <div class="comments-section">
+      <h2>Comments ({{ comments.length }})</h2>
+
+      <!-- Enhanced Sentiment and Emotion Filters -->
+      <div class="filter-section" *ngIf="comments.length > 0">
+        <div class="filter-controls">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search comments</mat-label>
+            <input matInput [(ngModel)]="searchQuery" (input)="onSearchQueryChange()" placeholder="Search by content or author...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Sort by</mat-label>
+            <mat-select [(value)]="sortBy" (selectionChange)="onSortChange()">
+              <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-button (click)="clearFilters()" *ngIf="selectedSentimentFilter !== 'ALL' || selectedEmotionFilter !== 'ALL' || searchQuery">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+
+        <div class="sentiment-filter">
+          <h4>Filter by Sentiment:</h4>
+          <mat-chip-list>
+            <mat-chip 
+              *ngFor="let option of sentimentOptions"
+              [selected]="selectedSentimentFilter === option.value"
+              (click)="selectedSentimentFilter = option.value; onSentimentFilterChange()"
+              [ngClass]="option.value === 'ALL' ? '' : getSentimentClass(option.value)">
+              {{ option.label }}
+            </mat-chip>
+          </mat-chip-list>
+
+          <h4>Filter by Emotion:</h4>
+          <mat-chip-list>
+            <mat-chip 
+              *ngFor="let option of emotionOptions"
+              [selected]="selectedEmotionFilter === option.value"
+              (click)="selectedEmotionFilter = option.value; onEmotionFilterChange()"
+              color="accent">
+              <span *ngIf="option.value !== 'ALL'">
+                <mat-icon>{{ getEmotionIcon(option.value) }}</mat-icon>
+              </span>
+              {{ option.label }}
+            </mat-chip>
+          </mat-chip-list>
+        </div>
+
+        <!-- Statistics -->
+        <div class="comment-stats" *ngIf="comments.length > 0">
+          <h4>Comment Statistics:</h4>
+          <div class="stats-chips">
+            <mat-chip *ngFor="let stat of getSentimentStats() | keyvalue" 
+                     [ngClass]="stat.key === 'total' ? '' : getSentimentClass(stat.key)">
+              {{ stat.key | titlecase }}: {{ stat.value }}
+            </mat-chip>
+          </div>
+        </div>
       </div>
-      
-      <mat-divider></mat-divider>
-      
-      <div class="post-footer">
-        <h3>Comments</h3>
-        <p class="no-comments">Comments feature coming soon!</p>
+
+      <!-- Enhanced comment form with speech recognition -->
+      <div class="comment-form">
+        <div class="comment-input-container">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Add a comment</mat-label>
+            <textarea 
+              id="comment-textarea"
+              matInput 
+              [(ngModel)]="newCommentContent" 
+              (input)="autoResizeTextarea($event)"
+              rows="3" 
+              placeholder="Share your thoughts..."
+              maxlength="5000">
+            </textarea>
+            <mat-hint align="end">{{ newCommentContent.length }}/5000</mat-hint>
+          </mat-form-field>
+          
+          <!-- Speech recognition button for comments -->
+          <div class="speech-controls">
+            <button 
+              mat-icon-button 
+              (click)="startRecordingForComment()"
+              [disabled]="isSubmittingComment || !isSpeechRecognitionSupported"
+              [matTooltip]="isRecordingComment ? 'Stop recording' : 'Start voice input'"
+              [color]="isRecordingComment ? 'warn' : 'primary'">
+              <mat-icon>{{ isRecordingComment ? 'mic_off' : 'mic' }}</mat-icon>
+            </button>
+            
+            <!-- Recording indicator -->
+            <div class="recording-indicator" *ngIf="isRecordingComment">
+              <div class="pulse-dot"></div>
+              <span class="recording-text">Recording...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="comment-form-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="addComment()" 
+            [disabled]="!newCommentContent.trim() || isSubmittingComment || isRecordingComment">
+            <mat-icon>send</mat-icon>
+            <span *ngIf="!isSubmittingComment">Post Comment</span>
+            <span *ngIf="isSubmittingComment">Posting...</span>
+          </button>
+          
+          <!-- Speech recognition support indicator -->
+          <div class="speech-support-info" *ngIf="!isSpeechRecognitionSupported">
+            <mat-icon color="warn">warning</mat-icon>
+            <small>Voice input not supported</small>
+          </div>
+        </div>
       </div>
+
+      <!-- Comments loading indicator -->
+      <div class="loading-comments" *ngIf="isLoadingComments">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Loading comments...</span>
+      </div>
+
+      <!-- Enhanced Comments list -->
+      <div class="comments-list" *ngIf="!isLoadingComments && filteredComments.length > 0; else noComments">
+        <div class="comment" *ngFor="let comment of filteredComments">
+          <div class="comment-header">
+            <span class="author">{{ comment.authorName || comment.authorId }}</span>
+            <span class="date">{{ comment.createdAt | date:'short' }}</span>
+            
+            <!-- Edit indicator -->
+            <div class="edit-info" *ngIf="wasCommentEdited(comment)">
+              <mat-icon class="edit-icon">edit</mat-icon>
+              <small>{{ getEditInfoText(comment) }}</small>
+            </div>
+            
+            <!-- Enhanced Sentiment Display -->
+            <div class="sentiment-tags" *ngIf="comment.sentiment">
+              <mat-chip [ngClass]="getSentimentClass(comment.sentiment)" class="sentiment-chip">
+                <mat-icon>{{ getSentimentIcon(comment.sentiment) }}</mat-icon>
+                {{ comment.sentiment }}
+              </mat-chip>
+              <mat-chip *ngIf="comment.emotions && comment.emotions.length > 0" class="emotion-chip">
+                <mat-icon>{{ getEmotionIcon(comment.emotions[0].emotion) }}</mat-icon>
+                {{ comment.emotions[0].emotion }}
+              </mat-chip>
+              <mat-chip *ngIf="comment.sentimentScore !== undefined" class="score-chip">
+                Score: {{ comment.sentimentScore | number:'1.2-2' }}
+              </mat-chip>
+            </div>
+          </div>
+
+          <div class="comment-body">
+            <!-- Normal comment display -->
+            <div *ngIf="editingCommentId !== comment.id; else editCommentTemplate">
+              <p>{{ comment.content }}</p>
+              
+              <!-- Enhanced metadata display -->
+              <div class="comment-meta">
+                <span *ngIf="comment.readingTimeSeconds">
+                  <mat-icon>schedule</mat-icon> {{ formatReadingTime(comment.readingTimeSeconds) }}
+                </span>
+                <span *ngIf="comment.wordCount">
+                  <mat-icon>text_fields</mat-icon> {{ comment.wordCount }} words
+                </span>
+                <span *ngIf="comment.characterCount">
+                  <mat-icon>text_format</mat-icon> {{ comment.characterCount }} chars
+                </span>
+              </div>
+
+              <!-- Keywords display -->
+              <div class="keyword-section" *ngIf="comment.keywords && comment.keywords.length > 0">
+                <div class="keyword-tags">
+                  <mat-chip *ngFor="let keyword of getKeywordChips(comment.keywords)" class="keyword-chip">
+                    🔑 {{ keyword }}
+                  </mat-chip>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Edit comment form -->
+            <ng-template #editCommentTemplate>
+              <div class="edit-comment-form">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Edit your comment</mat-label>
+                  <textarea 
+                    matInput
+                    [(ngModel)]="editContent"
+                    [id]="'edit-comment-' + comment.id"
+                    (input)="autoResizeTextarea($event)"
+                    (keydown)="onEditKeydown($event, 'comment')"
+                    placeholder="Edit your comment..."
+                    rows="3"
+                    maxlength="5000">
+                  </textarea>
+                  <mat-hint align="end">
+                    {{ editContent.length }}/5000 characters
+                    <span *ngIf="!isEditContentValid(editContent)" class="error-hint">
+                      - {{ getEditContentError(editContent) }}
+                    </span>
+                  </mat-hint>
+                </mat-form-field>
+                
+                <div class="edit-actions">
+                  <button mat-button (click)="cancelEditComment()" [disabled]="isUpdatingComment">
+                    <mat-icon>cancel</mat-icon>
+                    Cancel
+                  </button>
+                  
+                  <button 
+                    mat-raised-button 
+                    color="primary" 
+                    (click)="submitEditComment()"
+                    [disabled]="!isEditContentValid(editContent) || isUpdatingComment">
+                    <mat-icon>save</mat-icon>
+                    <span *ngIf="!isUpdatingComment">Save Changes</span>
+                    <span *ngIf="isUpdatingComment">Saving...</span>
+                  </button>
+                </div>
+                
+                <div class="keyboard-shortcuts">
+                  <small>
+                    <mat-icon class="shortcut-icon">keyboard</mat-icon>
+                    Ctrl+Enter to save, Esc to cancel
+                  </small>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="comment-actions" *ngIf="editingCommentId !== comment.id">
+            <div class="like-section">
+              <button mat-icon-button 
+                      (click)="likeComment(comment)"
+                      [attr.aria-label]="isCommentLikedByUser(comment) ? 'Unlike comment' : 'Like comment'">
+                <mat-icon [color]="isCommentLikedByUser(comment) ? 'warn' : ''">
+                  {{ isCommentLikedByUser(comment) ? 'favorite' : 'favorite_border' }}
+                </mat-icon>
+              </button>
+              <span>{{ comment.likes.length || 0 }}</span>
+            </div>
+
+            <button mat-button (click)="startReply(comment.id)">
+              <mat-icon>reply</mat-icon>
+              Reply
+            </button>
+
+            <div class="edit-delete" *ngIf="canEditComment(comment)">
+              <button mat-button (click)="startEditComment(comment)">
+                <mat-icon>edit</mat-icon>
+                Edit
+              </button>
+              <button mat-button (click)="deleteComment(comment.id)" color="warn">
+                <mat-icon>delete</mat-icon>
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <!-- Enhanced Reply form with speech recognition -->
+          <div class="reply-form" *ngIf="replyingToCommentId === comment.id">
+            <div class="reply-input-wrapper">
+              <mat-form-field appearance="outline" class="reply-textarea-field">
+                <mat-label>Write a reply</mat-label>
+                <textarea 
+                  id="reply-textarea"
+                  matInput 
+                  [(ngModel)]="replyContent" 
+                  (input)="autoResizeTextarea($event)"
+                  rows="2" 
+                  placeholder="Write your reply..."
+                  maxlength="5000">
+                </textarea>
+                <mat-hint align="end">{{ replyContent.length }}/5000</mat-hint>
+                
+                <!-- Speech recognition button positioned inside the form field -->
+                <button 
+                  mat-icon-button 
+                  matSuffix
+                  type="button"
+                  (click)="startRecordingForReply()"
+                  [disabled]="isSubmittingReply || !isSpeechRecognitionSupported"
+                  [matTooltip]="isRecordingReply ? 'Stop recording' : 'Start voice input'"
+                  [color]="isRecordingReply ? 'warn' : 'primary'"
+                  class="reply-speech-button">
+                  <mat-icon>{{ isRecordingReply ? 'mic_off' : 'mic' }}</mat-icon>
+                </button>
+              </mat-form-field>
+              
+              <!-- Recording indicator for replies -->
+              <div class="reply-recording-indicator" *ngIf="isRecordingReply">
+                <div class="pulse-dot"></div>
+                <span class="recording-text">Recording...</span>
+              </div>
+            </div>
+            
+            <div class="reply-actions">
+              <button mat-button (click)="cancelReply()" type="button">
+                <mat-icon>cancel</mat-icon>
+                Cancel
+              </button>
+              <button 
+                mat-raised-button 
+                color="primary" 
+                (click)="submitReply()" 
+                type="button"
+                [disabled]="!replyContent.trim() || isSubmittingReply || isRecordingReply">
+                <mat-icon>send</mat-icon>
+                <span *ngIf="!isSubmittingReply">Post Reply</span>
+                <span *ngIf="isSubmittingReply">Posting...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Enhanced Replies -->
+          <div class="replies" *ngIf="comment.replies && comment.replies.length > 0">
+            <div class="reply" *ngFor="let reply of comment.replies">
+              <div class="comment-header">
+                <span class="author">{{ reply.authorName || reply.authorId }}</span>
+                <span class="date">{{ reply.createdAt | date:'short' }}</span>
+                
+                <!-- Edit indicator for replies -->
+                <div class="edit-info" *ngIf="wasCommentEdited(reply)">
+                  <mat-icon class="edit-icon">edit</mat-icon>
+                  <small>{{ getEditInfoText(reply) }}</small>
+                </div>
+                
+                <!-- Enhanced Sentiment Display for Replies -->
+                <div class="sentiment-tags" *ngIf="reply.sentiment">
+                  <mat-chip [ngClass]="getSentimentClass(reply.sentiment)" class="sentiment-chip">
+                    <mat-icon>{{ getSentimentIcon(reply.sentiment) }}</mat-icon>
+                    {{ reply.sentiment }}
+                  </mat-chip>
+                  <mat-chip *ngIf="reply.emotions && reply.emotions.length > 0" class="emotion-chip">
+                    <mat-icon>{{ getEmotionIcon(reply.emotions[0].emotion) }}</mat-icon>
+                    {{ reply.emotions[0].emotion }}
+                  </mat-chip>
+                  <mat-chip *ngIf="reply.sentimentScore !== undefined" class="score-chip">
+                    Score: {{ reply.sentimentScore | number:'1.2-2' }}
+                  </mat-chip>
+                </div>
+              </div>
+
+              <div class="comment-body">
+                <!-- Normal reply display -->
+                <div *ngIf="editingReplyId !== reply.id; else editReplyTemplate">
+                  <p>{{ reply.content }}</p>
+                  <div class="comment-meta" *ngIf="reply.readingTimeSeconds || reply.wordCount">
+                    <span *ngIf="reply.readingTimeSeconds">
+                      <mat-icon>schedule</mat-icon> {{ formatReadingTime(reply.readingTimeSeconds) }}
+                    </span>
+                    <span *ngIf="reply.wordCount">
+                      <mat-icon>text_fields</mat-icon> {{ reply.wordCount }} words
+                    </span>
+                  </div>
+
+                  <!-- Keywords for replies -->
+                  <div class="keyword-section" *ngIf="reply.keywords && reply.keywords.length > 0">
+                    <div class="keyword-tags">
+                      <mat-chip *ngFor="let keyword of getKeywordChips(reply.keywords)" class="keyword-chip">
+                        🔑 {{ keyword }}
+                      </mat-chip>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Edit reply form -->
+                <ng-template #editReplyTemplate>
+                  <div class="edit-comment-form">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Edit your reply</mat-label>
+                      <textarea 
+                        matInput
+                        [(ngModel)]="editReplyContent"
+                        [id]="'edit-reply-' + reply.id"
+                        (input)="autoResizeTextarea($event)"
+                        (keydown)="onEditKeydown($event, 'reply')"
+                        placeholder="Edit your reply..."
+                        rows="2"
+                        maxlength="5000">
+                      </textarea>
+                      <mat-hint align="end">
+                        {{ editReplyContent.length }}/5000 characters
+                        <span *ngIf="!isEditContentValid(editReplyContent)" class="error-hint">
+                          - {{ getEditContentError(editReplyContent) }}
+                        </span>
+                      </mat-hint>
+                    </mat-form-field>
+                    
+                    <div class="edit-actions">
+                      <button mat-button (click)="cancelEditReply()" [disabled]="isUpdatingReply">
+                        <mat-icon>cancel</mat-icon>
+                        Cancel
+                      </button>
+                      
+                      <button 
+                        mat-raised-button 
+                        color="primary" 
+                        (click)="submitEditReply()"
+                        [disabled]="!isEditContentValid(editReplyContent) || isUpdatingReply">
+                        <mat-icon>save</mat-icon>
+                        <span *ngIf="!isUpdatingReply">Save Changes</span>
+                        <span *ngIf="isUpdatingReply">Saving...</span>
+                      </button>
+                    </div>
+                    
+                    <div class="keyboard-shortcuts">
+                      <small>
+                        <mat-icon class="shortcut-icon">keyboard</mat-icon>
+                        Ctrl+Enter to save, Esc to cancel
+                      </small>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+
+              <div class="comment-actions" *ngIf="editingReplyId !== reply.id">
+                <div class="like-section">
+                  <button mat-icon-button 
+                          (click)="likeComment(reply)"
+                          [attr.aria-label]="isCommentLikedByUser(reply) ? 'Unlike reply' : 'Like reply'">
+                    <mat-icon [color]="isCommentLikedByUser(reply) ? 'warn' : ''">
+                      {{ isCommentLikedByUser(reply) ? 'favorite' : 'favorite_border' }}
+                    </mat-icon>
+                  </button>
+                  <span>{{ reply.likes.length || 0 }}</span>
+                </div>
+
+                <div class="edit-delete" *ngIf="canEditComment(reply)">
+                  <button mat-button (click)="startEditReply(reply)">
+                    <mat-icon>edit</mat-icon>
+                    Edit
+                  </button>
+                  <button mat-button (click)="deleteComment(reply.id)" color="warn">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noComments>
+        <div class="no-comments">
+          <mat-icon>comment</mat-icon>
+          <p>
+            {{ selectedSentimentFilter === 'ALL' && selectedEmotionFilter === 'ALL' && !searchQuery ? 
+               'No comments yet. Be the first to comment!' : 
+               'No comments match the selected filters.' }}
+          </p>
+          <button mat-button (click)="clearFilters()" *ngIf="selectedSentimentFilter !== 'ALL' || selectedEmotionFilter !== 'ALL' || searchQuery">
+            <mat-icon>clear</mat-icon>
+            Clear Filters
+          </button>
+        </div>
+      </ng-template>
     </div>
   </div>
-  
+
+  <!-- Error state -->
+  <div class="error-state" *ngIf="!post && !isLoading">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Post not found</h2>
+    <p>The post you're looking for doesn't exist or has been removed.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Go Back
+    </button>
+  </div>
+</div>

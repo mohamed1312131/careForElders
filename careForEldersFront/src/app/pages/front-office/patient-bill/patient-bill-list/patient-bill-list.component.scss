@@ -4,6 +4,12 @@
   --status-danger: #f44336;
   --status-info: #2196f3;
   --status-neutral: #9e9e9e;
+  --primary-text: #333333;
+  
+  // Service type colors
+  --service-doctor: #2196F3;
+  --service-paramedical: #4CAF50;
+  --service-subscription: #FF9800;
 }
 
 .patient-bill-container {
@@ -52,6 +58,83 @@
       }
     }
   }
+  
+  // Filter Section Styles
+  .filter-section {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+
+    .filter-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-weight: 500;
+      color: #495057;
+
+      mat-icon {
+        font-size: 20px;
+        color: #6c757d;
+      }
+    }
+  }
+
+  .service-type-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &.all-types {
+      background-color: #fff;
+      border-color: #6c757d;
+      color: #6c757d;
+
+      &:hover {
+        background-color: #6c757d;
+        color: white;
+      }
+    }
+
+    &.doctor-care:hover {
+      background-color: var(--service-doctor);
+      color: white;
+    }
+
+    &.para-medical:hover {
+      background-color: var(--service-paramedical);
+      color: white;
+    }
+
+    &.subscription:hover {
+      background-color: var(--service-subscription);
+      color: white;
+    }
+  }
 }
 
 .patient-bill-content {
@@ -67,13 +150,94 @@
     .bill-table {
       width: 100%;
       
+      // Service Type Column Styles
+      .service-type-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .service-type-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+      
+      .service-type-text {
+        font-weight: 500;
+        font-size: 14px;
+      }
+      
+      .mat-column-serviceType {
+        min-width: 140px;
+      }
+      
       .mat-column-actions {
-        width: 200px; // Increased width to accommodate the new payment button
+        width: 200px;
         text-align: center;
       }
       
       .mat-column-totalAmount {
         text-align: right;
+      }
+
+      // Balanced Amount Column Styles
+      .mat-column-balancedAmount {
+        min-width: 150px;
+        text-align: right;
+      }
+
+      .amount-column {
+        text-align: right !important;
+        
+        .header-text {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 8px;
+          font-weight: 600;
+          color: var(--primary-text);
+          
+          .header-icon {
+            font-size: 18px;
+            height: 18px;
+            width: 18px;
+          }
+        }
+      }
+
+      .balanced-amount-cell {
+        padding-right: 16px !important;
+      }
+
+      .balanced-amount-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      .amount-badge {
+        font-family: 'Roboto Mono', 'Courier New', monospace;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+      }
+
+      .paid-icon, .overdue-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      .paid-icon {
+        color: var(--status-success) !important;
+      }
+
+      .overdue-icon {
+        color: var(--status-danger) !important;
+        animation: pulse 2s infinite;
       }
 
       .payment-actions-header {
@@ -85,6 +249,17 @@
         
         .payment-button {
           min-width: 80px;
+          transition: all 0.2s ease;
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+          
+          &:not(:disabled):hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          }
           
           mat-icon {
             margin-right: 4px;
@@ -169,6 +344,27 @@
   }
 }
 
+// Animations
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.8); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.7; 
+  }
+}
+
 @media (max-width: 768px) {
   .patient-bill-header {
     .header-content {
@@ -178,6 +374,28 @@
       .title-section {
         margin-bottom: 16px;
       }
+    }
+    
+    // Responsive filter section
+    .filter-section {
+      padding: 12px;
+      
+      .filter-header {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+    }
+
+    .service-type-filters {
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .filter-button {
+      width: 100%;
+      justify-content: flex-start;
+      padding: 10px 16px;
+      border-radius: 8px;
     }
   }
   
@@ -189,11 +407,73 @@
         .mat-column-actions {
           width: 180px;
         }
+        
+        .mat-column-serviceType {
+          min-width: 100px;
+        }
+
+        .mat-column-balancedAmount {
+          min-width: 120px;
+        }
+
+        .amount-column {
+          .header-text {
+            font-size: 12px;
+            
+            .header-icon {
+              font-size: 16px;
+              height: 16px;
+              width: 16px;
+            }
+          }
+        }
+
+        .amount-badge {
+          font-size: 12px;
+        }
+
+        .paid-icon, .overdue-icon {
+          font-size: 16px;
+          height: 16px;
+          width: 16px;
+        }
+        
+        .service-type-cell {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+        }
       }
     }
   }
 
   .mat-column-paymentActions {
     width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .patient-bill-content {
+    .table-container {
+      .bill-table {
+        .service-type-cell {
+          .service-type-text {
+            display: none; // Hide text on very small screens, show only icon
+          }
+        }
+
+        .mat-column-balancedAmount {
+          min-width: 100px;
+        }
+
+        .amount-column {
+          .header-text {
+            flex-direction: column;
+            gap: 2px;
+            font-size: 10px;
+          }
+        }
+      }
+    }
   }
 }

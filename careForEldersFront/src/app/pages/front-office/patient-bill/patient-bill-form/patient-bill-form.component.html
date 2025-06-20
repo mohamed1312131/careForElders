@@ -1,173 +1,243 @@
-<div class="patient-bill-form-container">
-    <div class="form-header">
-      <div class="title-section">
-        <button mat-icon-button (click)="goBack()" class="back-button">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <h1>{{ isEditMode ? 'Edit' : 'Create' }} Patient Bill</h1>
+<div class="patient-bill-form-container" [ngClass]="{'view-mode': isViewMode}">
+  <div class="form-header">
+    <div class="title-section">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>{{ isViewMode ? 'View' : (isEditMode ? 'Edit' : 'Create') }} Patient Bill</h1>
+    </div>
+    <div class="actions">
+      <button mat-button (click)="goBack()">{{ isViewMode ? 'Back' : 'Cancel' }}</button>
+      <!-- Only show save button if not in view mode -->
+      <button 
+        *ngIf="!isViewMode"
+        mat-raised-button 
+        color="primary" 
+        [disabled]="isLoading" 
+        (click)="onSubmit()">
+        <mat-icon>save</mat-icon>
+        <span>{{ isEditMode ? 'Update' : 'Create' }} Bill</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="form-content">
+    <form [formGroup]="billForm" (ngSubmit)="onSubmit()" class="bill-form">
+      <div class="form-section">
+        <h2>Patient Information</h2>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Patient ID</mat-label>
+            <input matInput formControlName="patientId" placeholder="Enter patient ID">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="billForm.get('patientId')?.hasError('required')">
+              Patient ID is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Patient Name</mat-label>
+            <input matInput formControlName="patientName" placeholder="Enter patient name">
+            <mat-icon matPrefix>badge</mat-icon>
+            <mat-error *ngIf="billForm.get('patientName')?.hasError('required')">
+              Patient name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Patient Email</mat-label>
+            <input matInput formControlName="patientEmail" placeholder="Enter patient email" type="email">
+            <mat-icon matPrefix>email</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Patient Phone</mat-label>
+            <input matInput formControlName="patientPhone" placeholder="Enter patient phone">
+            <mat-icon matPrefix>phone</mat-icon>
+          </mat-form-field>
+        </div>
       </div>
-      <div class="actions">
-        <button mat-button (click)="goBack()">Cancel</button>
+
+      <div class="form-section">
+        <h2>Bill Details</h2>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Service Type</mat-label>
+            <mat-select formControlName="serviceType">
+              <mat-option *ngFor="let type of serviceTypes" [value]="type.value">
+                {{type.viewValue}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="billForm.get('serviceType')?.hasError('required')">
+              Service type is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option *ngFor="let status of paymentStatuses" [value]="status.value">
+                {{status.viewValue}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="billForm.get('status')?.hasError('required')">
+              Status is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Bill Date</mat-label>
+            <input matInput [matDatepicker]="billDatePicker" formControlName="billDate">
+            <mat-datepicker-toggle matSuffix [for]="billDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #billDatePicker></mat-datepicker>
+            <mat-error *ngIf="billForm.get('billDate')?.hasError('required')">
+              Bill date is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate">
+            <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #dueDatePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Total Amount</mat-label>
+            <input matInput formControlName="totalAmount" readonly>
+            <mat-icon matPrefix>attach_money</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Paid Amount</mat-label>
+            <input matInput formControlName="paidAmount" readonly>
+            <mat-icon matPrefix>payments</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Balance Amount</mat-label>
+            <input matInput formControlName="balanceAmount" readonly>
+            <mat-icon matPrefix>account_balance</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="form-section bill-items-section">
+        <div class="section-header">
+          <h2>Bill Items</h2>
+          <!-- Only show Add Item button in edit mode or create mode -->
+          <button 
+            *ngIf="!isViewMode" 
+            type="button" 
+            mat-raised-button 
+            color="primary" 
+            (click)="addItem()" 
+            class="add-item-button">
+            <mat-icon>add</mat-icon>
+            Add Item
+          </button>
+        </div>
+
+        <div class="bill-items-table">
+          <div class="bill-items-table-header">
+            <div class="item-description">Description</div>
+            <div class="item-quantity">Quantity</div>
+            <div class="item-unit-price">Unit Price</div>
+            <div class="item-amount">Amount</div>
+            <div class="item-actions" *ngIf="!isViewMode">Actions</div>
+          </div>
+
+          <div formArrayName="items" class="bill-items-list">
+            <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="bill-item-row">
+              <mat-form-field appearance="outline" class="item-description">
+                <mat-label>Description</mat-label>
+                <input matInput formControlName="description" placeholder="Item description">
+                <mat-error *ngIf="item.get('description')?.hasError('required')">
+                  Description is required
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-quantity">
+                <mat-label>Quantity</mat-label>
+                <input matInput type="number" formControlName="quantity" min="1" (change)="calculateItemAmount(i)">
+                <mat-error *ngIf="item.get('quantity')?.hasError('required')">
+                  Required
+                </mat-error>
+                <mat-error *ngIf="item.get('quantity')?.hasError('min')">
+                  Min 1
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-unit-price">
+                <mat-label>Unit Price</mat-label>
+                <input matInput type="number" formControlName="unitPrice" min="0" step="0.01" (change)="calculateItemAmount(i)">
+                <mat-error *ngIf="item.get('unitPrice')?.hasError('required')">
+                  Required
+                </mat-error>
+                <mat-error *ngIf="item.get('unitPrice')?.hasError('min')">
+                  Min 0
+                </mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="item-amount">
+                <mat-label>Amount</mat-label>
+                <input matInput formControlName="amount" readonly>
+              </mat-form-field>
+
+              <!-- Only show delete button in edit mode or create mode -->
+              <button 
+                *ngIf="!isViewMode"
+                type="button" 
+                mat-icon-button 
+                color="warn" 
+                (click)="removeItem(i)" 
+                class="item-actions">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <!-- Empty space for alignment in view mode -->
+              <div *ngIf="isViewMode" class="item-actions"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Additional Information</h2>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="3" 
+                    placeholder="Enter additional notes about this bill"></textarea>
+        </mat-form-field>
+      </div>
+      
+      <!-- Only show form actions if not in view mode -->
+      <div class="form-actions" *ngIf="!isViewMode">
+        <button mat-button type="button" (click)="goBack()">Cancel</button>
         <button 
           mat-raised-button 
           color="primary" 
-          [disabled]="isLoading" 
-          (click)="onSubmit()">
+          type="submit"
+          [disabled]="isLoading">
           <mat-icon>save</mat-icon>
           <span>{{ isEditMode ? 'Update' : 'Create' }} Bill</span>
         </button>
       </div>
-    </div>
-  
-    <div class="form-content">
-      <form [formGroup]="billForm" (ngSubmit)="onSubmit()" class="bill-form">
-        <div class="form-section">
-          <h2>Patient Information</h2>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Patient ID</mat-label>
-              <input matInput formControlName="patientId" placeholder="Enter patient ID" type="number">
-              <mat-icon matPrefix>person</mat-icon>
-              <mat-error *ngIf="billForm.get('patientId')?.hasError('required')">
-                Patient ID is required
-              </mat-error>
-            </mat-form-field>
-  
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Patient Name</mat-label>
-              <input matInput formControlName="patientName" placeholder="Enter patient name">
-              <mat-icon matPrefix>badge</mat-icon>
-              <mat-error *ngIf="billForm.get('patientName')?.hasError('required')">
-                Patient name is required
-              </mat-error>
-            </mat-form-field>
-          </div>
-        </div>
-  
-        <div class="form-section">
-          <h2>Bill Details</h2>
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Bill Date</mat-label>
-              <input matInput [matDatepicker]="billDatePicker" formControlName="billDate">
-              <mat-datepicker-toggle matSuffix [for]="billDatePicker"></mat-datepicker-toggle>
-              <mat-datepicker #billDatePicker></mat-datepicker>
-              <mat-error *ngIf="billForm.get('billDate')?.hasError('required')">
-                Bill date is required
-              </mat-error>
-            </mat-form-field>
-  
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Due Date</mat-label>
-              <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate">
-              <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
-              <mat-datepicker #dueDatePicker></mat-datepicker>
-            </mat-form-field>
-          </div>
-  
-          <div class="form-row">
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Payment Status</mat-label>
-              <mat-select formControlName="paymentStatus">
-                <mat-option *ngFor="let status of paymentStatuses" [value]="status.value">
-                  {{status.viewValue}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="billForm.get('paymentStatus')?.hasError('required')">
-                Payment status is required
-              </mat-error>
-            </mat-form-field>
-  
-            <mat-form-field appearance="outline" class="form-field">
-              <mat-label>Total Amount</mat-label>
-              <input matInput formControlName="totalAmount" readonly>
-              <mat-icon matPrefix>attach_money</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-  
-        <div class="form-section bill-items-section">
-          <div class="section-header">
-            <h2>Bill Items</h2>
-            <button type="button" mat-raised-button color="primary" (click)="addItem()" class="add-item-button">
-              <mat-icon>add</mat-icon>
-              Add Item
-            </button>
-          </div>
-  
-          <div class="bill-items-table">
-            <div class="bill-items-table-header">
-              <div class="item-description">Description</div>
-              <div class="item-quantity">Quantity</div>
-              <div class="item-unit-price">Unit Price</div>
-              <div class="item-amount">Amount</div>
-              <div class="item-actions">Actions</div>
-            </div>
-  
-            <div formArrayName="items" class="bill-items-list">
-              <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="bill-item-row">
-                <mat-form-field appearance="outline" class="item-description">
-                  <input matInput formControlName="description" placeholder="Item description">
-                  <mat-error *ngIf="item.get('description')?.hasError('required')">
-                    Description is required
-                  </mat-error>
-                </mat-form-field>
-  
-                <mat-form-field appearance="outline" class="item-quantity">
-                  <input matInput type="number" formControlName="quantity" min="1" (change)="calculateItemAmount(i)">
-                  <mat-error *ngIf="item.get('quantity')?.hasError('required')">
-                    Required
-                  </mat-error>
-                  <mat-error *ngIf="item.get('quantity')?.hasError('min')">
-                    Min 1
-                  </mat-error>
-                </mat-form-field>
-  
-                <mat-form-field appearance="outline" class="item-unit-price">
-                  <input matInput type="number" formControlName="unitPrice" min="0" step="0.01" (change)="calculateItemAmount(i)">
-                  <mat-error *ngIf="item.get('unitPrice')?.hasError('required')">
-                    Required
-                  </mat-error>
-                  <mat-error *ngIf="item.get('unitPrice')?.hasError('min')">
-                    Min 0
-                  </mat-error>
-                </mat-form-field>
-  
-                <mat-form-field appearance="outline" class="item-amount">
-                  <input matInput formControlName="amount" readonly>
-                </mat-form-field>
-  
-                <button type="button" mat-icon-button color="warn" (click)="removeItem(i)" class="item-actions">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-  
-        <div class="form-section">
-          <h2>Additional Information</h2>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Notes</mat-label>
-            <textarea matInput formControlName="notes" rows="3" 
-                      placeholder="Enter additional notes about this bill"></textarea>
-          </mat-form-field>
-        </div>
-        
-        <div class="form-actions">
-          <button mat-button type="button" (click)="goBack()">Cancel</button>
-          <button 
-            mat-raised-button 
-            color="primary" 
-            type="submit"
-            [disabled]="isLoading">
-            <mat-icon>save</mat-icon>
-            <span>{{ isEditMode ? 'Update' : 'Create' }} Bill</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  
-    <mat-progress-bar *ngIf="isLoading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+      
+      <!-- View mode only has a back button -->
+      <div class="form-actions view-actions" *ngIf="isViewMode">
+        <button mat-raised-button color="primary" type="button" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Back to Bills</span>
+        </button>
+      </div>
+    </form>
   </div>
-  
+
+  <mat-progress-bar *ngIf="isLoading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+</div>

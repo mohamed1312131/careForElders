@@ -22,4 +22,6 @@ public class Appointment {
     private String treatment;
     private String status; // upcoming, completed, canceled
 
+
+
 }

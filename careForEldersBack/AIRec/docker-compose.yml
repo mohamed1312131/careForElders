@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  ai-service:
+    build: ../planAndExercise
+    ports:
+      - "8010:8010"
+    container_name: ai-recommender

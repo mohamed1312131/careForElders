@@ -90,38 +90,44 @@ export class DoctorAddProgramComponent {
   }
 
   saveProgram(): void {
-    if (!this.validateForm()) return;
+  if (!this.validateForm()) return;
   
-    this.isLoading = true;
+  this.isLoading = true;
   
-    const payload = {
-      name: this.programData.name,
-      description: this.programData.description,
-      programCategory: this.programData.programCategory,
-      programImage: '', // optional: you can send base64 here if needed
-      days: this.programDays.map(day => ({
-        dayNumber: day.dayNumber,
-        exerciseIds: day.exercises.map(ex => ex.id),
-        restDay: day.restDay,
-        warmUpMinutes: day.warmUpMinutes || 0,
-        coolDownMinutes: day.coolDownMinutes || 0,
-        instructions: day.instructions || '',
-        notesForPatient: day.notesForPatient || ''
-      }))
-    };
+  // Prepare payload (without image)
+   const payload = {
+    name: this.programData.name,
+    description: this.programData.description,
+    programCategory: this.programData.programCategory,
+    status: "DRAFT", // Add required status field
+    durationWeeks: 1, // Add required duration field (default value)
+    days: this.programDays.map(day => ({
+      dayNumber: day.dayNumber,
+      exerciseIds: day.exercises.map(ex => ex.id),
+      restDay: day.restDay,
+      warmUpMinutes: day.warmUpMinutes || 0,
+      coolDownMinutes: day.coolDownMinutes || 0,
+      instructions: day.instructions || '',
+      notesForPatient: day.notesForPatient || ''
+    }))
+  };
   
-    this.programService.createProgram(payload, this.doctorId).subscribe({
-      next: () => {
-        this.snackBar.open('Program created successfully!', 'Close', { duration: 3000 });
-        this.resetForm();
-      },
-      error: (err) => {
-        console.error(err);
-        this.snackBar.open('Error creating program', 'Close', { duration: 3000 });
-      },
-      complete: () => this.isLoading = false
-    });
-  }
+  this.programService.createProgram(
+    payload,
+    this.programData.programImage,
+    this.doctorId
+  ).subscribe({
+    next: () => {
+      this.snackBar.open('Program created successfully!', 'Close', { duration: 3000 });
+      this.resetForm();
+    },
+    error: (err) => {
+      console.error('Error details:', err);
+      this.snackBar.open(`Error creating program: ${err.error.message || err.message}`, 'Close', { duration: 5000 });
+    },
+    complete: () => this.isLoading = false
+  });
+}
   
 
   private validateForm(): boolean {

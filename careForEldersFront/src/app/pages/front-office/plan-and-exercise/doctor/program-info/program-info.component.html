@@ -1,135 +1,205 @@
-<div class="p-6 space-y-6 max-h-[90vh] overflow-y-auto">
-    <div *ngIf="isLoading" class="text-center">
-      <mat-spinner diameter="50"></mat-spinner>
-      <p class="mt-2 text-gray-600">Loading program details...</p>
+<div class="program-info-dialog-wrapper">
+  <div *ngIf="isLoading && !errorLoading" class="loading-container">
+    <mat-spinner diameter="60" color="primary"></mat-spinner>
+    <p class="loading-text">Loading program details...</p>
+  </div>
+
+  <div *ngIf="errorLoading" class="error-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button mat-stroked-button (click)="loadProgramDetails()">Try Again</button>
+    <button mat-button (click)="closeDialog()" class="close-error-button">Close</button>
+  </div>
+
+  <ng-container *ngIf="program && !isLoading && !errorLoading">
+    <div class="program-header-image-container">
+      <img [src]="program.programImage || 'assets/images/default-program-banner.jpg'"
+           alt="{{ program.name }} banner"
+           class="program-header-image">
     </div>
-  
-    <div *ngIf="errorLoading" class="text-center text-red-500">
-      Failed to load program details
-    </div>
-  
-    <div *ngIf="program && !isLoading">
-      <!-- Program Header -->
-      <div class="text-center">
-        <img [src]="program.programImage || 'assets/default-program.png'" 
-             alt="Program Image" 
-             class="rounded-xl mx-auto mb-4 shadow-lg w-full max-w-3xl h-48 object-cover">
-        <h2 class="text-2xl font-bold">{{ program.name }}</h2>
-        <p class="text-gray-600">{{ program.description }}</p>
-        <p class="mt-2 text-sm text-gray-500">
-          Category: <span class="font-semibold">{{ program.programCategory }}</span>
-        </p>
+
+    <h2 mat-dialog-title class="dialog-title">{{ program.name }}</h2>
+
+    <mat-dialog-content class="dialog-content">
+      <p *ngIf="program.description" class="program-description">{{ program.description }}</p>
+
+      <div class="metadata-grid">
+        <div class="meta-item" *ngIf="program.programCategory">
+          <mat-icon>category</mat-icon>
+          <span>Category: <strong>{{ program.programCategory }}</strong></span>
+        </div>
+        <div class="meta-item" *ngIf="program.createdBy">
+          <mat-icon>person_outline</mat-icon>
+          <span>Created by: <strong>{{ program.createdBy }}</strong></span>
+        </div>
+        <div class="meta-item" *ngIf="program.createdDate">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Created: <strong>{{ program.createdDate | date:'mediumDate' }}</strong></span>
+        </div>
+        <div class="meta-item" *ngIf="program.updatedDate">
+          <mat-icon>update</mat-icon>
+          <span>Last Updated: <strong>{{ program.updatedDate | date:'mediumDate' }}</strong></span>
+        </div>
       </div>
-  
-      <!-- Metadata -->
-      <div class="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
-        <div>Created by: <span class="font-semibold">{{ program.createdBy }}</span></div>
-        <div>Created on: <span class="font-semibold">{{ program.createdDate | date:'mediumDate' }}</span></div>
-        <div>Last Updated: <span class="font-semibold">{{ program.updatedDate | date:'mediumDate' }}</span></div>
-      </div>
-  
-      <!-- Program Days -->
-      <mat-accordion class="mt-6">
-        <mat-expansion-panel *ngFor="let day of program.days">
+
+      <mat-divider class="section-divider"></mat-divider>
+
+      <h3 class="section-title">Program Schedule</h3>
+      <mat-accordion multi="true" displayMode="default">
+        <mat-expansion-panel *ngFor="let day of program.days; let i = index" [expanded]="i < 2">
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              Day {{ day.dayNumber }} 
-              <span *ngIf="day.restDay" class="text-red-500 ml-2">(Rest Day)</span>
+            <mat-panel-title class="day-panel-title">
+              <mat-icon>{{ day.restDay ? 'hotel' : 'fitness_center' }}</mat-icon>
+              Day {{ day.dayNumber }}
+              <span *ngIf="day.restDay" class="rest-day-indicator">(Rest Day)</span>
             </mat-panel-title>
           </mat-expansion-panel-header>
-  
-          <div class="p-4 space-y-4">
-            <div *ngIf="!day.restDay">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 class="font-semibold">Warm-up:</h4>
-                  <p>{{ day.warmUpMinutes }} minutes</p>
+
+          <div class="day-content">
+            <div *ngIf="day.restDay" class="rest-day-content">
+              <mat-icon>self_improvement</mat-icon>
+              <p>Take this day to rest and recover.</p>
+            </div>
+
+            <ng-container *ngIf="!day.restDay">
+              <div class="day-summary">
+                <div *ngIf="day.warmUpMinutes" class="summary-item">
+                  <mat-icon color="accent">whatshot</mat-icon>
+                  <span>Warm-up: {{ day.warmUpMinutes }} min</span>
                 </div>
-                <div>
-                  <h4 class="font-semibold">Cool-down:</h4>
-                  <p>{{ day.coolDownMinutes }} minutes</p>
+                <div *ngIf="day.coolDownMinutes" class="summary-item">
+                  <mat-icon color="primary">ac_unit</mat-icon>
+                  <span>Cool-down: {{ day.coolDownMinutes }} min</span>
                 </div>
               </div>
-  
-              <div *ngIf="day.instructions">
-                <h4 class="font-semibold">Instructions:</h4>
-                <p class="whitespace-pre-wrap">{{ day.instructions }}</p>
-              </div>
-  
-              <div *ngIf="day.notesForPatient">
-                <h4 class="font-semibold">Patient Notes:</h4>
-                <p class="whitespace-pre-wrap">{{ day.notesForPatient }}</p>
-              </div>
-  
-              <div *ngIf="day.exercises?.length" class="mt-4">
-                <h3 class="text-lg font-semibold mb-2">Exercises</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div *ngFor="let exercise of day.exercises" 
-                       class="border rounded-lg p-4 shadow-md bg-white">
-                    <img [src]="exercise.imageUrl || 'assets/default-exercise.png'" 
-                         alt="Exercise" 
-                         class="rounded-lg mb-2 w-full h-40 object-cover">
-                    <h4 class="font-bold">{{ exercise.name }}</h4>
-                    <p class="text-sm text-gray-600">{{ exercise.description }}</p>
-                    <div class="mt-2 space-y-1">
-                      <div class="text-sm">
-                        <span class="font-semibold">Duration:</span> 
-                        {{ exercise.defaultDurationMinutes }} minutes
-                      </div>
-                      <div class="text-sm">
-                        <span class="font-semibold">Difficulty:</span> 
-                        {{ exercise.difficultyLevel }}
-                      </div>
-                      <div class="text-sm">
-                        <span class="font-semibold">Equipment:</span> 
-                        {{ exercise.equipmentNeeded?.join(', ') || 'None' }}
-                      </div>
+
+              <p *ngIf="day.instructions" class="day-instructions"><strong>Instructions:</strong> {{ day.instructions }}</p>
+              <p *ngIf="day.notesForPatient" class="day-notes"><strong>Notes for Patient:</strong> {{ day.notesForPatient }}</p>
+
+              <div *ngIf="day.exercises && day.exercises.length > 0" class="exercises-section">
+                <h4 class="subsection-title">Exercises for Day {{day.dayNumber}}</h4>
+                <div class="exercises-grid">
+                  <mat-card *ngFor="let exercise of day.exercises" class="exercise-card">
+                    <div *ngIf="!exercise.safeVideoUrl" class="exercise-media-container">
+                       <img mat-card-image [src]="exercise.imageUrl || 'assets/images/default-exercise.png'"
+                           alt="{{ exercise.name }}" class="exercise-image">
                     </div>
-                    <a *ngIf="exercise.videoTutorialUrl" 
-                       [href]="exercise.videoTutorialUrl" 
-                       target="_blank"
-                       class="text-blue-500 hover:underline mt-2 inline-block">
-                      Watch Tutorial
-                    </a>
-                  </div>
+                    <div *ngIf="exercise.safeVideoUrl" class="video-container exercise-media-container">
+                      <iframe width="560" height="315" [src]="exercise.safeVideoUrl"
+                              frameborder="0" allowfullscreen
+                              title="Exercise Video: {{exercise.name}}"></iframe>
+                    </div>
+
+                    <mat-card-header>
+                      <mat-card-title>{{ exercise.name }}</mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <p *ngIf="exercise.description" class="exercise-description">{{ exercise.description }}</p>
+                      <mat-list dense class="exercise-details-list">
+                        <mat-list-item *ngIf="exercise.defaultDurationMinutes">
+                          <mat-icon matListItemIcon>timer</mat-icon>
+                          Duration: {{ exercise.defaultDurationMinutes }} min
+                        </mat-list-item>
+                        <mat-list-item *ngIf="exercise.difficultyLevel">
+                          <mat-icon matListItemIcon>leaderboard</mat-icon>
+                          Difficulty: {{ exercise.difficultyLevel }}
+                        </mat-list-item>
+                        <mat-list-item *ngIf="exercise.equipmentNeeded && exercise.equipmentNeeded.length > 0">
+                          <mat-icon matListItemIcon>fitness_center</mat-icon>
+                          Equipment: {{ exercise.equipmentNeeded?.join(', ') || 'None' }}
+                        </mat-list-item>
+                         <mat-list-item *ngIf="exercise.videoTutorialUrl && !exercise.safeVideoUrl">
+                           <mat-icon matListItemIcon>videocam</mat-icon>
+                           <a [href]="exercise.videoTutorialUrl" target="_blank" rel="noopener noreferrer">Watch Tutorial (External)</a>
+                         </mat-list-item>
+                      </mat-list>
+                    </mat-card-content>
+                  </mat-card>
                 </div>
               </div>
-            </div>
-  
-            <div *ngIf="day.restDay" class="text-center text-gray-500">
-              Rest Day - No Exercises
-            </div>
+            </ng-container>
           </div>
         </mat-expansion-panel>
       </mat-accordion>
-  
-      <!-- Patients Table -->
-      <div class="mt-8" *ngIf="patients.length > 0">
-        <h3 class="text-xl font-bold mb-4">Assigned Patients ({{ patients.length }})</h3>
-        <div class="border rounded-lg overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-50">
+
+      <mat-divider class="section-divider" *ngIf="patients.length > 0"></mat-divider>
+
+      <div *ngIf="patients.length > 0" class="patients-section">
+        <h3 class="section-title">Assigned Patients ({{ patients.length }})</h3>
+        <div class="table-container mat-elevation-z2">
+          <table class="patients-table">
+            <thead>
               <tr>
-                <th class="px-4 py-2 text-left">Name</th>
-                <th class="px-4 py-2 text-left">Email</th>
-                <th class="px-4 py-2 text-left">Assigned Date</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Assigned Date</th>
+                <th>Status</th>
+                <th>action</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let patient of patients" class="hover:bg-gray-50">
-                <td class="px-4 py-2">{{ patient.name }}</td>
-                <td class="px-4 py-2">{{ patient.email }}</td>
-                <td class="px-4 py-2">{{ patient.assignedDate | date }}</td>
+              <tr *ngFor="let patient of patients">
+                <td data-label="Name">{{ patient.name }}</td>
+                <td data-label="Email">{{ patient.email || 'N/A' }}</td>
+                <td data-label="Assigned Date">{{ patient.assignedDate | date:'mediumDate' }}</td>
+                <td data-label="Status">
+                  <span [ngClass]="{
+                    'status-active': patient.status === 'active',
+                    'status-inactive': patient.status === 'inactive',
+                    'status-pending': patient.status === 'pending'
+                  }">{{ patient.status }}</span> </td>
+                  <td><button mat-icon-button color="accent" (click)="openUserDialog(patient, data.programId)">
+  <mat-icon>info</mat-icon>
+</button></td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-  
-      <div class="text-center mt-6">
-        <button mat-raised-button color="primary" (click)="close()">
-          Close
-        </button>
+
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-flat-button color="primary" (click)="closeDialog()">Close</button>
+    </mat-dialog-actions>
+  </ng-container>
+</div>
+<div class="chart-section">
+  <button mat-stroked-button color="primary" (click)="toggleChart()" class="chart-toggle-btn">
+    <mat-icon>{{ showChart ? 'visibility_off' : 'insert_chart' }}</mat-icon>
+    {{ showChart ? 'Hide Statistics' : 'Show Program Statistics' }}
+  </button>
+
+  <div *ngIf="showChart" class="chart-container">
+    <div id="chart" *ngIf="chartOptions.series && chartOptions.series.length > 0">
+   <apx-chart
+        [series]="chartOptions.series!"
+        [chart]="chartOptions.chart!" [labels]="chartOptions.labels!" [responsive]="chartOptions.responsive!"
+        [legend]="chartOptions.legend!"
+        [dataLabels]="chartOptions.dataLabels!"
+        [colors]="chartOptions.colors!">
+      </apx-chart>
+
+      
+      <div *ngIf="chartData" class="chart-summary">
+        <div class="summary-item">
+          <span class="summary-label">Total Assignments:</span>
+          <span class="summary-value">{{ chartData.totalAssignments }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Completed:</span>
+          <span class="summary-value">{{ chartData.completedAssignments }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Active:</span>
+          <span class="summary-value">{{ chartData.activeAssignments }}</span>
+        </div>
       </div>
     </div>
+    
+    <div *ngIf="showChart && (!chartOptions.series || chartOptions.series.length === 0)" class="no-data-message">
+      <mat-icon>info</mat-icon>
+      <p>No statistics data available for this program</p>
+    </div>
   </div>
+</div>
