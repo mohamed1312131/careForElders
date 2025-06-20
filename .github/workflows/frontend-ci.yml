@@ -40,7 +40,8 @@ jobs:
 
       - name: Build Backend Services (Maven)
         working-directory: careForEldersBack
-        run: mvn clean install -DskipTests
+        run: mvn clean install -pl user-service,planAndExercise,service-registry,api-gateway -am -DskipTests
+
 
       - name: Docker Login
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
