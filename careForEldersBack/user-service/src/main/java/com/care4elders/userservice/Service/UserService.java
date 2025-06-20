@@ -17,4 +17,6 @@ public interface UserService {
     User getUserEntityByEmail(String email);
     List<UserResponse> getAllDoctors();
     List<UserResponse> getUsersByRole(String role);
+    List<User> getAllUsersN();
+
 }

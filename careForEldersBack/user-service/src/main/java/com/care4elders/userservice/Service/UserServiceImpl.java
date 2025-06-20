@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.care4elders.userservice.Config.CloudinaryConfig;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,18 +36,24 @@ public class UserServiceImpl implements UserService {
     }
 
     private UserResponse mapToResponse(User user) {
-        return new UserResponse(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getRole(),
-                user.getBirthDate(),
-                user.getProfileImage(),
-                user.getSpecialization(),
-                user.isTwoFactorEnabled()
-        );
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setPhoneNumber(user.getPhoneNumber());
+        response.setRole(user.getRole());
+        response.setBirthDate(user.getBirthDate());
+        response.setProfileImage(user.getProfileImage());
+        response.setSpecialization(user.getSpecialization());
+        response.setTwoFactorEnabled(user.isTwoFactorEnabled());
+
+        // Add emergency contact fields
+        response.setEmergencyContactName(user.getEmergencyContactName());
+        response.setEmergencyContactPhone(user.getEmergencyContactPhone());
+        response.setEmergencyContactEmail(user.getEmergencyContactEmail());
+
+        return response;
     }
 
     @Override
@@ -65,17 +73,15 @@ public class UserServiceImpl implements UserService {
         user.setProfileImage(request.getProfileImage());
         user.setEnabled(false);
 
+        // Add emergency contact info
+        user.setEmergencyContactName(request.getEmergencyContactName());
+        user.setEmergencyContactPhone(request.getEmergencyContactPhone());
+        user.setEmergencyContactEmail(request.getEmergencyContactEmail());
+
         String token = UUID.randomUUID().toString();
         user.setVerificationToken(token);
 
         User savedUser = userRepository.save(user);
-
-    /*    emailService.sendEmail(
-                user.getEmail(),
-                "Verify your account",
-                "Click this link to verify your email: http://localhost:8081/auth/verify?token=" + token
-        );*/
-
         return mapToResponse(savedUser);
     }
 
@@ -84,9 +90,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElse(null);
 
         if (user == null) {
-            return null; // Or return ResponseEntity.notFound() in controller
+            return null;
         }
 
+        // Existing fields
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
         if (request.getEmail() != null) user.setEmail(request.getEmail());
@@ -100,20 +107,20 @@ public class UserServiceImpl implements UserService {
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        User updatedUser = userRepository.save(user);
 
-        // Manual mapping to UserResponse
-        UserResponse response = new UserResponse();
-        response.setId(updatedUser.getId());
-        response.setFirstName(updatedUser.getFirstName());
-        response.setLastName(updatedUser.getLastName());
-        response.setEmail(updatedUser.getEmail());
-        response.setPhoneNumber(updatedUser.getPhoneNumber());
-        response.setBirthDate(updatedUser.getBirthDate());
-        response.setProfileImage(updatedUser.getProfileImage());
-        response.setRole(updatedUser.getRole());
-        response.setTwoFactorEnabled(updatedUser.isTwoFactorEnabled());
-        return response;
+        // Add emergency contact updates
+        if (request.getEmergencyContactName() != null) {
+            user.setEmergencyContactName(request.getEmergencyContactName());
+        }
+        if (request.getEmergencyContactPhone() != null) {
+            user.setEmergencyContactPhone(request.getEmergencyContactPhone());
+        }
+        if (request.getEmergencyContactEmail() != null) {
+            user.setEmergencyContactEmail(request.getEmergencyContactEmail());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return mapToResponse(updatedUser);
     }
 
 
@@ -179,5 +186,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.getUsersByRole(role).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+    @Override
+    public List<User> getAllUsersN() {
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return users;
     }
 }
