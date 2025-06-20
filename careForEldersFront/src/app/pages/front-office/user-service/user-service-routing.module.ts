@@ -26,6 +26,9 @@ import {PatientBillHistoryComponent} from "../patient-bill/patient-bill-history/
 import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
 import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
 import {RoleGuard} from "../../../guards/role.guard";
+import {UnauthorizedComponent} from "../subscription/unauthorized/unauthorized.component";
+import {MyScheduleComponent} from "../appointment-availability/my-schedule/my-schedule.component";
+import {SubscriptionGuard} from "../subscription/subscriptionguard";
 
 
 
@@ -53,47 +56,47 @@ const routes: Routes = [
       { path: 'mySchedule', component: MyScheduleComponent },
 
       // Silver Plan Features
-      { 
-        path: 'AI', 
-        component: ChatAIComponent, 
-        /*canActivate: [SubscriptionGuard], 
+      {
+        path: 'AI',
+        component: ChatAIComponent,
+        /*canActivate: [SubscriptionGuard],
         data: { modules: 'Chat with doctors' } */
       },
-      { 
-        path: 'bill', 
-        component: PatientBillListComponent, 
-        //canActivate: [SubscriptionGuard], 
-        data: { modules: 'patientBill' } 
+      {
+        path: 'bill',
+        component: PatientBillListComponent,
+        //canActivate: [SubscriptionGuard],
+        data: { modules: 'patientBill' }
       },
-      { 
-        path: 'create', 
-        component: PatientBillFormComponent, 
-        //canActivate: [SubscriptionGuard], 
-        data: { modules: 'patientBill' } 
+      {
+        path: 'create',
+        component: PatientBillFormComponent,
+        //canActivate: [SubscriptionGuard],
+        data: { modules: 'patientBill' }
       },
-      { 
-        path: 'edit/:id', 
-        component: PatientBillFormComponent, 
-        //canActivate: [SubscriptionGuard], 
-        data: { modules: 'patientBill' } 
+      {
+        path: 'edit/:id',
+        component: PatientBillFormComponent,
+        //canActivate: [SubscriptionGuard],
+        data: { modules: 'patientBill' }
       },
-      { 
-        path: 'view/:id', 
-        component: PatientBillFormComponent, 
-        //canActivate: [SubscriptionGuard], 
-        data: { modules: 'patientBill' } 
+      {
+        path: 'view/:id',
+        component: PatientBillFormComponent,
+        //canActivate: [SubscriptionGuard],
+        data: { modules: 'patientBill' }
       },
-      { 
-        path: 'payment/:id', 
-        component: PatientBillPaymentComponent, 
-        //canActivate: [SubscriptionGuard], 
-        data: { modules: 'patientBill' } 
+      {
+        path: 'payment/:id',
+        component: PatientBillPaymentComponent,
+        //canActivate: [SubscriptionGuard],
+        data: { modules: 'patientBill' }
       },
-      { 
-        path: 'history/:id', 
-        component: PatientBillHistoryComponent, 
-        canActivate: [SubscriptionGuard], 
-        data: { modules: 'patientBill' } 
+      {
+        path: 'history/:id',
+        component: PatientBillHistoryComponent,
+        canActivate: [SubscriptionGuard],
+        data: { modules: 'patientBill' }
 
       },
 
