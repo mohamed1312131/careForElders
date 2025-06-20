@@ -1,10 +1,14 @@
 import { Routes } from '@angular/router';
 import { HomePageComponent } from './home-page/home-page.component';
-import { UsersComponent } from './user-service/user/user.component'; // Import the User component
 import { UserinfoComponent } from './user-service/userinfo/userinfo.component';
 import {MedicalRecordComponent} from "./medical-record/medical-record/medical-record.component";
-import {MedicalRecordListComponent} from "./medical-record/medical-records-list/medical-records-list.component";
 import { PatientBillFormComponent } from './patient-bill/patient-bill-form/patient-bill-form.component';
+import {PlanListComponent} from "./nutrition/plan-list/plan-list.component";
+import {PlanDetailsComponent} from "./nutrition/plan-details/plan-details.component";
+import {AdminDashboardComponent} from "./nutrition/admin-dashboard/admin-dashboard.component";
+import {UsersComponent} from "./user-service/user/user.component";
+import {MedicalRecordListComponent} from "./medical-record/medical-records-list/medical-records-list.component";
+import { PostListComponent } from './blog-forum/post-list/post-list.component';
 
 
 export const FrontOfficeRoutes: Routes = [
@@ -34,6 +38,15 @@ export const FrontOfficeRoutes: Routes = [
     data: { preload: true }
   },
   {
+    path: "post",
+    component:PostListComponent,  }, 
+  {
+    path: 'abonnement',
+    loadChildren: () =>
+      import('./subscription/subscription.module').then((m) => m.SubscriptionModule),
+  },
+
+  {
     path: 'users',
     component: UsersComponent,
   },
@@ -57,17 +70,35 @@ export const FrontOfficeRoutes: Routes = [
     path:'medicalRecord',
     component:MedicalRecordComponent,
   },
+  {
+    path:'nutritionplanlist',
+    component:PlanListComponent,
+  },
+  {
+    path:'nutritionplandetails/:id',
+    component:PlanDetailsComponent ,
+  },
+  {
+
+    path:'nutritionplainadmin',
+    component:AdminDashboardComponent,
+  },
+  {
+    path:'medicalrecordlist',
+    component:MedicalRecordListComponent,
+  },
+  {
+    path:'medicalrecord/:id',
+    component:MedicalRecordComponent ,
+  },
   /*{
     path: 'bill',
     loadChildren: () =>
       import('./patient-bill/patient-bills.module').then((m) => m.PatientBillsModule),
     // Remove the component property here
   },
-
-  {
-    path: "blog-forum",
-    loadChildren: () => import("./blog-forum/blog-forum.module").then((m) => m.BlogForumModule),
-  }, */
+*/
+  
 
 
 ];

@@ -12,6 +12,20 @@ import { Subscription, Observable, catchError, of, forkJoin } from 'rxjs';
 import { ProgramService, ProgramAssignmentDTO } from '../../ProgramService'; // Ensure path is correct
 import { DayFormComponent } from '../day-form/day-form.component'; // Ensure DayFormComponent is standalone or its module imported
 
+// Material Modules for standalone component
+import { CommonModule } from '@angular/common';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatCardModule } from '@angular/material/card'; // For exercise display
 
 export interface ProgramEditData {
   programId: string;
@@ -106,7 +120,6 @@ export class DoctorEditPlanComponent implements OnInit, OnDestroy {
       }).subscribe(({ program, allPatients, assigned }) => {
         if (program) {
           this.programDetails = program;
-          console.log('✅ Loaded Program Details:', this.programDetails);
           this.programForm.patchValue({
             id: program.id,
             name: program.name,
@@ -120,19 +133,16 @@ export class DoctorEditPlanComponent implements OnInit, OnDestroy {
         this.allAssignablePatients = allPatients;
         this.assignedPatients = assigned;
 
-        console.log(`👥 Loaded ${this.allAssignablePatients.length} assignable patients.`);
-        console.log(`✅ ${this.assignedPatients.length} patients already assigned:`, this.assignedPatients);
-
         this.isLoadingProgram = false;
         this.isLoadingPatients = false;
       })
     );
   }
 
-getUnassignedPatients(): any[] {
-  const assignedIds = new Set(this.assignedPatients.map(p => String(p.patientId)));
-  return this.allAssignablePatients.filter(p => !assignedIds.has(String(p.patientId)));
-}
+  getUnassignedPatients(): any[] {
+    const assignedIds = new Set(this.assignedPatients.map(p => p.id));
+    return this.allAssignablePatients.filter(p => !assignedIds.has(p.id));
+  }
 
   onSaveProgramDetails(): void {
     if (this.programForm.invalid) {
@@ -162,52 +172,25 @@ getUnassignedPatients(): any[] {
   }
 
   onAssignSelectedPatients(): void {
-  // Frontend validation: filter out already assigned patients
-  const assignedIds = new Set(this.assignedPatients.map(p => String(p.id)));
-  const newSelections = this.selectedPatientIdsForAssignment.filter(id => 
-    !assignedIds.has(String(id))
-  );
-  
-  // Show error for already assigned patients
-  const alreadyAssigned = this.selectedPatientIdsForAssignment.filter(id => 
-    assignedIds.has(String(id))
-  );
-  
-  if (alreadyAssigned.length > 0) {
-    const names = alreadyAssigned.map(id => this.getPatientName(id) || id).join(', ');
-    this.snackBar.open(
-      `Cannot assign: ${names} already assigned to program`,
-      'Close',
-      { duration: 5000, panelClass: 'error-snackbar' }
-    );
-  }
-
-  if (newSelections.length === 0) {
-    if (alreadyAssigned.length > 0) return;
-    this.snackBar.open('No new patients selected', 'Close', { duration: 3000 });
-    return;
-  }
-
-  // Proceed with backend assignment for new selections
-  this.isAssigning = true;
-  const assignmentObservables: Observable<any>[] = newSelections.map(patientId => {
-    const assignmentDTO: ProgramAssignmentDTO = {
-      programId: this.data.programId,
-      patientId: String(patientId)
-    };
-    return this.programService.assignProgramToPatient(assignmentDTO, this.doctorId).pipe(
-      catchError(err => {
-        console.error(`Assignment error: ${err.message}`);
-        const patientName = this.getPatientName(patientId) || `Patient ID: ${patientId}`;
-        this.snackBar.open(
-          `Error assigning ${patientName}: ${err.error?.message || 'Already assigned'}`,
-          'Close',
-          { duration: 5000, panelClass: 'error-snackbar' }
-        );
-        return of({ error: true, patientId });
-      })
-    );
-  });
+    if (this.selectedPatientIdsForAssignment.length === 0) {
+      this.snackBar.open('No new patients selected for assignment.', 'Close', { duration: 3000 });
+      return;
+    }
+    this.isAssigning = true;
+    const assignmentObservables: Observable<any>[] = this.selectedPatientIdsForAssignment.map(patientId => {
+      const assignmentDTO: ProgramAssignmentDTO = {
+        programId: this.data.programId,
+        patientId: patientId
+      };
+      return this.programService.assignProgramToPatient(assignmentDTO, this.doctorId).pipe(
+        catchError(err => {
+          console.error(`Failed to assign program to patient ${patientId}:`, err);
+          const patientName = this.getPatientName(patientId) || `Patient ID: ${patientId}`;
+          this.snackBar.open(`Error assigning to ${patientName}.`, 'Retry', { duration: 5000, panelClass: 'error-snackbar' });
+          return of({ error: true, patientId });
+        })
+      );
+    });
 
     this.subscriptions.add(
       forkJoin(assignmentObservables).subscribe(results => {
@@ -237,6 +220,18 @@ getUnassignedPatients(): any[] {
       const patient = this.allAssignablePatients.find(p => p.id === patientId) || this.assignedPatients.find(p => p.id === patientId);
       return patient ? patient.name : undefined;
   }
+  
+  // Method to unassign a patient (example, not fully implemented in UI yet)
+  onUnassignPatient(patientId: string): void {
+    if (!confirm(`Are you sure you want to unassign ${this.getPatientName(patientId) || 'this patient'}?`)) {
+      return;
+    }
+    // Add service call to unassign patient
+    // this.programService.unassignProgramFromPatient(this.data.programId, patientId, this.doctorId).subscribe(...)
+    console.log('Unassign patient:', patientId);
+    this.snackBar.open('Unassign feature not fully implemented.', 'Close', {duration: 3000});
+  }
+
 
   closeDialog(result?: any): void {
     this.dialogRef.close(result);
@@ -270,6 +265,12 @@ getUnassignedPatients(): any[] {
   });
 }
 
+
+
+  // addDay and updateDay methods are now effectively handled by openDayForm and its afterClosed logic.
+  // The DayFormComponent should handle the actual API call for add/update.
+  // The main component (DoctorEditPlanComponent) just needs to update its local programDetails.days array.
+
   deleteDay(dayToDelete: any): void {
     if (confirm(`Are you sure you want to delete Day ${dayToDelete.dayNumber}? This action cannot be undone.`)) {
       this.programService.deleteProgramDay(this.data.programId, dayToDelete.id, this.doctorId)
@@ -289,33 +290,4 @@ getUnassignedPatients(): any[] {
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-  onUnassignPatient(patientId: string): void {
-  console.log('Unassigning patient:', patientId);
-  if (!confirm(`Are you sure you want to unassign ${this.getPatientName(patientId) || 'this patient'}?`)) {
-    return;
-  }
-
-  this.programService.unassignProgramFromPatient(this.data.programId, patientId, this.doctorId)
-    .subscribe({
-      next: () => {
-        this.snackBar.open('Patient unassigned successfully.', 'Close', {
-          duration: 3000,
-          panelClass: 'success-snackbar'
-        });
-        this.loadInitialData(); // ✅ reload to reflect changes
-      },
-      error: (err) => {
-        console.error(err);
-        this.snackBar.open('Error unassigning patient: ' + (err.error?.message || 'Unknown error'), 'Close', {
-          duration: 5000,
-          panelClass: 'error-snackbar'
-        });
-      }
-    });
-}
-isPatientAlreadyAssigned(patientId: string): boolean {
-  return this.assignedPatients.some(p => String(p.id) === String(patientId));
-}
-
-
 }

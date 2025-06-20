@@ -21,7 +21,7 @@
         </div>
   
         <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <form enctype="multipart/form-data">
+          <form>
             <h6 class="text-blueGray-400 text-sm mt-3 mb-6 font-bold uppercase">
               Program Information
             </h6>
@@ -66,10 +66,9 @@
                   </label>
                   <input 
                     type="file" 
-        (change)="onFileSelected($event)"
-        accept="image/*"
-        name="programImage"
-        class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150">
+                    (change)="onFileSelected($event)"
+                    accept="image/*"
+                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150">
                 </div>
               </div>
   

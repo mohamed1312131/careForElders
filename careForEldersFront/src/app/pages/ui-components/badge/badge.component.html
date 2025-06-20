@@ -1,57 +1,121 @@
-<mat-card class="cardWithShadow theme-card">
-  <mat-card-header>
-    <mat-card-title class="m-b-0">Badges</mat-card-title>
-  </mat-card-header>
-  <mat-card-content class="b-t-1">
-    <mat-card class="b-1 shadow-none">
-      <mat-card-content>
-        <p>
-          <span matBadge="4" matBadgeOverlap="false" class="f-w-500 text-muted">Text with a badge</span>
-        </p>
-      </mat-card-content>
-    </mat-card>
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <div class="last-updated">Last updated: {{ now | date:'medium' }}</div>
+  </div>
 
-    <mat-card class="b-1 shadow-none">
-      <mat-card-content>
-        <p>
-          <span matBadge="4" matBadgeOverlap="false" matBadgeSize="large" class="f-w-500 text-muted">Text with large
-            badge</span>
-        </p>
-      </mat-card-content>
-    </mat-card>
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card">
+      <h3>Total Reservations</h3>
+      <div class="value">{{ reservationStats.total }}</div>
+    </div>
+    <div class="card">
+      <h3>Confirmed</h3>
+      <div class="value">{{ reservationStats.confirmed }}</div> <!-- Fixed typo from "confirmed" -->
+    </div>
+    <div class="card">
+      <h3>Cancelled</h3>
+      <div class="value">{{ reservationStats.cancelled }}</div>
+    </div>
+    <div class="card">
+      <h3>Completed</h3>
+      <div class="value">{{ reservationStats.completed }}</div>
+    </div>
+  </div>
 
-    <mat-card class="b-1 shadow-none">
-      <mat-card-content>
-        <p class="f-w-500 text-muted">
-          Button with a badge on the left
-          <button mat-flat-button color="primary" matBadge="8" matBadgePosition="before" matBadgeColor="accent">
-            Action
-          </button>
-        </p>
-      </mat-card-content>
-    </mat-card>
+  <!-- Analytics Section -->
+  <div class="analytics-section">
+    <div class="chart-container">
+      <h3>Reservation Status</h3>
+      <P>hahahahah</P>
+    </div>
+    <div class="chart-container">
+      <h3>Reservation Types</h3>
+      <P>hahahahah</P>
+    </div>
+    <div class="chart-container">
+      <h3>Doctor Utilization</h3>
+      <P>hahahahah</P>
+    </div>
+  </div>
 
-    <mat-card class="b-1 shadow-none">
-      <mat-card-content>
-        <p class="f-w-500 text-muted">
-          Icon with a badge
-          <mat-icon matBadge="15" matBadgeColor="warn">home</mat-icon>
-        </p>
-      </mat-card-content>
-    </mat-card>
+  <!-- Rest of your template remains the same -->
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <select [(ngModel)]="statusFilter" (change)="updateStats()">
+      <option value="ALL">All Statuses</option>
+      <option value="CONFIRME">Confirmed</option>
+      <option value="ANNULE">Cancelled</option>
+      <option value="TERMINE">Completed</option>
+    </select>
 
-    <mat-card class="b-1 shadow-none">
-      <mat-card-content>
-        <p>
-          Button toggles badge visibility
-          <button mat-flat-button color="primary" matBadge="7" [matBadgeHidden]="hidden" (click)="toggleBadgeVisibility()">
-            Hide
-          </button>
-        </p>
-      </mat-card-content>
-    </mat-card>
+    <select [(ngModel)]="typeFilter" (change)="updateStats()">
+      <option value="ALL">All Types</option>
+      <option value="EN_LIGNE">Online</option>
+      <option value="PRESENTIEL">In-Person</option>
+    </select>
 
+    <select [(ngModel)]="doctorFilter" (change)="updateStats()">
+      <option value="ALL">All Doctors</option>
+      <option *ngFor="let doctor of doctors" [value]="doctor.id">
+        {{ doctor.firstName }} {{ doctor.lastName }}
+      </option>
+    </select>
+  </div>
 
+  <!-- Reservations Table -->
+  <div class="reservations-table">
+    <h2>Reservation Management</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reservation of filteredReservations">
+          <td>{{ reservation.id }}</td>
+          <td>{{ getUserName(reservation.userId) }}</td>
+          <td>{{ getDoctorName(reservation.doctorId) }}</td>
+          <td>{{ reservation.date | date }}</td>
+          <td>{{ reservation.heure }}</td>
+          <td>{{ reservation.reservationType }}</td>
+          <td>
+            <span [class]="'status-badge ' + reservation.statut.toLowerCase()">
+              {{ reservation.statut }}
+            </span>
+          </td>
+          <td>
+            <button (click)="cancelReservation(reservation.id)">Cancel</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  </mat-card-content>
-</mat-card>
+  <!-- Doctor Availability Section -->
+  <div class="availability-section">
+    <h2>Doctor Availability Management</h2>
+    <div class="availability-list">
+      <div *ngFor="let availability of doctorsAvailability" class="availability-item">
+        <div class="availability-info">
+          <span class="doctor-name">{{ getDoctorName(availability.doctorId) }}</span>
+          <span class="availability-date">{{ availability.date | date }}</span>
+          <span class="availability-time">{{ availability.heureDebut }} - {{ availability.heureFin }}</span>
+        </div>
+        <div class="availability-actions">
+          <button (click)="deleteAvailability(availability.id)">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

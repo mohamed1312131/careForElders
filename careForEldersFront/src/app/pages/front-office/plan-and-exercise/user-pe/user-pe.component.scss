@@ -131,17 +131,3 @@ $font-family: 'Poppins', sans-serif; // Example font
     // border: 1px solid rgba($progress-color, 0.5); // Example border
   }
 }
-.progress-bar-container {
-  height: 6px;
-  width: 100%;
-  background-color: #e0e0e0;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background-color: #4caf50; // green
-  transition: width 0.4s ease;
-}

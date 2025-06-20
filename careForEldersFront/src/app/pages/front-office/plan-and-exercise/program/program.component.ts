@@ -8,14 +8,15 @@ import { Subscription } from 'rxjs';
 
 // Define interfaces for better type safety
 export interface Exercise {
-  id: string;
+  id: string; // or number
   name: string;
-  imageUrl?: string;
+  imageUrl?: string; // Make optional if not always present
   durationMinutes: number;
   recommendedRepetitions?: string;
-  difficultyLevel?: 'Easy' | 'Medium' | 'Hard' | string;
+  difficultyLevel?: 'Easy' | 'Medium' | 'Hard' | string; // Allow string for flexibility
   videoUrl?: string;
-  equipmentNeeded?: string;
+  equipmentNeeded?: string; // Example of another detail
+  // Internal state for UI
   isActive?: boolean;
   expanded?: boolean;
 }
@@ -23,9 +24,7 @@ export interface Exercise {
 export interface DayExercises {
   totalDuration: number;
   exercises: Exercise[];
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED';
-  locked: boolean;
-  dayNumber: number;
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED'; // Use specific statuses
 }
 
 @Component({
@@ -38,7 +37,8 @@ export class ProgramComponent implements OnInit, OnDestroy {
   assignmentId!: string;
   dayNumber!: string;
   userId!: string;
-  isWorkoutActive: boolean = false;
+
+  isWorkoutActive: boolean = false; // To show a general "workout in progress" indicator
   private dialogSubscription!: Subscription;
 
   constructor(
@@ -56,6 +56,8 @@ export class ProgramComponent implements OnInit, OnDestroy {
 
     if (!this.userId) {
       console.error("User ID not found. Redirecting or showing error.");
+      // Potentially navigate to a login page or display an error message
+      // this.router.navigate(['/login']);
       return;
     }
     this.loadExercises();
@@ -65,139 +67,125 @@ export class ProgramComponent implements OnInit, OnDestroy {
     this.programService.getDayExercises(this.assignmentId, +this.dayNumber, this.userId)
       .subscribe({
         next: (data: DayExercises) => {
-          console.log('Loaded exercises for day:', this.dayNumber, data);
           this.dayExercises = {
             ...data,
             exercises: data.exercises.map(ex => ({
               ...ex,
-              isActive: false,
+              isActive: false, // Initialize UI state properties
               expanded: false
             }))
           };
-          
+          // If coming back to this page and a workout was active, update UI indicator.
+          // This is a simple check; more complex state (like which exercise was active)
+          // would need to be persisted and restored if the player isn't modal.
           if (this.dayExercises.status === 'IN_PROGRESS') {
-            this.isWorkoutActive = true;
+              this.isWorkoutActive = true; // Show general indicator
           } else {
-            this.isWorkoutActive = false;
+              this.isWorkoutActive = false;
           }
         },
         error: (err) => {
           console.error('Error loading exercises:', err);
-          this.dayExercises = null;
+          this.dayExercises = null; // Important to handle template *ngIf
         }
       });
-  }
-
-  isEmbeddableVideo(url: string): boolean {
-    if (!url) return false;
-    return url.includes('youtube.com/embed') || 
-           url.includes('youtu.be') || 
-           url.includes('player.vimeo.com/video') ||
-           url.includes('vimeo.com');
   }
 
   getSafeVideoUrl(url: string): SafeResourceUrl {
-    if (url.includes('youtu.be/')) {
-      const videoId = url.split('youtu.be/')[1]?.split('?')[0];
-      url = `https://www.youtube.com/embed/${videoId}`;
-    } else if (url.includes('youtube.com/watch?v=')) {
-      const videoId = url.split('v=')[1]?.split('&')[0];
-      url = `https://www.youtube.com/embed/${videoId}`;
-    }
-    
-    if (url.includes('vimeo.com/') && !url.includes('player.vimeo.com')) {
-      const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
-      url = `https://player.vimeo.com/video/${videoId}`;
-    }
-
+    // Ensure URL is a valid embeddable URL (basic check)
     if (url && (url.includes('youtube.com/embed') || url.includes('player.vimeo.com/video'))) {
       return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
-    
     console.warn('Attempted to sanitize an invalid or non-embeddable video URL:', url);
-    return '';
+    return ''; // Return empty or a placeholder, but an empty src for iframe is usually fine
+  }
+
+  completeDay(): void {
+    this.programService.completeDay(this.assignmentId, +this.dayNumber, this.userId)
+      .subscribe({
+        next: () => {
+          this.isWorkoutActive = false;
+          this.loadExercises(); // Refresh data to show 'COMPLETED' status
+        },
+        error: (err) => console.error('Error completing day:', err)
+      });
   }
 
   startWorkout(): void {
-  if (!this.dayExercises || !this.dayExercises.exercises || this.dayExercises.exercises.length === 0) {
-    console.warn("No exercises available to start.");
-    return;
-  }
+    if (!this.dayExercises || !this.dayExercises.exercises || this.dayExercises.exercises.length === 0) {
+      console.warn("No exercises available to start.");
+      // Optionally show a user-friendly message (e.g., using MatSnackBar)
+      return;
+    }
 
-  // Check if day is locked
-  if (this.dayExercises.locked) {
-    console.warn("This day is locked. Complete previous days first.");
-    return;
-  }
+    const startApiCall = this.dayExercises.status !== 'IN_PROGRESS' ?
+                         this.programService.startDay(this.assignmentId, +this.dayNumber, this.userId) :
+                         Promise.resolve(); // If already in progress, no need to call API again
 
-  const shouldStartDay = this.dayExercises.status === 'NOT_STARTED' || this.dayExercises.status === 'PENDING';
+    Promise.resolve(startApiCall).then(() => { // Handles both Observable and Promise resolve
+      if (this.dayExercises) this.dayExercises.status = 'IN_PROGRESS'; // Optimistically update
+      this.isWorkoutActive = true;
 
-  if (shouldStartDay) {
-    this.programService.startDay(this.assignmentId, +this.dayNumber, this.userId)
-      .subscribe({
-        next: () => {
-          this.dayExercises!.status = 'IN_PROGRESS';
-          this.isWorkoutActive = true;
-          this.openWorkoutDialog();
+      const dialogRef = this.dialog.open(WorkoutPlayerComponent, {
+        width: '100vw', // Full width
+        height: '100vh', // Full height
+        maxWidth: '100vw', // Ensure it takes full viewport on mobile
+        panelClass: ['workout-player-dialog-fullscreen'], // Custom class for fullscreen styling
+        data: {
+          exercises: this.dayExercises!.exercises, // Non-null assertion as we checked above
+          assignmentId: this.assignmentId,
+          dayNumber: this.dayNumber,
+          userId: this.userId,
+          totalDurationMinutes: this.dayExercises!.totalDuration,
+          // You can pass current progress if resuming a persisted state
         },
-        error: (err) => {
-          console.error('Error starting day via API:', err);
-          this.isWorkoutActive = false;
+        disableClose: true // Important: prevent closing via escape or backdrop click
+      });
+
+      if (this.dialogSubscription) {
+        this.dialogSubscription.unsubscribe();
+      }
+
+      this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
+        this.isWorkoutActive = false; // Workout player is closed
+        // Result can contain information like { workoutCompleted: true } or { progress: ... }
+        if (result?.workoutCompleted) {
+          // The WorkoutPlayerComponent might call the completeDay service itself,
+          // or expect this component to do it. For simplicity, let's assume this component reloads.
+          this.loadExercises(); // Refresh to get the 'COMPLETED' status
+        } else if (result?.cancelledByUser && this.dayExercises) {
+            // If user cancels, keep status as IN_PROGRESS unless specified otherwise
+            // No specific API call here unless you want to track cancellations
+            console.log("Workout cancelled by user. Current status:", this.dayExercises.status);
+            this.loadExercises(); // Refresh to ensure UI consistency
+        } else {
+          // Any other close reason (e.g., error in player, or simply closed without finishing)
+          // Reload to get the latest server state.
+          this.loadExercises();
         }
       });
-  } else {
-    this.isWorkoutActive = true;
-    this.openWorkoutDialog();
-  }
-}
-openWorkoutDialog(): void {
-  const dialogRef = this.dialog.open(WorkoutPlayerComponent, {
-    width: '100vw',
-    height: '100vh',
-    maxWidth: '100vw',
-    panelClass: ['workout-player-dialog-fullscreen'],
-    data: {
-      exercises: this.dayExercises!.exercises,
-      assignmentId: this.assignmentId,
-      dayNumber: +this.dayNumber,
-      userId: this.userId,
-      totalDurationMinutes: this.dayExercises!.totalDuration,
-    },
-    disableClose: true
-  });
-
-  if (this.dialogSubscription) {
-    this.dialogSubscription.unsubscribe();
+    }).catch(err => {
+        console.error('Error starting day via API:', err);
+        this.isWorkoutActive = false; // Revert indicator if API call failed
+    });
   }
 
-  this.dialogSubscription = dialogRef.afterClosed().subscribe(result => {
-    this.isWorkoutActive = false;
-    if (result?.workoutCompleted) {
-      this.loadExercises(); // Refresh updated status
-    } else if (result?.cancelledByUser) {
-      console.log("Workout cancelled by user.");
-      this.loadExercises();
-    } else {
-      this.loadExercises();
-    }
-  });
-}
-
+  // Optional: If you want to allow editing the workout plan
   editWorkout(): void {
+    // Example: navigate to an edit route
+    // this.router.navigate(['/edit-program', this.assignmentId, 'day', this.dayNumber]);
     alert('Edit functionality to be implemented.');
     console.log('Edit workout for assignment:', this.assignmentId, 'Day:', this.dayNumber);
   }
 
-  onImageError(event: Event): void {
-    const target = event.target as HTMLImageElement;
-    if (target) {
-      target.src = 'assets/placeholder-exercise.png';
-    }
-  }
-
+  // Method to highlight exercise from WorkoutPlayer (if needed and player isn't fully modal)
   highlightActiveExercise(exerciseId: string): void {
     this.dayExercises?.exercises.forEach(ex => {
       ex.isActive = ex.id === exerciseId;
+      if (ex.isActive) {
+        // Potentially scroll this item into view if list is long
+        // document.getElementById(`exercise-${ex.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     });
   }
 

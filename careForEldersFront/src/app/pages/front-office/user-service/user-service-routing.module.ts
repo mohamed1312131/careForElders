@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UsersComponent} from './user/user.component';
-
-//import { UsersComponent } from './user/user.component';
-
+import { UsersComponent } from './user/user.component';
 import { UserLayoutComponent } from './userProfile/user-layout/user-layout.component';
 import { UserinfoComponent } from './userinfo/userinfo.component';
 import { ChatAIComponent } from '../chat/chat-ai/chat-ai.component';
 import { PatientBillListComponent } from '../patient-bill/patient-bill-list/patient-bill-list.component';
-import { TestingComponent } from '../appointment-availability/testing/testing.component';
 import { SearchDoctorComponent } from '../appointment-availability/search-doctor/search-doctor.component';
 import { DoctorDetailsComponent } from '../appointment-availability/doctor-details/doctor-details.component';
 import { AddAvailabilityComponent } from '../appointment-availability/add-availability/add-availability.component';
@@ -20,19 +16,24 @@ import { PlanListComponent } from '../plan-and-exercise/plan-list/plan-list.comp
 import { PlanDetailsComponent } from '../plan-and-exercise/plan-details/plan-details.component';
 import { ProgramComponent } from '../plan-and-exercise/program/program.component';
 import { AddExerciseComponent } from '../plan-and-exercise/doctor/add-exercise/add-exercise.component';
-import {PatientBillFormComponent} from "../patient-bill/patient-bill-form/patient-bill-form.component";
-import {PatientBillPaymentComponent} from "../patient-bill/patient-bill-payment/patient-bill-payment.component";
-import {PatientBillHistoryComponent} from "../patient-bill/patient-bill-history/patient-bill-history.component";
-import {MedicalRecordListComponent} from "../medical-record/medical-records-list/medical-records-list.component";
-import {MedicalRecordComponent} from "../medical-record/medical-record/medical-record.component";
-import {RoleGuard} from "../../../guards/role.guard";
-
-
-
+import { MyScheduleComponent } from '../appointment-availability/my-schedule/my-schedule.component';
+import { UserServicesComponent } from '../paramedical-care/user-services/user-services.component';
+import { UserRequestsComponent } from '../paramedical-care/user-requests/user-requests.component';
+import { SoignantRequestsComponent } from '../paramedical-care/soignant-requests/soignant-requests.component';
+import { PatientBillFormComponent } from '../patient-bill/patient-bill-form/patient-bill-form.component';
+import { PatientBillPaymentComponent } from '../patient-bill/patient-bill-payment/patient-bill-payment.component';
+import { PatientBillHistoryComponent } from '../patient-bill/patient-bill-history/patient-bill-history.component';
+import { PostDetailComponent } from '../blog-forum/post-detail/post-detail.component';
+import { PostFormComponent } from '../blog-forum/post-form/post-form.component';
+import { PostListComponent } from '../blog-forum/post-list/post-list.component';
+import { AdminDashboardComponent } from "../nutrition/admin-dashboard/admin-dashboard.component";
+import { UnauthorizedComponent } from '../subscription/unauthorized/unauthorized.component';
+import { SubscriptionGuard } from '../subscription/subscriptionguard';
+import { MedicalRecordComponent } from '../medical-record/medical-record/medical-record.component';
+import { MedicalRecordListComponent } from '../medical-record/medical-records-list/medical-records-list.component';
 
 const routes: Routes = [
   {
-
     path: '',
     component: UserLayoutComponent,
   },
@@ -40,7 +41,6 @@ const routes: Routes = [
     path: 'userProfile',
     component: UserLayoutComponent,
     children: [
-
       // Basic Plan Features (available to all)
       { path: 'search', component: SearchDoctorComponent },
       { path: 'doctor/:id', component: DoctorDetailsComponent },
@@ -56,8 +56,8 @@ const routes: Routes = [
       { 
         path: 'AI', 
         component: ChatAIComponent, 
-        /*canActivate: [SubscriptionGuard], 
-        data: { modules: 'Chat with doctors' } */
+        canActivate: [SubscriptionGuard], 
+        data: { modules: 'Chat with doctors' } 
       },
       { 
         path: 'bill', 
@@ -94,111 +94,91 @@ const routes: Routes = [
         component: PatientBillHistoryComponent, 
         canActivate: [SubscriptionGuard], 
         data: { modules: 'patientBill' } 
-
       },
 
-{
-    path: "edit/:id",
-    component: PatientBillFormComponent,
-  },
-  {
-    path: "view/:id",
-    component: PatientBillFormComponent, // You can create a dedicated view component later
-  },
-  // Payment related routes
-  {
-    path: "payment/:id",
-    component: PatientBillPaymentComponent,
-    //data: { title: "Process Payment" },
-  },
-  {
-    path: "history/:id",
-    component: PatientBillHistoryComponent,
-    //data: { title: "Payment History" },
-  },
+      // Blog/Forum
+      { 
+        path: "post", 
+        component: PostListComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'blogForum' } 
+      },
+      { 
+        path: "post/create", 
+        component: PostFormComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'blogForum' } 
+      },
+      { 
+        path: "post/edit/:id", 
+        component: PostFormComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'blogForum' } 
+      },
+      { 
+        path: "post/:id", 
+        component: PostDetailComponent, 
+        //canActivate: [SubscriptionGuard], 
+        data: { modules: 'blogForum' } 
+      },
+
+      // Nutrition & Plans
       {
-        path: 'create',
-        component: PatientBillFormComponent
+        path: 'plan',
+      
+        children: [
+          { path: 'add-program', component: DoctorAddProgramComponent },
+          { path: 'list', component: DoctorPlanListComponent },
+          { path: 'userprogram', component: PlanListComponent },
+          { path: 'plandetails/:programId', component: PlanDetailsComponent },
+          { path: 'program/:assignmentId/day/:dayNumber', component: ProgramComponent },
+          { path: 'addExercise', component: AddExerciseComponent }
+        ]
       },
       {
-        path: 'userinfo/:id',
-        component: UserinfoComponent,
-
+        path: 'nutrition',
+        canActivate: [SubscriptionGuard],
+        data: { modules: 'nutrition' },
+        children: [
+          { path: 'nutritionplanlist', component: PlanListComponent },
+          { path: 'nutritionplandetails/:id', component: PlanDetailsComponent },
+          { path: 'nutritionplainadmin', component: AdminDashboardComponent }
+        ]
       },
-      {
-        path: 'users',
-        component: UsersComponent,
-
-      },
-
-
       {path:'medicalRecord',
         children: [
           {
             path:'medicalrecordlist',
             component:MedicalRecordListComponent,
-
           },
           {
             path:'medicalrecord/:id',
             component:MedicalRecordComponent ,
           },
         ]},
-
-      {path:'search',
-        component: SearchDoctorComponent
+      // Gold Plan Features
+      
+      { 
+        path: 'userServices', 
+        component: UserServicesComponent, 
+        canActivate: [SubscriptionGuard], 
+        data: { modules: 'paramedicalCare' } 
       },
-      {path:'doctor/:id',
-        component: DoctorDetailsComponent
+      { 
+        path: 'SoignantRequests', 
+        component: SoignantRequestsComponent, 
+        canActivate: [SubscriptionGuard], 
+        data: { modules: 'paramedicalCare' } 
       },
-      {path:'doctor/:id/AddAvailability',
-        component: AddAvailabilityComponent
-      },
-      {path:'Reservation',
-        component: MyReservationsComponent
-      },
-      {path:'Abonnement',
-        component: AbonnementTypeComponent
-      },
-      {
-        path: 'plan',
-        children: [
-          {
-            path:'add-program',
-            component: DoctorAddProgramComponent
-          },
-          {
-            path:'list',
-            component: DoctorPlanListComponent
-          },
-          {
-            path:'userprogram',
-            component: PlanListComponent
-          },
-          {
-            path: 'plandetails/:programId',
-            component: PlanDetailsComponent,
-          },
-          {
-            path:'program/:assignmentId/day/:dayNumber',
-            component: ProgramComponent,
-          },
-          {
-            path:'addExercise',
-            component: AddExerciseComponent,
-          },
-        ]
-      },
+      { 
+        path: 'UserRequests', 
+        component: UserRequestsComponent, 
+        canActivate: [SubscriptionGuard], 
+        data: { modules: 'paramedicalCare' } 
+      }
     ]
-
   },
-  {
-    path: 'userinfo/:id',
-    component: UserinfoComponent,
-  },
-
-
-
+  { path: 'userinfo/:id', component: UserinfoComponent }
 ];
 
 @NgModule({

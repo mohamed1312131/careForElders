@@ -1,174 +1,70 @@
-// Optional: Import your global theme if you have one for Angular Material
-// @import '~@angular/material/theming';
-// @import 'path/to/your/theme-file'; // If you have a custom theme
+// Optional: Import global variables or styles if you have them
+// @import 'styles/variables';
 
-// Define some variables for consistency (optional, but good practice)
-$primary-color: #6e48d2; // Original accent color, can be theme.primary
-$accent-color: #ff4081;  // Example accent, can be theme.accent
-$text-color-dark: #333;
-$text-color-light: #555;
-$background-color: #f4f6f8; // Light background for the page
-$card-background: #ffffff;
-$border-radius: 8px;
-$base-padding: 20px;
-$base-margin: 20px;
-
-// --- Global Styles for this Component ---
-:host {
-  display: block; // Ensures the component takes up block space
-  // background-color: $background-color; // Set this at a higher level (body) or here if needed
-}
-
-.program-dashboard-container {
-  padding: $base-padding ($base-padding * 1.5);
-  max-width: 1600px; // Increased max-width for wider layouts
-  margin: 0 auto;
-  box-sizing: border-box;
-
+.workout-list-container {
+    padding: 30px 20px; // Add padding around the whole list (adjust as needed)
+    max-width: 1400px; // Max width for the content area on very large screens
+    margin: 0 auto; // Center the container on the page
+    box-sizing: border-box; // Include padding in width calculation
+    width: 100%;
+  
+    .list-title {
+      font-size: 2em; // Clear title for the section
+      font-weight: 700;
+      color: #333; // Dark color for contrast
+      margin-bottom: 25px; // Space below the title
+      padding-left: 10px; // Slight indent to align nicely with grid padding below
+      border-left: 4px solid #6e48d2; // Accent line matching card progress bar
+    }
+  
+    .cards-wrapper {
+      display: grid;
+      // --- Responsive Grid Layout ---
+      // auto-fit: Creates as many columns as fit within the container.
+      // minmax(300px, 1fr): Each column will be at least 300px wide,
+      //                    but can grow equally (1fr) to fill available space.
+      // This naturally creates ~3 columns on medium/large screens if the container
+      // is wide enough (e.g., > 900px + gap), 2 columns on smaller tablets,
+      // and 1 column on narrow mobile screens.
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  
+      // --- Spacing ---
+      gap: 25px; // Consistent spacing between cards (rows and columns)
+  
+      // --- Alignment (Optional) ---
+      // align-items: stretch; // Default: makes cards in the same row equal height if content differs
+    }
+  }
+  
+  // --- Media Queries for Fine-tuning (Optional) ---
   @media (max-width: 768px) {
-    padding: ($base-padding * 0.75) $base-padding;
+    .workout-list-container {
+      padding: 20px 15px; // Reduce padding on smaller screens
+  
+      .list-title {
+        font-size: 1.8em; // Slightly smaller title
+        margin-bottom: 20px;
+      }
+  
+      .cards-wrapper {
+        gap: 20px; // Slightly reduce gap
+        // Adjust minmax if needed for smaller screens, but auto-fit often handles it well.
+        // e.g., grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+    }
   }
-
+  
   @media (max-width: 480px) {
-    padding: ($base-padding * 0.5) ($base-padding * 0.75);
-  }
-}
-
-.program-section {
-  margin-bottom: ($base-margin * 2.5); // More space between "Your" and "Recommended"
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.section-header {
-  margin-bottom: $base-margin * 1.25;
-}
-
-.section-title {
-  font-size: 2rem; // Material-like heading size
-  font-weight: 600;
-  color: $text-color-dark;
-  margin-bottom: $base-margin * 0.5; // Space before the divider
-  padding-left: 0; // Removed old padding-left and border
-  border-left: none; // Removed old border
-  // Optionally, use Angular Material Typography classes if set up
-  // @include mat-typography-level-to-styles($config, headline-5);
-}
-
-// --- Cards Grid ---
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); // Slightly larger min size for cards
-  gap: $base-padding * 1.5; // Gap between cards
-
-  @media (max-width: 992px) { // For tablets
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: $base-padding;
-  }
-
-  @media (max-width: 480px) { // For small mobile
-    grid-template-columns: 1fr; // Single column
-    gap: $base-padding * 0.75;
-  }
-}
-
-// --- Individual Program Card ---
-.program-item-card {
-  background-color: $card-background;
-  border-radius: $border-radius;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  overflow: hidden; // Ensures content like ripples stay within card bounds
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); // More pronounced shadow on hover
-  }
-
-  // Assuming app-user-pe has its own internal padding for content.
-  // If not, you might need to style its container or app-user-pe itself.
-  // For example, if app-user-pe directly contains text, you might add:
-  // app-user-pe {
-  //   display: block;
-  //   padding: 16px; // Standard Material card content padding
-  // }
-}
-
-.program-card-actions {
-  padding: 8px 16px !important; // Override default mat-card-actions padding if needed
-  border-top: 1px solid #eee; // Separator line for actions
-  background-color: lighten($background-color, 2%); // Slightly different bg for actions
-
-  button {
-    margin-left: 8px; // Space between buttons
-  }
-
-  mat-icon { // Ensure icons in buttons are vertically aligned
-    vertical-align: middle;
-  }
-  span { // For text next to icon in button
-    vertical-align: middle;
-    margin-left: 4px;
-  }
-}
-
-// --- Empty State Styling ---
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $base-padding * 2;
-  text-align: center;
-  color: $text-color-light;
-  background-color: $card-background; // Can use card background or a lighter shade
-  border-radius: $border-radius;
-  margin-top: $base-margin;
-  min-height: 200px; // Give it some body
-
-  .empty-state-icon {
-    font-size: 3rem; // Larger icon
-    width: 3rem;
-    height: 3rem;
-    margin-bottom: $base-margin * 0.75;
-    color: $primary-color; // Use primary color for the icon
-    opacity: 0.8;
-  }
-
-  p {
-    margin-bottom: $base-margin * 0.5;
-    font-size: 1.1rem;
-    line-height: 1.6;
-
-    &.empty-state-suggestion {
-        font-size: 0.9rem;
-        color: lighten($text-color-light, 15%);
+    .workout-list-container {
+      padding: 15px 10px;
+  
+      .list-title {
+          font-size: 1.5em;
+      }
+       .cards-wrapper {
+          // On very small screens, ensure it definitely goes to one column if minmax wasn't enough
+          grid-template-columns: 1fr;
+          gap: 15px;
+       }
     }
   }
-}
-
-// --- Fine-tuning Media Queries (if specific overrides needed beyond grid) ---
-@media (max-width: 768px) {
-  .section-title {
-    font-size: 1.8rem;
-  }
-  .program-card-actions {
-    // Make actions stack or adjust for smaller cards if needed
-  }
-}
-
-@media (max-width: 480px) {
-  .section-title {
-    font-size: 1.6rem;
-  }
-  .program-card-actions {
-    padding: 8px !important;
-    button {
-      // Full width buttons on very small screens if desired
-      // width: 100%;
-      // margin-bottom: 8px;
-      // &:last-child { margin-bottom: 0; }
-    }
-  }
-}

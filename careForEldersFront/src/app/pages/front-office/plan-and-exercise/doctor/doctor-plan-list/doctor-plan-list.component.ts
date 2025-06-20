@@ -31,7 +31,6 @@ export interface ProgramData {
   numberOfExercises: number;
   numberOfPatients: number;
   totalDuration: number; // Assuming this is in minutes
-  
 }
 
 @Component({
@@ -42,7 +41,6 @@ export interface ProgramData {
   providers: [DatePipe, TitleCasePipe] // Provide pipes if not globally available via CommonModule in all contexts
 })
 export class DoctorPlanListComponent implements AfterViewInit {
-  userId!: string;
   displayedColumns: string[] = [
     'name',
     'category',
@@ -74,7 +72,6 @@ export class DoctorPlanListComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.userId = localStorage.getItem('user_id') ?? '';
     this.loadPrograms();
   }
 
@@ -183,38 +180,23 @@ export class DoctorPlanListComponent implements AfterViewInit {
     });
   }
 
-deleteProgram(programId: string): void {
-    if (!this.userId) {
-      console.error('Doctor ID is missing');
-      this.snackBar.open('Unable to delete program: doctor not identified.', 'Close', {
-        duration: 3000,
-        panelClass: ['error-snackbar']
-      });
-      return;
-    }
-
+  deleteProgram(programId: string): void {
+    // Consider using MatConfirmDialog for better UX than native confirm
     if (confirm('Are you sure you want to delete this program? This action cannot be undone.')) {
-      this.isLoading = true;
-      this.programService.deleteProgram(programId, this.userId).subscribe({
+      this.isLoading = true; // Show loading indicator during delete
+      this.programService.deleteProgram(programId).subscribe({
         next: () => {
-          this.snackBar.open('Program deleted successfully', 'Close', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-          this.loadPrograms();
+          this.snackBar.open('Program deleted successfully', 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
+          this.loadPrograms(); // Reload data, which will set isLoading = false
         },
         error: (err) => {
           console.error(err);
-          this.snackBar.open('Error deleting program', 'Close', {
-            duration: 3000,
-            panelClass: ['error-snackbar']
-          });
+          this.snackBar.open('Error deleting program', 'Close', { duration: 3000, panelClass: ['error-snackbar'] });
           this.isLoading = false;
         }
       });
     }
   }
-
 
   createNewProgram(): void {
     // This would typically open the DoctorEditPlanComponent with no programId,

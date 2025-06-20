@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserCompComponent } from './user-comp.component';
+import { AbonnementAdminComponent } from './abonnement-admin.component';
 
-describe('UserCompComponent', () => {
-  let component: UserCompComponent;
-  let fixture: ComponentFixture<UserCompComponent>;
+describe('AbonnementAdminComponent', () => {
+  let component: AbonnementAdminComponent;
+  let fixture: ComponentFixture<AbonnementAdminComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserCompComponent]
+      imports: [AbonnementAdminComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(UserCompComponent);
+    fixture = TestBed.createComponent(AbonnementAdminComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

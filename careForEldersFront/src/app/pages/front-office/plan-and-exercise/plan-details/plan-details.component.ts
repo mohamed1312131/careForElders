@@ -21,8 +21,6 @@ export class PlanDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("OK");
-    
     this.patientId = localStorage.getItem('user_id')!;
     const programId = this.route.snapshot.paramMap.get('programId')!;
 

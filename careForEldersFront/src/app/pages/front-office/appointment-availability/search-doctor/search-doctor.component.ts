@@ -18,6 +18,7 @@ export class SearchDoctorComponent {
   ngOnInit(): void {
     this.userService.getAllDoctors().subscribe({
       next: (data) => {
+        console.log('data',data);
         this.users = data;
       },
       error: (err) => {

@@ -20,9 +20,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 
 import {MatChipsModule} from '@angular/material/chips';
 import { DayFormComponent } from './doctor/day-form/day-form.component';
-import { UserProgramInfoComponent } from './user-program-info/user-program-info.component';
-import { NgApexchartsModule } from 'ng-apexcharts';
-import { UserCompComponent } from './doctor/user-comp/user-comp.component';
 @NgModule({
   declarations: [
     UserPEComponent,
@@ -35,9 +32,7 @@ import { UserCompComponent } from './doctor/user-comp/user-comp.component';
     ProgramInfoComponent,
     AddExerciseComponent,
     DoctorEditPlanComponent,
-    DayFormComponent,
-    UserProgramInfoComponent,
-    UserCompComponent
+    DayFormComponent
   ],
   imports: [
     CommonModule,
@@ -49,7 +44,6 @@ import { UserCompComponent } from './doctor/user-comp/user-comp.component';
     ReactiveFormsModule,
     MatChipsModule,
     MatDialogModule,
-    NgApexchartsModule
     
   ],
   exports: [

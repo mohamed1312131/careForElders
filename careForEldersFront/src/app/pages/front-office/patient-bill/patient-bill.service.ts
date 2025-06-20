@@ -20,6 +20,8 @@ export class PatientBillService {
   private httpOptions = {
     headers: new HttpHeaders({
       "Content-Type": "application/json",
+      // Add any auth headers if needed
+      // 'Authorization': 'Bearer ' + localStorage.getItem('token')
     }),
   }
 
@@ -82,15 +84,19 @@ export class PatientBillService {
       totalAmount: bill.totalAmount,
       paidAmount: bill.paidAmount || 0,
       balanceAmount: bill.balanceAmount || bill.totalAmount,
+      // Use status directly instead of paymentStatus to match backend field name
       status: bill.status || bill.paymentStatus,
       serviceType: bill.serviceType || "DOCTOR_CARE", // Ensure service type is included
       items: bill.items.map((item: any) => ({
-        id: item.id,
+        id: item.id, // Include ID for existing items
         serviceType: item.serviceType || bill.serviceType || "DOCTOR_CARE",
         description: item.description,
+        //serviceCode: item.serviceCode || this.generateServiceCode(item.description),
+        //category: item.category || this.getCategoryForServiceType(item.serviceType || bill.serviceType),
         quantity: Number(item.quantity),
         unitPrice: Number(item.unitPrice),
         unit: item.unit || "Session",
+        //serviceDate: this.item.serviceDate,
       })),
       notes: bill.notes || "",
     }
@@ -122,6 +128,7 @@ export class PatientBillService {
       totalAmount: bill.totalAmount,
       paidAmount: bill.paidAmount || 0,
       balanceAmount: bill.balanceAmount || bill.totalAmount,
+      // Use status directly instead of paymentStatus to match backend field name
       status: bill.status || bill.paymentStatus,
       serviceType: bill.serviceType || "DOCTOR_CARE", // Ensure service type is included
       items: bill.items.map((item: any) => ({
