@@ -3,14 +3,15 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavigationEnd, Router, Event as RouterEvent } from '@angular/router';
 import { filter, takeUntil } from 'rxjs/operators'; // For RxJS operators
 import { Subject } from 'rxjs'; // For managing subscriptions
-import { UserService } from 'src/app/services/user.service'; // Adjust path as needed
+import { UserService } from 'src/app/services/user.service';
+import {AuthService} from "../../../../../services/auth.service"; // Adjust path as needed
 
 @Component({
   selector: 'app-user-layout',
   templateUrl: './user-layout.component.html',
   styleUrl: './user-layout.component.scss'
 })
-export class UserLayoutComponent implements OnInit {
+export class UserLayoutComponent implements OnInit, OnDestroy {
   isPlanMenuOpen = false;
   isPMedicalRecordMenuOpen = false;
   inNutritionmenu = false;
@@ -18,6 +19,8 @@ export class UserLayoutComponent implements OnInit {
   isParamedicalMenuOpen = false;
   inParamedicalMenu = false;
   isDealsMenuOpen = false;
+  isUserMenuOpen = false;
+  inUserMenu = false;
   currentTitle = 'Pipeline';
   user: any = null;
   breadcrumbs: Array<{ label: string, url: string }> = [];
@@ -29,7 +32,9 @@ export class UserLayoutComponent implements OnInit {
 
   constructor(
     public router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService,
+
   ) {}
 
   ngOnInit(): void {
@@ -60,8 +65,8 @@ export class UserLayoutComponent implements OnInit {
     }
 
 
-}
-togglePlanMenu(): void {
+  }
+  togglePlanMenu(): void {
     this.isPlanMenuOpen = !this.isPlanMenuOpen;
   }
 
@@ -75,26 +80,30 @@ togglePlanMenu(): void {
     this.inMedicalRecordmenu = !this.inMedicalRecordmenu;
   }
 
+  toggleUserMenu() :void {
+    this.inUserMenu = !this.inUserMenu;
+  }
+
   getUserInfo(): void {
     // Get user ID directly from localStorage
     const userId = localStorage.getItem('user_id');
 
     if (!userId) {
-        console.warn('User ID not found in local storage.');
-        return;
+      console.warn('User ID not found in local storage.');
+      return;
     }
 
     this.userService.getUserById(userId).subscribe({
-        next: (data) => {
-            this.user = data;
-            console.log('✅ User Info:', this.user);
-            this.isDoctor = this.user.role === 'DOCTOR';
-        },
-        error: (err) => {
-            console.error('❌ Failed to retrieve user info', err);
-        }
+      next: (data) => {
+        this.user = data;
+        console.log('✅ User Info:', this.user);
+        this.isDoctor = this.user.role === 'DOCTOR';
+      },
+      error: (err) => {
+        console.error('❌ Failed to retrieve user info', err);
+      }
     });
-}
+  }
 
   toggleDealsMenu(): void {
     this.isDealsMenuOpen = !this.isDealsMenuOpen;
@@ -176,5 +185,14 @@ togglePlanMenu(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+  isDoctor2(): boolean {
+    return this.authService.getCurrentUserRole() === 'DOCTOR';
+  }
+
+  isAdministrator(): boolean {
+    console.log(this.authService.getCurrentUserRole());
+    return this.authService.getCurrentUserRole() === 'ADMINISTRATOR';
+  }
+
 
 }
