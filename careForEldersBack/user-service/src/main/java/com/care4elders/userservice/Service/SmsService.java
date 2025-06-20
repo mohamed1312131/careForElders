@@ -1,7 +1,8 @@
 package com.care4elders.userservice.Service;
 
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
+//import com.twilio.rest.api.v2010.account.Message;
+//import com.twilio.type.PhoneNumber;
+import org.apache.logging.log4j.message.Message;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,7 @@ public class SmsService {
 
     @Value("${twilio.phone_number}")
     private String from;
-
+/*
     public void sendSms(String to, String message) {
         Message.creator(
                 new PhoneNumber(to),
@@ -18,6 +19,6 @@ public class SmsService {
                 message
         ).create();
     }
-
+*/
 
 }

@@ -94,13 +94,10 @@
               </h3>
               <div *ngIf="assignedPatients.length > 0; else noAssignedPatients" class="assigned-patients-chips">
                 <mat-chip-listbox aria-label="Assigned patients">
-                  <mat-chip *ngFor="let patient of assignedPatients" selected="true" [color]="'primary'" class="assigned-chip">
-  <mat-icon matChipAvatar>person</mat-icon>
-  {{ patient.name || patient.id }}
-  <button mat-icon-button matTooltip="Unassign" (click)="onUnassignPatient(patient.patientId); $event.stopPropagation();" class="unassign-icon">
-    <mat-icon color="warn">cancel</mat-icon>
-  </button>
-</mat-chip>
+                  <mat-chip *ngFor="let patient of assignedPatients" selected="true" [color]="'primary'">
+                    <mat-icon matChipAvatar>person</mat-icon>
+                    {{ patient.name || patient.id }}
+                    </mat-chip>
                 </mat-chip-listbox>
               </div>
               <ng-template #noAssignedPatients>
@@ -125,13 +122,10 @@
                         (+{{selectedPatientIdsForAssignment.length - 1}} {{selectedPatientIdsForAssignment.length === 2 ? 'other' : 'others'}})
                       </span>
                     </mat-select-trigger>
-                    <mat-option *ngFor="let patient of allAssignablePatients"
-            [value]="patient.id"
-            [disabled]="isPatientAlreadyAssigned(patient.id)">
-  <mat-icon class="option-icon">person_outline</mat-icon>
-  {{ patient.name || patient.id }} ({{ patient.email || 'No email' }})
-  <span *ngIf="isPatientAlreadyAssigned(patient.id)" class="assigned-label">[Already Assigned]</span>
-</mat-option>
+                    <mat-option *ngFor="let patient of getUnassignedPatients()" [value]="patient.id">
+                      <mat-icon class="option-icon">person_outline</mat-icon>
+                      {{ patient.name || patient.id }} ({{ patient.email || 'No email' }})
+                    </mat-option>
                   </mat-select>
                 </mat-form-field>
                 <button mat-stroked-button color="accent"

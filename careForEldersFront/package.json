@@ -25,8 +25,13 @@
     "angular-calendar": "^0.31.1",
     "angular-tabler-icons": "^3.1.0",
     "apexcharts": "^3.49.0",
+
     "date-fns": "^4.1.0",
     "leaflet": "^1.9.4",
+
+    "chart.js": "^4.4.9",
+    "date-fns": "^4.1.0",
+ ebe25a6 (change)
     "ng-apexcharts": "1.10.0",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.1",

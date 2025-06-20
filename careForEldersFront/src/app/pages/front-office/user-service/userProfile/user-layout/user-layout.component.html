@@ -21,6 +21,7 @@
         <li>
           <a (click)="toggleNutritionMenu()" [ngClass]="{ active: isPlanMenuOpen }">Nutrition</a>
           <ul *ngIf="inNutritionmenu">
+
             <li><a routerLink="/user/userProfile/nutrition/admin-dashboard" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
             <li><a routerLink="/user/userProfile/nutrition/list" routerLinkActive="active">Nutrition Plans List</a></li>
             <li><a routerLink="/user/userProfile/nutrition/plan-generator" routerLinkActive="active">Nutrition Plan Generator</a></li>
@@ -34,6 +35,10 @@
             <li><a routerLink="/user/userProfile/paramedical-care/professional-list" routerLinkActive="active">Professional List</a></li>
             <li><a routerLink="/user/userProfile/paramedical-care/appointment" routerLinkActive="active">Appointments</a></li>
             <li><a routerLink="/user/userProfile/paramedical-care/paramedical-map" routerLinkActive="active">Paramedical Map</a></li>
+
+            <li><a  routerLink="/nutritionplanlist" routerLinkActive="active">Nutrition Admin Dashboard</a></li>
+            <li><a  routerLink="/nutritionplainadmin" routerLinkActive="active">Nutrition PLans List</a></li>
+ ebe25a6 (change)
           </ul>
         </li>
       </ul>
@@ -41,7 +46,7 @@
         <li>
           <a (click)="toggleMedicalRecordMenu()" [ngClass]="{ active: isPMedicalRecordMenuOpen }">Medical Record</a>
           <ul *ngIf="inMedicalRecordmenu">
-            <li *ngIf="!isDoctor"><a  routerLink="/user/userProfile/medicalRecord/medicalrecordlist" routerLinkActive="active">Medical Records List </a></li>
+            <li><a  routerLink="/user/userProfile/medicalRecord/medicalrecordlist" routerLinkActive="active">Medical Records List </a></li>
             <li>
               <a [routerLink]="['/user/userProfile/medicalRecord/medicalrecord', userId]" routerLinkActive="active">
                 Medical Record
@@ -53,22 +58,15 @@
       <li><a routerLink="AI" routerLinkActive="active">AI</a></li>
       <li><a routerLink="search" routerLinkActive="active">Look For Doctor</a></li>
       <li><a routerLink="Reservation" routerLinkActive="active">My reservations</a></li>
-      <li><a routerLink="mySchedule" routerLinkActive="active">My Schedule</a></li>
+      <li><a *ngIf="isDoctor" routerLink="mySchedule" routerLinkActive="active">My Schedule</a></li>
       <li><a routerLink="bill" routerLinkActive="active">Billing</a></li>
       <li><a routerLink="/chat/test/investors" routerLinkActive="active">Investors</a></li>
+      <li><a routerLink="userServices" routerLinkActive="active">Services</a></li>
+      <li><a routerLink="UserRequests" routerLinkActive="active">UserRequests</a></li>
+            <li><a routerLink="SoignantRequests" routerLinkActive="active">SoignantRequests</a></li>
       <li><a routerLink="Abonnement" routerLinkActive="active">Abonnement</a></li>
-
-      <li><a routerLink="blog" routerLinkActive="active">Check Post</a></li>
-      <ul>
-        <li>
-          <a (click)="toggleUserMenu()" [ngClass]="{ active: isUserMenuOpen }">User Service</a>
-          <ul *ngIf="inUserMenu">
-            <li ><a [routerLink]="['/user/userProfile/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
-            <li ><a [routerLink]="['/user/userProfile/users']" routerLinkActive="active">Users Dashboard</a></li>
-          </ul>
-        </li>
-      </ul>
-
+      <li><a routerLink="post" routerLinkActive="active">Community Forum</a></li>
+      <li><a [routerLink]="['/userinfo', userId]" routerLinkActive="active">My Profile</a></li>
       <li><a (click)="logout()">Logout</a></li>
     </ul>
   </nav>

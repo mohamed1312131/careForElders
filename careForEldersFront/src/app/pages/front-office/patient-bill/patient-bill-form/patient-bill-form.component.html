@@ -1,16 +1,14 @@
-<div class="patient-bill-form-container" [ngClass]="{'view-mode': isViewMode}">
+<div class="patient-bill-form-container">
   <div class="form-header">
     <div class="title-section">
       <button mat-icon-button (click)="goBack()" class="back-button">
         <mat-icon>arrow_back</mat-icon>
       </button>
-      <h1>{{ isViewMode ? 'View' : (isEditMode ? 'Edit' : 'Create') }} Patient Bill</h1>
+      <h1>{{ isEditMode ? 'Edit' : 'Create' }} Patient Bill</h1>
     </div>
     <div class="actions">
-      <button mat-button (click)="goBack()">{{ isViewMode ? 'Back' : 'Cancel' }}</button>
-      <!-- Only show save button if not in view mode -->
+      <button mat-button (click)="goBack()">Cancel</button>
       <button 
-        *ngIf="!isViewMode"
         mat-raised-button 
         color="primary" 
         [disabled]="isLoading" 
@@ -131,14 +129,7 @@
       <div class="form-section bill-items-section">
         <div class="section-header">
           <h2>Bill Items</h2>
-          <!-- Only show Add Item button in edit mode or create mode -->
-          <button 
-            *ngIf="!isViewMode" 
-            type="button" 
-            mat-raised-button 
-            color="primary" 
-            (click)="addItem()" 
-            class="add-item-button">
+          <button type="button" mat-raised-button color="primary" (click)="addItem()" class="add-item-button">
             <mat-icon>add</mat-icon>
             Add Item
           </button>
@@ -150,7 +141,7 @@
             <div class="item-quantity">Quantity</div>
             <div class="item-unit-price">Unit Price</div>
             <div class="item-amount">Amount</div>
-            <div class="item-actions" *ngIf="!isViewMode">Actions</div>
+            <div class="item-actions">Actions</div>
           </div>
 
           <div formArrayName="items" class="bill-items-list">
@@ -190,18 +181,9 @@
                 <input matInput formControlName="amount" readonly>
               </mat-form-field>
 
-              <!-- Only show delete button in edit mode or create mode -->
-              <button 
-                *ngIf="!isViewMode"
-                type="button" 
-                mat-icon-button 
-                color="warn" 
-                (click)="removeItem(i)" 
-                class="item-actions">
+              <button type="button" mat-icon-button color="warn" (click)="removeItem(i)" class="item-actions">
                 <mat-icon>delete</mat-icon>
               </button>
-              <!-- Empty space for alignment in view mode -->
-              <div *ngIf="isViewMode" class="item-actions"></div>
             </div>
           </div>
         </div>
@@ -216,8 +198,7 @@
         </mat-form-field>
       </div>
       
-      <!-- Only show form actions if not in view mode -->
-      <div class="form-actions" *ngIf="!isViewMode">
+      <div class="form-actions">
         <button mat-button type="button" (click)="goBack()">Cancel</button>
         <button 
           mat-raised-button 
@@ -226,14 +207,6 @@
           [disabled]="isLoading">
           <mat-icon>save</mat-icon>
           <span>{{ isEditMode ? 'Update' : 'Create' }} Bill</span>
-        </button>
-      </div>
-      
-      <!-- View mode only has a back button -->
-      <div class="form-actions view-actions" *ngIf="isViewMode">
-        <button mat-raised-button color="primary" type="button" (click)="goBack()">
-          <mat-icon>arrow_back</mat-icon>
-          <span>Back to Bills</span>
         </button>
       </div>
     </form>
