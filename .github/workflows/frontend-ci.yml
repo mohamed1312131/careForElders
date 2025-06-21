@@ -1,4 +1,4 @@
-name: Fullstack CI/CD with Nexus
+name: Fullstack CI/CD with Nexus & SonarQube
 
 on:
   push:
@@ -7,12 +7,26 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Must be able to access local Nexus
+    runs-on: self-hosted  # Must be able to access local Nexus/SonarQube
 
     steps:
       # ========== CHECKOUT ==========
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      # ========== SONARQUBE ANALYSIS ==========
+      - name: Run SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: "http://10.0.2.15:9000"
+        run: |
+          docker run --network=host \
+            -e SONAR_HOST_URL="$SONAR_HOST_URL" \
+            -e SONAR_TOKEN="$SONAR_TOKEN" \
+            -v "$(pwd):/usr/src" \
+            sonarsource/sonar-scanner-cli:latest \
+            -Dsonar.projectKey=careForElders \
+            -Dsonar.java.binaries=./careForEldersBack/target/classes
 
       # ========== FRONTEND ==========
       - name: Setup Node.js
@@ -43,13 +57,13 @@ jobs:
             <servers>
               <server>
                 <id>nexus-releases</id>
-                <username>admin</username>
-                <password>admin</password>
+                <username>${{ secrets.NEXUS_USERNAME }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
               </server>
               <server>
                 <id>nexus-snapshots</id>
-                <username>admin</username>
-                <password>admin</password>
+                <username>${{ secrets.NEXUS_USERNAME }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
               </server>
             </servers>
           </settings>
@@ -59,7 +73,8 @@ jobs:
       - name: Build and Deploy Java Services to Nexus
         working-directory: careForEldersBack
         run: |
-          mvn clean deploy -DskipTests -pl user-service,planAndExercise,service-registry,api-gateway -am \
+          mvn clean package -DskipTests  # Required for SonarQube analysis
+          mvn deploy -DskipTests -pl user-service,planAndExercise,service-registry,api-gateway -am \
           -DaltReleaseDeploymentRepository=nexus-releases::default::http://10.0.2.15:8090/repository/maven-releases/ \
           -DaltSnapshotDeploymentRepository=nexus-snapshots::default::http://10.0.2.15:8090/repository/maven-snapshots/
 
