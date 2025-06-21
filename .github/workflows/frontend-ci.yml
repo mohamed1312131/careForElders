@@ -1,4 +1,4 @@
-name: Nexus Deployment Test
+name: Fullstack CI/CD with Nexus
 
 on:
   push:
@@ -6,22 +6,35 @@ on:
       - '**'
 
 jobs:
-  test-nexus:
-    runs-on: self-hosted  # Required for local Nexus access
+  build-and-deploy:
+    runs-on: self-hosted  # Must be able to access local Nexus
 
     steps:
-      # --- Checkout ---
+      # ========== CHECKOUT ==========
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # --- Java Setup ---
+      # ========== FRONTEND ==========
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Frontend Dependencies
+        working-directory: careForEldersFront
+        run: npm ci
+
+      - name: Build Angular App
+        working-directory: careForEldersFront
+        run: npm run build -- --configuration=production --project=testApp
+
+      # ========== BACKEND MAVEN SETUP ==========
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # --- Maven Configuration ---
       - name: Configure Maven for Nexus
         run: |
           mkdir -p ~/.m2
@@ -42,20 +55,26 @@ jobs:
           </settings>
           EOF
 
-      # --- Nexus Deployment ---
-      - name: Deploy to Nexus
+      # ========== BUILD + DEPLOY TO MAVEN NEXUS ==========
+      - name: Build and Deploy Java Services to Nexus
         working-directory: careForEldersBack
         run: |
-          mvn clean deploy -DskipTests -pl user-service \
+          mvn clean deploy -DskipTests -pl user-service,planAndExercise,service-registry,api-gateway -am \
           -DaltReleaseDeploymentRepository=nexus-releases::default::http://10.0.2.15:8090/repository/maven-releases/ \
           -DaltSnapshotDeploymentRepository=nexus-snapshots::default::http://10.0.2.15:8090/repository/maven-snapshots/
 
-      # --- Docker Test ---
-      - name: Test Docker Push
+      # ========== DOCKER NEXUS ==========
+      - name: Login to Nexus Docker Registry
         run: |
-          docker login http://10.0.2.15:8090 \
-            -u admin \
-            -p your_admin_password
-          
-          docker build -t 10.0.2.15:8090/user-service-test ./careForEldersBack/user-service
-          docker push 10.0.2.15:8090/user-service-test
+          echo "${{ secrets.NEXUS_PASSWORD }}" | docker login http://10.0.2.15:8090 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
+
+      - name: Build and Push Docker Images to Nexus
+        run: |
+          services=("user-service" "planAndExercise" "api-gateway" "service-registry")
+          for service in "${services[@]}"; do
+            docker build -t 10.0.2.15:8090/$service ./careForEldersBack/$service
+            docker push 10.0.2.15:8090/$service
+          done
+
+          docker build -t 10.0.2.15:8090/carefrontend ./careForEldersFront
+          docker push 10.0.2.15:8090/carefrontend
