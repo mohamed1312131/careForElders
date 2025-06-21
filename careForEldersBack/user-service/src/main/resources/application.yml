@@ -4,14 +4,13 @@ spring:
 
   data:
     mongodb:
-      # Docker URI
-      uri: mongodb://mongodb:27017/userdb
+      uri: mongodb://mongodb:27017/userdb  # Use this when running in Docker
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME}         # defined in Docker env
-    password: ${MAIL_PASSWORD}         # use env for security
+    username: aziz88303@gmail.com
+    password: raaufypwkwoqerca  # App password
     properties:
       mail:
         smtp:
@@ -28,28 +27,33 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://service-registry:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
 
 twilio:
-  account_sid: ${TWILIO_ACCOUNT_SID}
-  auth_token: ${TWILIO_AUTH_TOKEN}
-  phone_number: ${TWILIO_PHONE_NUMBER}
+  account_sid: ACcd31372ca9e785d6a1d9015aa7bab5b9
+  auth_token: 9101629a5e87ecb0e817f1b365c851a3
+  phone_number: "+15674065065"
 
 security:
   oauth2:
     client:
       registration:
         google:
-          client-id: ${GOOGLE_CLIENT_ID}
-          client-secret: ${GOOGLE_CLIENT_SECRET}
-          scope: profile, email
+          client-id: 514678328805-t37tceg3kfq3q5vjr56gnv689dn74rmm.apps.googleusercontent.com
+          client-secret: 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
+          scope:
+            - profile
+            - email
           redirect-uri: "{baseUrl}/oauth2/callback/google"
+
         facebook:
-          client-id: ${FACEBOOK_CLIENT_ID}
-          client-secret: ${FACEBOOK_CLIENT_SECRET}
-          scope: public_profile,email
+          client-id: YOUR_FB_CLIENT_ID
+          client-secret: YOUR_FB_CLIENT_SECRET
+          scope:
+            - public_profile
+            - email
           redirect-uri: "{baseUrl}/oauth2/callback/facebook"
 
       provider:

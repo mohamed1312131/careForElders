@@ -4,15 +4,19 @@ on:
   push:
     branches:
       - '**'
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-  build-and-deploy:
+  build-and-analyze:
     runs-on: ubuntu-latest
 
     steps:
       # --- Checkout code ---
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for SonarCloud
 
       # ========== FRONTEND ==========
       - name: Setup Node.js
@@ -33,10 +37,10 @@ jobs:
 
       # ========== BACKEND ==========
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
+          distribution: 'zulu'
 
       - name: Configure Maven to use Maven Central
         run: |
@@ -53,47 +57,59 @@ jobs:
           </settings>
           EOF
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       - name: Build Backend Services (Maven)
         working-directory: careForEldersBack
         run: mvn clean install -pl user-service,planAndExercise,service-registry,api-gateway -am -DskipTests
 
+      # ========== SONARCLOUD ANALYSIS ==========
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud Scan
+        working-directory: careForEldersBack
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=mohamed1312131_careForElders -Dsonar.organization=mohamed1312131 -Dsonar.host.url=https://sonarcloud.io
+
       # ========== DOCKER LOGIN ==========
+
       - name: Docker Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Docker Login to Nexus
-        run: echo "${{ secrets.NEXUS_PASSWORD }}" | docker login ${{ secrets.NEXUS_URL }}:5000 -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
-
       # ========== PUSH DOCKER IMAGES ==========
+
       ## FRONTEND
       - name: Push Frontend Image to DockerHub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/carefrontend
 
-      ## BACKEND: DockerHub and Nexus
+      ## BACKEND (ONLY DockerHub)
       - name: Build + Push user-service
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service ./careForEldersBack/user-service
           docker push ${{ secrets.DOCKER_USERNAME }}/user-service
-          docker tag ${{ secrets.DOCKER_USERNAME }}/user-service ${{ secrets.NEXUS_URL }}:5000/user-service
-          docker push ${{ secrets.NEXUS_URL }}:5000/user-service
 
       - name: Build + Push planAndExercise
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise ./careForEldersBack/planAndExercise
           docker push ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise
-          docker tag ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise ${{ secrets.NEXUS_URL }}:5000/plan-and-exercise
-          docker push ${{ secrets.NEXUS_URL }}:5000/plan-and-exercise
 
       - name: Build + Push api-gateway
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/api-gateway ./careForEldersBack/api-gateway
           docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway
-          docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway ${{ secrets.NEXUS_URL }}:5000/api-gateway
-          docker push ${{ secrets.NEXUS_URL }}:5000/api-gateway
 
       - name: Build + Push service-registry
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/service-registry ./careForEldersBack/service-registry
           docker push ${{ secrets.DOCKER_USERNAME }}/service-registry
-          docker tag ${{ secrets.DOCKER_USERNAME }}/service-registry ${{ secrets.NEXUS_URL }}:5000/service-registry
-          docker push ${{ secrets.NEXUS_URL }}:5000/service-registry
