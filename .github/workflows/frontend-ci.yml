@@ -20,30 +20,42 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          server-id: nexus
-          server-username: ${{ secrets.NEXUS_USERNAME }}
-          server-password: ${{ secrets.NEXUS_PASSWORD }}
 
-      # --- Maven Verification ---
-      - name: Verify Tools
+      # --- Maven Configuration ---
+      - name: Configure Maven for Nexus
         run: |
-          java -version
-          mvn -v
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>nexus-releases</id>
+                <username>admin</username>
+                <password>admin</password>
+              </server>
+              <server>
+                <id>nexus-snapshots</id>
+                <username>admin</username>
+                <password>admin</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
 
-      # --- Nexus Deployment Test ---
+      # --- Nexus Deployment ---
       - name: Deploy to Nexus
         working-directory: careForEldersBack
         run: |
           mvn clean deploy -DskipTests -pl user-service \
-          -DaltSnapshotDeploymentRepository=nexus-snapshots::default::${{ secrets.NEXUS_URL }}/repository/maven-snapshots/ \
-          -DaltReleaseDeploymentRepository=nexus-releases::default::${{ secrets.NEXUS_URL }}/repository/maven-releases/
+          -DaltReleaseDeploymentRepository=nexus-releases::default::http://10.0.2.15:8090/repository/maven-releases/ \
+          -DaltSnapshotDeploymentRepository=nexus-snapshots::default::http://10.0.2.15:8090/repository/maven-snapshots/
 
       # --- Docker Test ---
       - name: Test Docker Push
         run: |
-          docker login ${{ secrets.NEXUS_URL }} \
-            -u ${{ secrets.NEXUS_USERNAME }} \
-            -p ${{ secrets.NEXUS_PASSWORD }}
+          docker login http://10.0.2.15:8090 \
+            -u admin \
+            -p your_admin_password
           
-          docker build -t ${{ secrets.NEXUS_URL }}/user-service-test ./careForEldersBack/user-service
-          docker push ${{ secrets.NEXUS_URL }}/user-service-test
+          docker build -t 10.0.2.15:8090/user-service-test ./careForEldersBack/user-service
+          docker push 10.0.2.15:8090/user-service-test
