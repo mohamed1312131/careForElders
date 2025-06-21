@@ -1,4 +1,4 @@
-name: Fullstack CI/CD with Nexus
+name: Fast Nexus Test
 
 on:
   push:
@@ -6,30 +6,16 @@ on:
       - '**'
 
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted
+  test-nexus:
+    runs-on: self-hosted  # Required for local Nexus access
 
     steps:
-      # --- Checkout code ---
+      # --- Checkout first ---
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # ========== FRONTEND ==========
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Frontend Dependencies
-        working-directory: careForEldersFront
-        run: npm ci
-
-      - name: Build Angular App
-        working-directory: careForEldersFront
-        run: npm run build -- --configuration=production --project=testApp
-
-      # ========== BACKEND ==========
-      - name: Set up Java
+      # ========== NEXUS TEST (MOVED TO TOP) ==========
+      - name: Setup Java for Nexus
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -38,26 +24,19 @@ jobs:
           server-username: ${{ secrets.NEXUS_USERNAME }}
           server-password: ${{ secrets.NEXUS_PASSWORD }}
 
-      - name: Build and Deploy to Nexus
+      # Install Maven explicitly (fixes "mvn not found")
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
+      - name: Quick Nexus Deploy Test
         working-directory: careForEldersBack
         run: |
-          mvn clean deploy -DskipTests
-          mvn clean install -pl user-service,planAndExercise,service-registry,api-gateway -am -DskipTests
+          mvn -v  # Verify Maven installation
+          mvn clean deploy -DskipTests -pl user-service  # Test with just one module
 
-      # ========== DOCKER IMAGES TO NEXUS ==========
-      - name: Login to Nexus Docker Registry
+      # ========== DOCKER TEST ==========
+      - name: Quick Docker Push Test
         run: |
-          echo "${{ secrets.NEXUS_PASSWORD }}" | docker login ${{ secrets.NEXUS_URL }} -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
-
-      - name: Build and Push Docker Images
-        run: |
-          # Build and push each service
-          services=("user-service" "planAndExercise" "api-gateway" "service-registry")
-          for service in "${services[@]}"; do
-            docker build -t ${{ secrets.NEXUS_URL }}/$service ./careForEldersBack/$service
-            docker push ${{ secrets.NEXUS_URL }}/$service
-          done
-
-          # Frontend image
-          docker build -t ${{ secrets.NEXUS_URL }}/carefrontend ./careForEldersFront
-          docker push ${{ secrets.NEXUS_URL }}/carefrontend
+          docker login ${{ secrets.NEXUS_URL }} -u ${{ secrets.NEXUS_USERNAME }} -p ${{ secrets.NEXUS_PASSWORD }}
+          docker build -t ${{ secrets.NEXUS_URL }}/quick-test ./careForEldersBack/user-service
+          docker push ${{ secrets.NEXUS_URL }}/quick-test
