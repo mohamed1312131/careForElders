@@ -1,4 +1,4 @@
-name: Fast Nexus Test
+name: Nexus Deployment Test
 
 on:
   push:
@@ -10,12 +10,12 @@ jobs:
     runs-on: self-hosted  # Required for local Nexus access
 
     steps:
-      # --- Checkout first ---
+      # --- Checkout ---
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # ========== NEXUS TEST (MOVED TO TOP) ==========
-      - name: Setup Java for Nexus
+      # --- Java Setup ---
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -24,19 +24,26 @@ jobs:
           server-username: ${{ secrets.NEXUS_USERNAME }}
           server-password: ${{ secrets.NEXUS_PASSWORD }}
 
-      # Install Maven explicitly (fixes "mvn not found")
-      - name: Install Maven
-        run: sudo apt-get update && sudo apt-get install -y maven
+      # --- Maven Verification ---
+      - name: Verify Tools
+        run: |
+          java -version
+          mvn -v
 
-      - name: Quick Nexus Deploy Test
+      # --- Nexus Deployment Test ---
+      - name: Deploy to Nexus
         working-directory: careForEldersBack
         run: |
-          mvn -v  # Verify Maven installation
-          mvn clean deploy -DskipTests -pl user-service  # Test with just one module
+          mvn clean deploy -DskipTests -pl user-service \
+          -DaltSnapshotDeploymentRepository=nexus-snapshots::default::${{ secrets.NEXUS_URL }}/repository/maven-snapshots/ \
+          -DaltReleaseDeploymentRepository=nexus-releases::default::${{ secrets.NEXUS_URL }}/repository/maven-releases/
 
-      # ========== DOCKER TEST ==========
-      - name: Quick Docker Push Test
+      # --- Docker Test ---
+      - name: Test Docker Push
         run: |
-          docker login ${{ secrets.NEXUS_URL }} -u ${{ secrets.NEXUS_USERNAME }} -p ${{ secrets.NEXUS_PASSWORD }}
-          docker build -t ${{ secrets.NEXUS_URL }}/quick-test ./careForEldersBack/user-service
-          docker push ${{ secrets.NEXUS_URL }}/quick-test
+          docker login ${{ secrets.NEXUS_URL }} \
+            -u ${{ secrets.NEXUS_USERNAME }} \
+            -p ${{ secrets.NEXUS_PASSWORD }}
+          
+          docker build -t ${{ secrets.NEXUS_URL }}/user-service-test ./careForEldersBack/user-service
+          docker push ${{ secrets.NEXUS_URL }}/user-service-test
