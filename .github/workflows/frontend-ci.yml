@@ -1,22 +1,18 @@
-name: Fullstack CI/CD
+name: Fullstack CI/CD with Nexus
 
 on:
   push:
     branches:
       - '**'
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
-  build-and-analyze:
-    runs-on: ubuntu-latest
+  build-and-deploy:
+    runs-on: self-hosted
 
     steps:
       # --- Checkout code ---
       - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Required for SonarCloud
+        uses: actions/checkout@v3
 
       # ========== FRONTEND ==========
       - name: Setup Node.js
@@ -32,84 +28,36 @@ jobs:
         working-directory: careForEldersFront
         run: npm run build -- --configuration=production --project=testApp
 
-      - name: Docker Build (Frontend)
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/carefrontend ./careForEldersFront
-
       # ========== BACKEND ==========
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
+          distribution: 'temurin'
           java-version: '17'
-          distribution: 'zulu'
+          server-id: nexus
+          server-username: ${{ secrets.NEXUS_USERNAME }}
+          server-password: ${{ secrets.NEXUS_PASSWORD }}
 
-      - name: Configure Maven to use Maven Central
-        run: |
-          mkdir -p ~/.m2
-          cat <<EOF > ~/.m2/settings.xml
-          <settings>
-            <mirrors>
-              <mirror>
-                <id>central</id>
-                <mirrorOf>*</mirrorOf>
-                <url>https://repo.maven.apache.org/maven2/</url>
-              </mirror>
-            </mirrors>
-          </settings>
-          EOF
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
-
-      - name: Build Backend Services (Maven)
+      - name: Build and Deploy to Nexus
         working-directory: careForEldersBack
-        run: mvn clean install -pl user-service,planAndExercise,service-registry,api-gateway -am -DskipTests
-
-      # ========== SONARCLOUD ANALYSIS ==========
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: SonarCloud Scan
-        working-directory: careForEldersBack
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=mohamed1312131_careForElders -Dsonar.organization=mohamed1312131 -Dsonar.host.url=https://sonarcloud.io
-
-      # ========== DOCKER LOGIN ==========
-
-      - name: Docker Login to DockerHub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      # ========== PUSH DOCKER IMAGES ==========
-
-      ## FRONTEND
-      - name: Push Frontend Image to DockerHub
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/carefrontend
-
-      ## BACKEND (ONLY DockerHub)
-      - name: Build + Push user-service
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/user-service ./careForEldersBack/user-service
-          docker push ${{ secrets.DOCKER_USERNAME }}/user-service
+          mvn clean deploy -DskipTests
+          mvn clean install -pl user-service,planAndExercise,service-registry,api-gateway -am -DskipTests
 
-      - name: Build + Push planAndExercise
+      # ========== DOCKER IMAGES TO NEXUS ==========
+      - name: Login to Nexus Docker Registry
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise ./careForEldersBack/planAndExercise
-          docker push ${{ secrets.DOCKER_USERNAME }}/plan-and-exercise
+          echo "${{ secrets.NEXUS_PASSWORD }}" | docker login ${{ secrets.NEXUS_URL }} -u ${{ secrets.NEXUS_USERNAME }} --password-stdin
 
-      - name: Build + Push api-gateway
+      - name: Build and Push Docker Images
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/api-gateway ./careForEldersBack/api-gateway
-          docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway
+          # Build and push each service
+          services=("user-service" "planAndExercise" "api-gateway" "service-registry")
+          for service in "${services[@]}"; do
+            docker build -t ${{ secrets.NEXUS_URL }}/$service ./careForEldersBack/$service
+            docker push ${{ secrets.NEXUS_URL }}/$service
+          done
 
-      - name: Build + Push service-registry
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/service-registry ./careForEldersBack/service-registry
-          docker push ${{ secrets.DOCKER_USERNAME }}/service-registry
+          # Frontend image
+          docker build -t ${{ secrets.NEXUS_URL }}/carefrontend ./careForEldersFront
+          docker push ${{ secrets.NEXUS_URL }}/carefrontend
